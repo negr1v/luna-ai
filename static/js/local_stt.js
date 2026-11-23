@@ -22,6 +22,7 @@ class LocalVoiceRecorder {
       controller.abort();
       source.disconnect();
       track.removeEventListener('ended', trackEnded);
+      try { track.stop(); } catch(e) {}
       if (recorder?.state === 'recording') recorder.stop();
       if (error) this.onerror?.({ error });
       this.onend?.();
@@ -53,8 +54,8 @@ class LocalVoiceRecorder {
         clearInterval(timer);
         if (finished) return;
         const speechDuration = speech ? (lastSound - speechStart) : 0;
-        // 500 ms altı sesleri eleme (gürültü/geçici ses filtresi; manuel durdurmada kullanıcı kararına saygı duyulur)
-        const isEligibleSpeech = speech && (manual || speechDuration >= 500);
+        // Kısa Türkçe onayları (220ms+) kabul et; tek tık/klavye vuruşlarını (<220ms) filtrele
+        const isEligibleSpeech = speech && (manual || speechDuration >= 220);
         if (chunks.length && isEligibleSpeech && !window.isSpeaking) {
           const currentTurn = ++turnSequence;
           try {
@@ -93,6 +94,12 @@ class LocalVoiceRecorder {
             if (typeof window.interruptSpeech === 'function') {
               window.interruptSpeech();
             }
+            wasSpeaking = false;
+            speech = true;
+            speechStart = performance.now();
+            lastSound = speechStart;
+            this.onspeechstart?.();
+            return;
           } else {
             wasSpeaking = true;
             loudFrames = 0;

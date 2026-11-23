@@ -603,3 +603,19 @@ node --test test_voice_composer_ui.cjs test_avatar_speech_ui.cjs
 - Barge-In (Söz Kesme): Asistan konuşurken mikrofondan belirgin kullanıcı sesi geldiğinde `window.interruptSpeech()` tetiklenerek ses oynatımı, token akışı ve TTS anında kesilecek şekilde kurgulandı.
 - Kredi Koruma Protokolü gereğince harici sağlayıcı veya kontrolsüz test çağrısı yapılmadı.
 
+# [PHASE: MANUS STYLE YAN SOHBET (SIDE CHAT)]
+
+- index.html: Üst çubuk eylemleri (.header-actions) içine Manus AI ile birebir eşleşen 💬+ düğmesi (#sideChatToggleBtn) ve bildirim rozeti yerleştirildi.
+- İlk açılış kartı (#sideChatTooltip): "Yan sohbet Yeni", "Luna çalışmayı sürdürürken, yan sohbette sorular sorabilir veya fikirler üzerine konuşabilirsiniz. Ana göreviniz kesintiye uğramaz." metni ve "Anladım" butonu eklendi.
+- Sağdan açılan OLED cam morfik çekmece paneli (#sideChatDrawer): Kompakt transkript, temizleme butonu ve bağımsız giriş formu oluşturuldu.
+- static/js/side_chat.js: İzole `sideChatAbortController` ve bağımsız SSE streaming döngüsü eklendi; ana görevi, transkripti veya ses motorunu kesintiye uğratmadan paralel fikir danışma ve soru sorma sağlandı. Konuşmalar `localStorage`'da kalıcı tutuldu.
+
+# [PHASE: STAGE DESK RESTORATION AND SIDEBAR CONVERSATION FIX]
+
+- index.html: Karakterin altında havada asılı duran yapay kahverengi masa tahtası (.orb-box::after) tamamen kaldırıldı (display: none !important).
+- Alt çubuğu (callbar) saran kaba dış gri kart kutusu ve kenarlık kaldırıldı; Study With Mommy referansındaki gibi mikrofon, ayarlar, mesaj hapı ve kapatma düğmelerinin masanın üzerinde bağımsız şeffaf cam morfik öğeler olarak yüzmesi sağlandı.
+- Sol kenar çubuğundaki #sidebarConversationList'in display:grid esnemesi (tek bir sohbet kartını devasa boyuta uzatan hata) display:flex column ve 38px sabit yükseklik ile düzeltildi. Tüm sohbetler her zaman eşit boyutta kilitlendi.
+- Kenar çubuğundaki bir sohbete tıklandığında hem transkriptin yüklenmesi hem de görünümün sohbet moduna geçip giriş kutusuna odaklanması sağlandı.
+
+
+

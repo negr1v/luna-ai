@@ -2873,14 +2873,15 @@
     background: transparent !important; padding: 8px 12px 6px; backdrop-filter: none;
   }
   #viewCockpit .chat-panel:has(.starter-message) .openluna-prompt-container {
-    border-radius: 14px; border: 1px solid var(--border); background: var(--card);
+    border-radius: 0; border: 0 !important; background: transparent !important; box-shadow: none !important;
   }
   #viewCockpit .chat-panel:has(.starter-message) .openluna-prompt-container > div:first-child {
-    border-top: 0;
+    border: 0 !important; background: transparent !important; box-shadow: none !important;
   }
   #viewCockpit .openluna-prompt-container:focus-within { outline: 0; }
   #viewCockpit .composer-row { display: flex; gap: 8px; align-items: center; }
-  #viewCockpit .composer-row:focus-within { outline: 1px solid var(--cyan); outline-offset: 2px; border-radius: 10px; }
+  #viewCockpit:not(.chat-active) #exitChatToStageBtn,
+  #viewCockpit:not(.chat-active) #studioCollapseBtn { display: none !important; }
   #viewCockpit #textInput { color: var(--txt); padding: 4px 7px; }
   #viewCockpit #textInput::placeholder { color: var(--dim); }
   #viewCockpit .composer-context { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -4061,16 +4062,7 @@
     cursor: default;
   }
   #viewCockpit:not(.chat-active) .center-stage .orb-box::after {
-    content: "";
-    position: absolute;
-    pointer-events: none;
-    inset: calc(100% - 1px) 3% auto;
-    height: 26px;
-    border-radius: 38% 38% 9px 9px / 18% 18% 9px 9px;
-    background:
-      repeating-linear-gradient(2deg, transparent 0 4px, #23151355 5px, transparent 7px 11px),
-      linear-gradient(180deg, #b28764 0%, #674534 43%, #302124 46%, #24191e 100%);
-    box-shadow: 0 8px 20px #110b14a0;
+    display: none !important;
   }
   #viewCockpit:not(.chat-active) .center-stage .orb-box > #animeAvatarBox {
     display: none !important;
@@ -4086,9 +4078,10 @@
     animation: studioBreath 6s ease-in-out infinite;
   }
   #viewCockpit:not(.chat-active) .center-stage .openluna-prompt-container > div:first-child {
-    background: #191823 !important;
-    border: 1px solid #766070 !important;
-    border-radius: 18px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
   #viewCockpit:not(.chat-active) .center-stage :is(.openluna-welcome-deck p, .starter-message) {
     color: #e3dbe5 !important;
@@ -4217,6 +4210,310 @@
   #voiceHeardText b { font-weight: 500; }
 
   .bubble-action-status { color: var(--dim); font-size: 12px; overflow-wrap: anywhere; }
+
+  /* =================================================================
+     LUNA AI — MANUS STYLE YAN SOHBET (SIDE CHAT)
+     ================================================================= */
+  .side-chat-trigger-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .side-chat-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .side-chat-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #fff;
+  }
+  .side-chat-btn[aria-expanded="true"] {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+    color: #38bdf8;
+  }
+  .side-chat-badge-dot {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0284c7;
+    box-shadow: 0 0 6px #38bdf8;
+    animation: sideChatPulse 2s infinite ease-in-out;
+  }
+  @keyframes sideChatPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+
+  /* Popover Tooltip (Manus Style) */
+  .side-chat-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: #17171c;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
+    z-index: 10005;
+    animation: topbar-appear 150ms ease-out both;
+  }
+  .side-chat-popover::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 14px;
+    width: 10px;
+    height: 10px;
+    background: #17171c;
+    border-left: 1px solid rgba(255, 255, 255, 0.14);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    transform: rotate(45deg);
+  }
+  .side-chat-popover-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #fff;
+  }
+  .side-chat-tag-new {
+    font-size: 10px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 1px 6px;
+    border-radius: 5px;
+  }
+  .side-chat-popover-desc {
+    margin: 0 0 12px 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #94a3b8;
+  }
+  .side-chat-popover-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .side-chat-confirm-btn {
+    background: #ffffff;
+    color: #0f172a;
+    border: none;
+    border-radius: 7px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .side-chat-confirm-btn:hover {
+    background: #e2e8f0;
+  }
+
+  /* Slide-Over Drawer (OLED Glassmorphism) */
+  .side-chat-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 380px;
+    max-width: 90vw;
+    background: rgba(14, 15, 20, 0.94);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.8);
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .side-chat-drawer.open {
+    transform: translateX(0);
+  }
+  .side-chat-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .side-chat-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .side-chat-icon-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .side-chat-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+  .side-chat-sub {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+  }
+  .side-chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .side-chat-action-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .side-chat-action-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+  .side-chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .side-chat-starter {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 14px;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .side-chat-starter p {
+    margin: 0 0 6px 0;
+  }
+  .side-chat-starter p:last-child {
+    margin: 0;
+  }
+  .side-chat-msg {
+    display: flex;
+    width: 100%;
+  }
+  .side-chat-msg.user {
+    justify-content: flex-end;
+  }
+  .side-chat-msg.assistant {
+    justify-content: flex-start;
+  }
+  .side-chat-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .side-chat-msg.user .side-chat-bubble {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    color: #f1f5f9;
+    border-radius: 14px 14px 2px 14px;
+  }
+  .side-chat-msg.assistant .side-chat-bubble {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    border-radius: 14px 14px 14px 2px;
+  }
+  .side-chat-bubble.streaming::after {
+    content: '▋';
+    display: inline-block;
+    color: #38bdf8;
+    animation: sideChatBlink 0.8s infinite;
+  }
+  @keyframes sideChatBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  .side-chat-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .side-chat-input-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    padding: 4px 6px 4px 12px;
+    transition: border-color 0.2s ease;
+  }
+  .side-chat-input-form:focus-within {
+    border-color: #38bdf8;
+  }
+  .side-chat-input-form input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #f8fafc;
+    font-size: 13px;
+  }
+  .side-chat-input-form input::placeholder {
+    color: #64748b;
+  }
+  .side-chat-input-form button {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: #38bdf8;
+    color: #000;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .side-chat-input-form button:hover {
+    opacity: 0.9;
+  }
 </style>
 </head>
 <body>
@@ -4268,6 +4565,32 @@
     </button>
 
     <button id="headerFocusRoomBtn" class="btn-sm topbar-control" type="button" aria-haspopup="dialog" aria-controls="focusRoom">Odak</button>
+
+    <!-- Manus Style Yan Sohbet (Side Chat) Button & Popover -->
+    <div class="side-chat-trigger-wrap">
+      <button class="btn-sm topbar-control side-chat-btn" id="sideChatToggleBtn" type="button" aria-label="Yan sohbet" title="Yan sohbet (Paralel soru &amp; fikir)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          <line x1="12" y1="8" x2="12" y2="14"></line>
+          <line x1="9" y1="11" x2="15" y2="11"></line>
+        </svg>
+        <span class="side-chat-badge-dot"></span>
+      </button>
+
+      <!-- Manus Popover Card -->
+      <div id="sideChatTooltip" class="side-chat-popover" role="dialog" aria-modal="false" style="display:none;">
+        <div class="side-chat-popover-header">
+          <strong>Yan sohbet</strong>
+          <span class="side-chat-tag-new">Yeni</span>
+        </div>
+        <p class="side-chat-popover-desc">
+          Luna çalışmayı sürdürürken, yan sohbette sorular sorabilir veya fikirler üzerine konuşabilirsiniz. Ana göreviniz kesintiye uğramaz.
+        </p>
+        <div class="side-chat-popover-actions">
+          <button id="sideChatTooltipDismissBtn" class="side-chat-confirm-btn" type="button">Anladım</button>
+        </div>
+      </div>
+    </div>
     <details class="dashboard-tools">
       <summary class="btn-sm topbar-control">Araçlar</summary>
       <div>
@@ -4404,7 +4727,7 @@
       <input type="search" id="chatSearchInput" aria-label="Sohbetlerde ara" placeholder="Sohbetlerde ara…" autocomplete="off" style="width:100%; padding:6px 10px; font-size:12px; background:#18161f; border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#fff; outline:none;">
     </div>
 
-    <div id="sidebarConversationList" class="sidebar-history" aria-label="Sohbetler" style="flex:1; overflow-y:auto; display:grid; gap:2px; max-height:none; margin-top:4px;"></div>
+    <div id="sidebarConversationList" class="sidebar-history" aria-label="Sohbetler" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:4px; max-height:none; margin-top:4px; align-content:flex-start;"></div>
   </aside>
 
   <!-- CENTER STAGE CONTAINER -->
@@ -6202,6 +6525,48 @@
     <button type="button" id="voiceModeCloseBtn" aria-label="Sesli sohbeti kapat" autofocus title="Kapat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
 </dialog>
+
+<!-- Side Chat Slide-Over Drawer (Manus Style) -->
+<aside id="sideChatDrawer" class="side-chat-drawer" aria-label="Yan Sohbet" aria-hidden="true" style="display:none;">
+  <div class="side-chat-drawer-header">
+    <div class="side-chat-title-wrap">
+      <div class="side-chat-icon-badge">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          <line x1="12" y1="8" x2="12" y2="14"></line>
+          <line x1="9" y1="11" x2="15" y2="11"></line>
+        </svg>
+      </div>
+      <div>
+        <h3 class="side-chat-title">Yan Sohbet</h3>
+        <span class="side-chat-sub">Ana görev kesintiye uğramaz</span>
+      </div>
+    </div>
+    <div class="side-chat-header-actions">
+      <button id="sideChatClearBtn" class="side-chat-action-btn" type="button" title="Sohbeti Temizle" aria-label="Temizle">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </button>
+      <button id="sideChatCloseBtn" class="side-chat-action-btn" type="button" title="Kapat" aria-label="Kapat">×</button>
+    </div>
+  </div>
+
+  <div id="sideChatTranscript" class="side-chat-body">
+    <div class="side-chat-starter">
+      <p>💡 <strong>Paralel Düşünce Alanı</strong></p>
+      <p>Luna ana ekranda çalışırken buraya bağımsız sorular yazabilir, fikir danışabilir veya not düşebilirsiniz.</p>
+    </div>
+  </div>
+
+  <div class="side-chat-footer">
+    <form id="sideChatForm" class="side-chat-input-form" onsubmit="return false;">
+      <input type="text" id="sideChatInput" placeholder="Yan sohbete yazın…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button type="submit" id="sideChatSendBtn" aria-label="Gönder" title="Gönder">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>
+      </button>
+    </form>
+  </div>
+</aside>
+
 <script src="/static/js/local_stt.js?v=4"></script>
 <script src="/static/js/study_ambience.js?v=1"></script>
 <script>
@@ -8440,7 +8805,7 @@
         event.preventDefault();
         switchConversation(conv.id);
       };
-      item.style.cssText = `display:flex; align-items:center; justify-content:space-between; padding:7px 10px; border-radius:8px; cursor:pointer; transition:all 0.15s; background:${isActive ? '#28292e' : 'transparent'}; border:1px solid ${isActive ? 'rgba(255,255,255,0.06)' : 'transparent'}; position:relative; min-height:36px;`;
+      item.style.cssText = `display:flex; align-items:center; justify-content:space-between; padding:7px 10px; border-radius:8px; cursor:pointer; transition:all 0.15s; background:${isActive ? '#28292e' : 'transparent'}; border:1px solid ${isActive ? 'rgba(255,255,255,0.06)' : 'transparent'}; position:relative; min-height:38px; height:38px; max-height:38px; box-sizing:border-box; flex-shrink:0;`;
       item.innerHTML = `
         <div style="display:flex; align-items:center; gap:8px; overflow:hidden; flex:1; min-width:0;">
           ${conv.pinned ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="color:#10b981; flex-shrink:0;"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5v6l1 1 1-1v-6h5v-2l-2-2z"/></svg>' : ''}
@@ -8489,6 +8854,10 @@
       item.onclick = (e) => {
         if (e.target.closest('.conv-more-btn')) return;
         switchConversation(conv.id);
+        if (typeof switchView === 'function') switchView('cockpit');
+        document.getElementById('viewCockpit')?.classList.add('chat-active');
+        if (typeof setStudioComposer === 'function') setStudioComposer(true);
+        if (textInput) textInput.focus();
       };
 
       listEl.appendChild(item);
@@ -8662,7 +9031,10 @@ const sidebarNewChatBtn = document.getElementById('sidebarNewChatBtn');
       try { localStorage.setItem('luna_conversations_v1', JSON.stringify(lunaConversations)); } catch(err){}
       loadActiveTranscript();
       renderSidebarConversations();
+      if (typeof switchView === 'function') switchView('cockpit');
+      document.getElementById('viewCockpit')?.classList.add('chat-active');
       setStudioComposer(true);
+      if (textInput) textInput.focus();
     };
   }
 
@@ -17273,5 +17645,6 @@ const sidebarNewChatBtn = document.getElementById('sidebarNewChatBtn');
 <script src="/static/js/app.js"></script>
 <script src="/static/js/navigation.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/side_chat.js"></script>
 </body>
 </html>
