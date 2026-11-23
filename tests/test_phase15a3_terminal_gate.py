@@ -16,7 +16,7 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from jarvis_agent_engine import (
+from luna_agent_engine import (
     AgentController,
     TaskState,
     PermissionLevel,
@@ -29,7 +29,7 @@ from jarvis_agent_engine import (
 class TestPhase15A3TerminalPermissionGate(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp(prefix="jarvis_test_15a3_")
+        self.temp_dir = tempfile.mkdtemp(prefix="luna_test_15a3_")
         self.controller = AgentController(self.temp_dir)
 
     def tearDown(self):

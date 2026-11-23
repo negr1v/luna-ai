@@ -1,6 +1,6 @@
 import re, json
 
-with open('C:/Users/negr1/Projeler/ACCIO-JARVIS/study_ref/bundle.js', 'r', encoding='utf-8') as f:
+with open('C:/Users/negr1/Projeler/LUNA-AI/study_ref/bundle.js', 'r', encoding='utf-8') as f:
     js = f.read()
 
 # Search for Rose, Lavender, Sage, Mommy images or portrait definitions

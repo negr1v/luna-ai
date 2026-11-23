@@ -1,5 +1,5 @@
 ================================================================================
-BAŞLIK: Jarvis
+BAŞLIK: Luna
 TARİH  : 1794155723.267655
 TOPLAM MESAJ SAYISI: 20
 ================================================================================
@@ -12,11 +12,11 @@ tmm mı devam edek burdan
 
 [2] CHATGPT (ASSISTANT)
 --------------------------------------------------------------------------------
-Kesinlikle, buradan devam edelim. Önceki sohbet dosyanı inceledim ve ACCIO JARVIS V4.0 projesinin geçmişini, mimari kararlarını ve geliştirme aşamalarını takip edebiliyorum.
+Kesinlikle, buradan devam edelim. Önceki sohbet dosyanı inceledim ve ACCIO LUNA V4.0 projesinin geçmişini, mimari kararlarını ve geliştirme aşamalarını takip edebiliyorum.
 
 En son kaldığımız noktayı da buldum.
 
-## ACCIO JARVIS V4.0 — Güncel durum
+## ACCIO LUNA V4.0 — Güncel durum
 
 <box border radius="lg" padding={3} gap={3}>
   <row align="center" justify="between">
@@ -67,7 +67,7 @@ Bu aşamada:
 
 Rapor geldiğinde buraya yapıştır. Teknik olarak inceleyip yalnızca sonraki gerekli adımı hazırlayacağım.
 
-ACCIO JARVIS V4.0'ı kontrollü şekilde tamamlamaya devam ediyoruz.
+ACCIO LUNA V4.0'ı kontrollü şekilde tamamlamaya devam ediyoruz.
 
 ================================================================================
 
@@ -76,7 +76,7 @@ ACCIO JARVIS V4.0'ı kontrollü şekilde tamamlamaya devam ediyoruz.
 ### Faz 8B.1 (Config API Security & Atomic Persistence) Sonuç Raporu
 
 **Doğrulama Durumu:** `12/12 PASS` (0 Hata, 0 Başarısızlık)  
-**Kapsanan Dosyalar:** `jarvis_server.py`, `index.html`, `test_phase8b1_config_security.py`
+**Kapsanan Dosyalar:** `luna_server.py`, `index.html`, `test_phase8b1_config_security.py`
 
 ---
 
@@ -101,7 +101,7 @@ ACCIO JARVIS V4.0'ı kontrollü şekilde tamamlamaya devam ediyoruz.
 
 #### Mimari Özeti (Neler Değişti?)
 1. **Sıfır Sızıntı (Zero Secret Leakage):** Tarayıcı tarafındaki `GET` çağrıları artık diskteki ham anahtarları ağ trafiğine çıkaramaz.
-2. **Fail-Closed Atomik Depolama:** Sunucu çökse veya elektrik kesilse dahi `jarvis_config.json` bozulamaz; geçici dosya üzerinden atomik takas yapılır.
+2. **Fail-Closed Atomik Depolama:** Sunucu çökse veya elektrik kesilse dahi `luna_config.json` bozulamaz; geçici dosya üzerinden atomik takas yapılır.
 3. **Whitelist & Tip Validasyonu:** `ALLOWED_CONFIG_KEYS` şeması dışındaki parametre enjeksiyonları tamamen kesildi.
 
 ================================================================================
@@ -136,9 +136,9 @@ Bir teknik ayrıntı da önemli: `os.replace` atomik dosya değiştirme sağlar;
 
 Aşağıdaki bilgileri mevcut dosyaları değiştirmeden raporla:
 
-1. `jarvis_server.py`, `index.html` ve `test_phase8b1_config_security.py` dosyalarının güncel SHA-256 hash'leri.
+1. `luna_server.py`, `index.html` ve `test_phase8b1_config_security.py` dosyalarının güncel SHA-256 hash'leri.
 2. Faz öncesi alınan yedeklerin dosya adları ve zaman damgaları.
-3. `jarvis_config.json` dosyasının güncel SHA-256 hash'i.
+3. `luna_config.json` dosyasının güncel SHA-256 hash'i.
 4. 12 testin gerçekten çalıştırıldığı komut ve terminal çıktısı.
 5. Task, memory, automation, notification ve config verilerinin korunup korunmadığına ilişkin doğrulama.
 6. `CONFIG_ASYNC_LOCK` kullanımının bütün config read-modify-write işlemlerini kapsayıp kapsamadığı.
@@ -173,7 +173,7 @@ Haklısın. Sohbet geçmişini tekrar kontrol ettim. Önceki promptumda önemli 
 
 Şimdi doğru promptu hazırladım. Bu kez amaç **Faz 8B.1'i yeniden kodlatmak değil, tamamlandığı iddia edilen işi gerçekten kabul edip edemeyeceğimizi kanıtlamak.**
 
-<WritingBlock id="83193" variant="document"># ACCIO JARVIS V4.0 — PHASE 8B.1
+<WritingBlock id="83193" variant="document"># ACCIO LUNA V4.0 — PHASE 8B.1
 # INDEPENDENT SECURITY ACCEPTANCE & DATA INTEGRITY VERIFICATION
 
 ## WORK MODE
@@ -182,7 +182,7 @@ READ-ONLY ACCEPTANCE AUDIT.
 DO NOT REIMPLEMENT PHASE 8B.1.
 
 Project:
-`C:\Users\negr1\Projeler\ACCIO-JARVIS`
+`C:\Users\negr1\Projeler\LUNA-AI`
 
 ## 0. PROJECT CONTEXT AND STRICT SCOPE
 
@@ -388,11 +388,11 @@ Verify their timestamps and identify which original files they represent.
 
 Calculate SHA-256 hashes for:
 
-- Current `jarvis_server.py`
+- Current `luna_server.py`
 - Current `index.html`
 - Current `test_phase8b1_config_security.py`
-- Available pre-change backups of `jarvis_server.py` and `index.html`
-- Current `jarvis_config.json`
+- Available pre-change backups of `luna_server.py` and `index.html`
+- Current `luna_config.json`
 
 Report before/after hashes wherever the original hash is actually available.
 
@@ -408,11 +408,11 @@ Verify that Phase 8B.1 did not damage unrelated persistent data.
 
 Inspect the available files:
 
-- `jarvis_tasks.json`
-- `jarvis_memory.json`
-- `jarvis_automations.json`
+- `luna_tasks.json`
+- `luna_memory.json`
+- `luna_automations.json`
 - Existing notification storage.
-- `jarvis_config.json`
+- `luna_config.json`
 
 Use existing backups or recorded baseline hashes where available.
 
@@ -503,7 +503,7 @@ Support the decision with evidence.
 This is a READ-ONLY acceptance audit.
 
 Do not modify:
-- `jarvis_server.py`
+- `luna_server.py`
 - `index.html`
 - Production JSON files
 - Existing backups
@@ -599,7 +599,7 @@ Tamam, bundan sonra gereksiz onay istemeden sıradaki aşamaya geçeceğim. 8B.1
 
 Aşağıdaki promptu doğrudan coding agent'a gönder:
 
-<WritingBlock id="84261" variant="document"># ACCIO JARVIS V4.0 — PHASE 8B.2
+<WritingBlock id="84261" variant="document"># ACCIO LUNA V4.0 — PHASE 8B.2
 # TELEGRAM CONCURRENCY & LIFECYCLE SAFETY
 
 ## WORK MODE
@@ -608,7 +608,7 @@ IMPLEMENT ONLY PHASE 8B.2.
 Preserve the existing application architecture.
 
 Project:
-`C:\Users\negr1\Projeler\ACCIO-JARVIS`
+`C:\Users\negr1\Projeler\LUNA-AI`
 
 ## 0. PROJECT CONTEXT
 
@@ -630,7 +630,7 @@ First inspect the actual Telegram implementation and identify the precise Phase 
 
 Inspect only Telegram-related sections and their direct dependencies in:
 
-- `jarvis_server.py`
+- `luna_server.py`
 - Existing Telegram-specific test files.
 - Existing Telegram configuration fields, without exposing their values.
 - aiohttp startup and cleanup hooks used by Telegram.
@@ -782,15 +782,15 @@ Clearly distinguish mocked API tests from real external Telegram tests.
 
 Before editing:
 
-- Record SHA-256 of `jarvis_server.py`.
+- Record SHA-256 of `luna_server.py`.
 - Record SHA-256 of relevant Telegram test files.
 - Create timestamped backups of files that will be modified.
 - Record hashes of:
-  - `jarvis_config.json`
-  - `jarvis_tasks.json`
-  - `jarvis_memory.json`
-  - `jarvis_automations.json`
-  - `jarvis_notifications.json`
+  - `luna_config.json`
+  - `luna_tasks.json`
+  - `luna_memory.json`
+  - `luna_automations.json`
+  - `luna_notifications.json`
 - Never display secret values.
 
 Only modify files required for Phase 8B.2.
@@ -905,7 +905,7 @@ Raporu gönderdiğinde doğrudan inceleyip sıradaki promptu hazırlayacağım; 
 --------------------------------------------------------------------------------
 Aşağıdaki promptu doğrudan coding agent'a gönder:
 
-<WritingBlock id="84261" variant="document"># ACCIO JARVIS V4.0 — PHASE 8B.2
+<WritingBlock id="84261" variant="document"># ACCIO LUNA V4.0 — PHASE 8B.2
 # TELEGRAM CONCURRENCY & LIFECYCLE SAFETY
 
 ## WORK MODE
@@ -914,7 +914,7 @@ IMPLEMENT ONLY PHASE 8B.2.
 Preserve the existing application architecture.
 
 Project:
-`C:\Users\negr1\Projeler\ACCIO-JARVIS`
+`C:\Users\negr1\Projeler\LUNA-AI`
 
 ## 0. PROJECT CONTEXT
 
@@ -936,7 +936,7 @@ First inspect the actual Telegram implementation and identify the precise Phase 
 
 Inspect only Telegram-related sections and their direct dependencies in:
 
-- `jarvis_server.py`
+- `luna_server.py`
 - Existing Telegram-specific test files.
 - Existing Telegram configuration fields, without exposing their values.
 - aiohttp startup and cleanup hooks used by Telegram.
@@ -1088,15 +1088,15 @@ Clearly distinguish mocked API tests from real external Telegram tests.
 
 Before editing:
 
-- Record SHA-256 of `jarvis_server.py`.
+- Record SHA-256 of `luna_server.py`.
 - Record SHA-256 of relevant Telegram test files.
 - Create timestamped backups of files that will be modified.
 - Record hashes of:
-  - `jarvis_config.json`
-  - `jarvis_tasks.json`
-  - `jarvis_memory.json`
-  - `jarvis_automations.json`
-  - `jarvis_notifications.json`
+  - `luna_config.json`
+  - `luna_tasks.json`
+  - `luna_memory.json`
+  - `luna_automations.json`
+  - `luna_notifications.json`
 - Never display secret values.
 
 Only modify files required for Phase 8B.2.
@@ -1214,10 +1214,10 @@ Sistem ve hafıza senkronizasyonu tamamlandı.
 ### Senkronizasyon ve Durum Özeti
 
 1. **Hafıza ve Kurallar**: `MEMORY.md`, `USER.md`, `SOUL.md` ve `STYLE.md` dosyaları `agent-core` dizinine kopyalandı; YKS 2027 takvimi, donanım takip eşikleri, iletişim sözleşmesi ve kredi koruma protokolü yüklendi.
-2. **ACCIO-JARVIS V4.0 Proje Durumu**: `run_all_regressions.py` çalıştırıldı; 16 test modülünün tamamı hatasız geçti (0 Fail, 0 Error).
+2. **LUNA-AI V4.0 Proje Durumu**: `run_all_regressions.py` çalıştırıldı; 16 test modülünün tamamı hatasız geçti (0 Fail, 0 Error).
 3. **Kaldığımız Yer**: 
    - **Faz 8B.1, 8C ve 8D**: Tamamlandı ve doğrulandı.
-   - **Faz 8B.2 (Telegram Concurrency & Lifecycle Safety)**: `jarvis_server.py` üzerindeki kilitler (`TELEGRAM_ASYNC_LOCK`, `TELEGRAM_OUTBOUND_LOCK`, `TELEGRAM_POLL_LOCK`, `TELEGRAM_LIFECYCLE_LOCK`), maskeleme ve uç noktalar uygulandı.
+   - **Faz 8B.2 (Telegram Concurrency & Lifecycle Safety)**: `luna_server.py` üzerindeki kilitler (`TELEGRAM_ASYNC_LOCK`, `TELEGRAM_OUTBOUND_LOCK`, `TELEGRAM_POLL_LOCK`, `TELEGRAM_LIFECYCLE_LOCK`), maskeleme ve uç noktalar uygulandı.
    - **Sıradaki İşlem**: `test_phase8b2_telegram_concurrency.py` test paketinin yazılması ve doğrulanması.
 
 Hazırım. Komutunla doğrudan Faz 8B.2 testine geçebiliriz.
@@ -1234,7 +1234,7 @@ Devam ediyoruz. **Sıradaki iş yalnızca Faz 8B.2'nin test paketini oluşturmak
 
 Aşağıdaki talimatı coding agent'a gönder:
 
-<WritingBlock id="73185" variant="document"># ACCIO JARVIS V4.0 — PHASE 8B.2
+<WritingBlock id="73185" variant="document"># ACCIO LUNA V4.0 — PHASE 8B.2
 # FOCUSED TEST IMPLEMENTATION & VERIFICATION
 
 MODE: LOW-CREDIT
@@ -1246,7 +1246,7 @@ The following work is reported as completed:
 
 - Phase 8B.1: completed and verified.
 - Phase 8C and Phase 8D: completed and verified.
-- Phase 8B.2 Telegram concurrency implementation: already present in `jarvis_server.py`.
+- Phase 8B.2 Telegram concurrency implementation: already present in `luna_server.py`.
 
 The reported synchronization primitives are:
 
@@ -1486,12 +1486,12 @@ Bence doğru sıra önce test modülünü regresyon listesine eklemek, ardından
 
 [16] KULLANICI (USER)
 --------------------------------------------------------------------------------
-### ACCIO-JARVIS V4.0 — MEVCUT DURUM RAPORU
+### LUNA-AI V4.0 — MEVCUT DURUM RAPORU
 
 #### 1. Tamamlanan Son Faz (Faz 8B.2)
 - **Kapsam**: Telegram Concurrency, Lock Correctness & Lifecycle Safety.
 - **Uygulanan Eşzamanlılık Kilitleri**:
-  - `TELEGRAM_ASYNC_LOCK`: `jarvis_telegram.json` yerel feed okuma/yazma ve atomik liste işlemlerini korur.
+  - `TELEGRAM_ASYNC_LOCK`: `luna_telegram.json` yerel feed okuma/yazma ve atomik liste işlemlerini korur.
   - `TELEGRAM_OUTBOUND_LOCK`: Giden mesajların serileştirilmesini sağlar, yarış durumlarını engeller.
   - `TELEGRAM_POLL_LOCK`: `telegram_poll_step` ve `process_telegram_update` döngülerini korur, `update_id` tekilleştirmesini sağlar.
   - `TELEGRAM_LIFECYCLE_LOCK`: Arka plan worker başlatma, durdurma ve yeniden başlatma işlemlerini kilitler.
@@ -1518,13 +1518,13 @@ Bence doğru sıra önce test modülünü regresyon listesine eklemek, ardından
 
 | Dosya | Durum | SHA-256 |
 |---|---|---|
-| `jarvis_server.py` | Düzeltildi | `47638846E5DD2D9F10989F0A4745C81ADF25634533D20FAB8D06473F63CE1AA9` |
-| `jarvis_server.py.pre_phase8b2_tg_deadlock_fix.bak` | Yedek | `6721588B291D92EF4C409B88AA68D6105BD237C343AC0FB35BA3596012604289` |
+| `luna_server.py` | Düzeltildi | `47638846E5DD2D9F10989F0A4745C81ADF25634533D20FAB8D06473F63CE1AA9` |
+| `luna_server.py.pre_phase8b2_tg_deadlock_fix.bak` | Yedek | `6721588B291D92EF4C409B88AA68D6105BD237C343AC0FB35BA3596012604289` |
 | `test_phase8b2_telegram_concurrency.py` | Eklendi | `72BBB2ECE9802AD58267EC964826935526B58137AF758312097481C62AFCFEDF` |
 | `run_all_regressions.py` | Güncellendi | `D5E5F0597E3F1F3507BCE8B416805877A531C29DAF9BA568979F7CA0281F0E4D` |
-| `jarvis_config.json` | Korundu | `D5315A617B4D07CD866625CA60EA158903525050AAA2439E97D245B8B6D58B7A` |
-| `jarvis_memory.json` | Korundu | `01D5F8469EEF9E31B59874BA907DDA9B512CC8AC28C6773580AF8BB753537F81` |
-| `jarvis_tasks.json` | Korundu | `4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945` |
+| `luna_config.json` | Korundu | `D5315A617B4D07CD866625CA60EA158903525050AAA2439E97D245B8B6D58B7A` |
+| `luna_memory.json` | Korundu | `01D5F8469EEF9E31B59874BA907DDA9B512CC8AC28C6773580AF8BB753537F81` |
+| `luna_tasks.json` | Korundu | `4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945` |
 | `index.html` | Korundu | `CD9EFFC842FD4CC830140E68A69CD190AD7B0BC39F1410BFD3FD96A4FEAE0BD5` |
 
 ---
@@ -1536,7 +1536,7 @@ Faz 8B.2 resmen tamamlandı, kilitlendi ve regresyona bağlandı. Sistem bir son
 
 [17] CHATGPT (ASSISTANT)
 --------------------------------------------------------------------------------
-ACCIO-JARVIS V4.0 mevcut durumunu güncel kabul ediyorum. **Faz 8B.2 tamamlandı ve regresyon listesine entegre edildi.**
+LUNA-AI V4.0 mevcut durumunu güncel kabul ediyorum. **Faz 8B.2 tamamlandı ve regresyon listesine entegre edildi.**
 
 ### Mevcut kalite durumu
 
@@ -1580,10 +1580,10 @@ Haklısın. 13 hatayı incelemeden “çevresel hata” kabul etmemeliydim. Ayr�
 
 Doğru sıra şu: **Önce 13 ERROR'ın tamamını tek tek teşhis et, gerekli düzeltmeleri yap; ardından beklemeden Faz 8B.3'e geç.** Bunun için kodlama aracına aşağıdaki talimatı ver:
 
-<WritingBlock id="83621" variant="document"># ACCIO-JARVIS V4.0 — ERROR ANALİZİ + FAZ 8B.3
+<WritingBlock id="83621" variant="document"># LUNA-AI V4.0 — ERROR ANALİZİ + FAZ 8B.3
 
 Proje dizini:
-`C:\Users\negr1\Projeler\ACCIO-JARVIS`
+`C:\Users\negr1\Projeler\LUNA-AI`
 
 Bu görev iki aşamadan oluşuyor. İlk aşamayı bitirdikten sonra kullanıcıdan onay istemeden doğrudan ikinci aşamaya geç. Ara onay veya gereksiz soru sorma.
 
@@ -1645,7 +1645,7 @@ Düzeltmelerden sonra:
 Aşama 1 tamamlanınca kullanıcıdan onay beklemeden bu aşamaya başla.
 
 ### 1. Ön inceleme
-Mevcut `jarvis_server.py`, middleware, aiohttp route kayıtları, CORS ayarları, frontend API istekleri ve sunucunun bind ayarlarını incele.
+Mevcut `luna_server.py`, middleware, aiohttp route kayıtları, CORS ayarları, frontend API istekleri ve sunucunun bind ayarlarını incele.
 
 Mevcut mimariyi ve gerçek kullanım biçimini anlamadan rastgele bir Host allowlist veya Origin kuralı ekleme. Özellikle localhost, 127.0.0.1, IPv6 ve uygulamanın mevcut LAN erişimini bozma.
 
@@ -1689,7 +1689,7 @@ Herhangi bir değişiklikten önce:
 - Mevcut ilgili dosyaların güncel SHA-256 değerlerini al.
 - Değiştirilecek dosyaları yedekle.
 - Faz 8B.2 sonrasındaki mevcut kodu esas al; eski yedeklerden yanlışlıkla geri dönüş yapma.
-- `jarvis_config.json`, `jarvis_memory.json`, `jarvis_tasks.json`, `jarvis_automations.json` ve `jarvis_notifications.json` dosyalarını koru.
+- `luna_config.json`, `luna_memory.json`, `luna_tasks.json`, `luna_automations.json` ve `luna_notifications.json` dosyalarını koru.
 
 ### 5. Faz 8B.3 doğrulaması
 - Yeni odaklanmış test paketini çalıştır.
@@ -1732,11 +1732,11 @@ Bir sonraki aşamaya geçiyorum: **Faz 8B.4 — Kapsamlı Secret Masking ve Bilg
 
 ## Kodlama aracına verilecek görev
 
-<WritingBlock id="82417" variant="document"># ACCIO-JARVIS V4.0 — FAZ 8B.4
+<WritingBlock id="82417" variant="document"># LUNA-AI V4.0 — FAZ 8B.4
 ## Comprehensive Secret Masking & Information Disclosure Audit
 
 Proje:
-`C:\Users\negr1\Projeler\ACCIO-JARVIS`
+`C:\Users\negr1\Projeler\LUNA-AI`
 
 Faz 8B.3 tamamlandı. Son rapora göre 18 test modülü ve 281 test PASS durumunda. Bu mevcut durumu başlangıç noktası kabul et; eski yedeklerden kod geri yükleme.
 
@@ -1745,7 +1745,7 @@ Bu görevi kullanıcıdan ara onay istemeden tamamla.
 ## 1. Önce mevcut durumu doğrula
 
 Şu dosyaları incele:
-- `jarvis_server.py`
+- `luna_server.py`
 - `index.html`
 - `run_all_regressions.py`
 - `test_phase8b1_config_security.py`
@@ -1842,11 +1842,11 @@ Node.js yolu için Faz 8B.3'te yapılan düzeltmeleri koru.
 ## 7. Kullanıcı verisi ve bütünlük
 
 Şu dosyaları kesinlikle koru:
-- `jarvis_config.json`
-- `jarvis_memory.json`
-- `jarvis_tasks.json`
-- `jarvis_automations.json`
-- `jarvis_notifications.json`
+- `luna_config.json`
+- `luna_memory.json`
+- `luna_tasks.json`
+- `luna_automations.json`
+- `luna_notifications.json`
 
 Gerçek API anahtarlarını, Telegram tokenlarını veya kullanıcı verilerini rapora kopyalama.
 

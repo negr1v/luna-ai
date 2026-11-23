@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    ACCIO JARVIS V16 — Phase 16A: Windows System Tray Entegrasyonu
+    ACCIO LUNA V16 — Phase 16A: Windows System Tray Entegrasyonu
 .DESCRIPTION
     Hafif, saf .NET / Windows Forms ve Win32 API tabanlı Sistem Tepsisi (Tray) yöneticisi.
     Harici Python veya Node/Electron bağımlılığı gerektirmez.
@@ -14,21 +14,21 @@ $ProjectDir = $PSScriptRoot
 $HostAddr = "127.0.0.1"
 $Port = 7860
 $DashboardUrl = "http://${HostAddr}:${Port}"
-$StartScript = Join-Path $ProjectDir "start_jarvis.ps1"
-$RuntimeMetaFile = Join-Path $ProjectDir ".jarvis_runtime.json"
+$StartScript = Join-Path $ProjectDir "start_luna.ps1"
+$RuntimeMetaFile = Join-Path $ProjectDir ".luna_runtime.json"
 
 # -----------------------------------------------------------------------------
 # 1. Tekil Sistem Tepsisi Süreci Güvencesi (Mutex)
 # -----------------------------------------------------------------------------
-$mutexName = "Global\ACCIO_JARVIS_TRAY_MUTEX"
+$mutexName = "Global\LUNA_AI_TRAY_MUTEX"
 $createdNew = $false
 try {
     $trayMutex = New-Object System.Threading.Mutex($true, $mutexName, [ref]$createdNew)
     if (-not $createdNew) {
         Add-Type -AssemblyName System.Windows.Forms
         [System.Windows.Forms.MessageBox]::Show(
-            "ACCIO JARVIS Sistem Tepsisi zaten çalışıyor.",
-            "ACCIO JARVIS Tray",
+            "ACCIO LUNA Sistem Tepsisi zaten çalışıyor.",
+            "ACCIO LUNA Tray",
             [System.Windows.Forms.MessageBoxButtons]::OK,
             [System.Windows.Forms.MessageBoxIcon]::Information
         )
@@ -74,7 +74,7 @@ public class Win32TrayHelper {
 # -----------------------------------------------------------------------------
 # 3. İkon Üretici Fonksiyonu (Dinamik Neon Gösterge)
 # -----------------------------------------------------------------------------
-function Create-JarvisTrayIcon([bool]$isRunning) {
+function Create-LunaTrayIcon([bool]$isRunning) {
     $bmp = New-Object System.Drawing.Bitmap 16, 16
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
@@ -112,7 +112,7 @@ function Create-JarvisTrayIcon([bool]$isRunning) {
 # -----------------------------------------------------------------------------
 # 4. Durum Tespit Fonksiyonu
 # -----------------------------------------------------------------------------
-function Get-JarvisServerState {
+function Get-LunaServerState {
     $state = @{
         IsRunning = $false
         Pid       = $null
@@ -169,10 +169,10 @@ $toggleConsoleItem.Text = "👁️ Konsolu Gizle / Göster"
 
 # Başlat / Durdur
 $startServerItem = New-Object System.Windows.Forms.ToolStripMenuItem
-$startServerItem.Text = "▶️ JARVIS'i Başlat"
+$startServerItem.Text = "▶️ LUNA'i Başlat"
 
 $stopServerItem = New-Object System.Windows.Forms.ToolStripMenuItem
-$stopServerItem.Text = "⏹️ JARVIS'i Durdur"
+$stopServerItem.Text = "⏹️ LUNA'i Durdur"
 
 # Ayırıcı
 $sep1 = New-Object System.Windows.Forms.ToolStripSeparator
@@ -201,20 +201,20 @@ $notifyIcon.Visible = $true
 
 # Menü Durumunu Güncelleme
 function Update-TrayMenuStatus {
-    $serverState = Get-JarvisServerState
+    $serverState = Get-LunaServerState
     $isRunning = $serverState.IsRunning
 
     if ($isRunning) {
-        $statusMenuItem.Text = "● JARVIS: Çalışıyor (Port $Port, PID: $($serverState.Pid))"
+        $statusMenuItem.Text = "● LUNA: Çalışıyor (Port $Port, PID: $($serverState.Pid))"
         $statusMenuItem.ForeColor = [System.Drawing.Color]::DarkGreen
-        $notifyIcon.Text = "ACCIO JARVIS (Çalışıyor - Port $Port)"
+        $notifyIcon.Text = "ACCIO LUNA (Çalışıyor - Port $Port)"
         $startServerItem.Enabled = $false
         $stopServerItem.Enabled = $true
         $toggleConsoleItem.Enabled = $true
     } else {
-        $statusMenuItem.Text = "○ JARVIS: Durduruldu"
+        $statusMenuItem.Text = "○ LUNA: Durduruldu"
         $statusMenuItem.ForeColor = [System.Drawing.Color]::Gray
-        $notifyIcon.Text = "ACCIO JARVIS (Durduruldu)"
+        $notifyIcon.Text = "ACCIO LUNA (Durduruldu)"
         $startServerItem.Enabled = $true
         $stopServerItem.Enabled = $false
         $toggleConsoleItem.Enabled = $false
@@ -222,19 +222,19 @@ function Update-TrayMenuStatus {
 
     # İkonu güncelle
     $oldIcon = $notifyIcon.Icon
-    $notifyIcon.Icon = Create-JarvisTrayIcon -isRunning $isRunning
+    $notifyIcon.Icon = Create-LunaTrayIcon -isRunning $isRunning
     if ($oldIcon) { $oldIcon.Dispose() }
 }
 
 # Kokpiti Aç Eylemi (Yinelenen sunucu başlatmaz)
 $openDashboardAction = {
-    $serverState = Get-JarvisServerState
+    $serverState = Get-LunaServerState
     if ($serverState.IsRunning) {
         Start-Process $DashboardUrl
     } else {
         $choice = [System.Windows.Forms.MessageBox]::Show(
-            "JARVIS sunucusu şu an çalışmıyor. Sunucu başlatılsın ve kokpit açılsın mı?",
-            "ACCIO JARVIS",
+            "LUNA sunucusu şu an çalışmıyor. Sunucu başlatılsın ve kokpit açılsın mı?",
+            "ACCIO LUNA",
             [System.Windows.Forms.MessageBoxButtons]::YesNo,
             [System.Windows.Forms.MessageBoxIcon]::Question
         )
@@ -250,14 +250,14 @@ $notifyIcon.Add_DoubleClick($openDashboardAction)
 
 # Konsolu Göster / Gizle (Sistem Tepsisine Küçültme)
 $toggleConsoleItem.Add_Click({
-    $serverState = Get-JarvisServerState
+    $serverState = Get-LunaServerState
     if (-not $serverState.IsRunning) { return }
 
     $hWnd = $serverState.WindowHandle
     if ($hWnd -eq [IntPtr]::Zero) {
         [System.Windows.Forms.MessageBox]::Show(
             "Konsol penceresi tanıtıcısı bulunamadı (Arka planda gizlenmiş veya izole çalışıyor olabilir).",
-            "ACCIO JARVIS Tray",
+            "ACCIO LUNA Tray",
             [System.Windows.Forms.MessageBoxButtons]::OK,
             [System.Windows.Forms.MessageBoxIcon]::Information
         )
@@ -268,7 +268,7 @@ $toggleConsoleItem.Add_Click({
     if ($isVisible) {
         # Tepsisine Küçült (Gizle)
         [Win32TrayHelper]::ShowWindow($hWnd, [Win32TrayHelper]::SW_HIDE)
-        $notifyIcon.ShowBalloonTip(2000, "ACCIO JARVIS", "Sunucu konsolu sistem tepsisine küçültüldü.", [System.Windows.Forms.ToolTipIcon]::Info)
+        $notifyIcon.ShowBalloonTip(2000, "ACCIO LUNA", "Sunucu konsolu sistem tepsisine küçültüldü.", [System.Windows.Forms.ToolTipIcon]::Info)
     } else {
         # Konsolu Geri Getir
         [Win32TrayHelper]::ShowWindow($hWnd, [Win32TrayHelper]::SW_RESTORE)
@@ -278,11 +278,11 @@ $toggleConsoleItem.Add_Click({
 
 # Sunucuyu Başlat Eylemi
 $startServerItem.Add_Click({
-    $serverState = Get-JarvisServerState
+    $serverState = Get-LunaServerState
     if ($serverState.IsRunning) {
         [System.Windows.Forms.MessageBox]::Show(
-            "JARVIS zaten çalışıyor (PID: $($serverState.Pid)).",
-            "ACCIO JARVIS",
+            "LUNA zaten çalışıyor (PID: $($serverState.Pid)).",
+            "ACCIO LUNA",
             [System.Windows.Forms.MessageBoxButtons]::OK,
             [System.Windows.Forms.MessageBoxIcon]::Information
         )
@@ -290,36 +290,36 @@ $startServerItem.Add_Click({
     }
 
     Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$StartScript`" -Action Start"
-    $notifyIcon.ShowBalloonTip(3000, "ACCIO JARVIS", "Sunucu başlatılıyor...", [System.Windows.Forms.ToolTipIcon]::Info)
+    $notifyIcon.ShowBalloonTip(3000, "ACCIO LUNA", "Sunucu başlatılıyor...", [System.Windows.Forms.ToolTipIcon]::Info)
     Start-Sleep -Milliseconds 1500
     Update-TrayMenuStatus
 })
 
 # Sunucuyu Durdur Eylemi (Graceful Stop)
 $stopServerItem.Add_Click({
-    $serverState = Get-JarvisServerState
+    $serverState = Get-LunaServerState
     if (-not $serverState.IsRunning) { return }
 
     $confirm = [System.Windows.Forms.MessageBox]::Show(
-        "JARVIS sunucusunu durdurmak istediğinize emin misiniz?",
+        "LUNA sunucusunu durdurmak istediğinize emin misiniz?",
         "Sunucuyu Durdur",
         [System.Windows.Forms.MessageBoxButtons]::YesNo,
         [System.Windows.Forms.MessageBoxIcon]::Question
     )
     if ($confirm -eq [System.Windows.Forms.DialogResult]::Yes) {
         Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$StartScript`" -Action Stop" -Wait
-        $notifyIcon.ShowBalloonTip(3000, "ACCIO JARVIS", "Sunucu güvenli şekilde durduruldu.", [System.Windows.Forms.ToolTipIcon]::Info)
+        $notifyIcon.ShowBalloonTip(3000, "ACCIO LUNA", "Sunucu güvenli şekilde durduruldu.", [System.Windows.Forms.ToolTipIcon]::Info)
         Update-TrayMenuStatus
     }
 })
 
 # Tepsiden Çıkış Eylemi
 $exitMenuItem.Add_Click({
-    $serverState = Get-JarvisServerState
+    $serverState = Get-LunaServerState
     if ($serverState.IsRunning) {
         $dialog = [System.Windows.Forms.MessageBox]::Show(
-            "Sistem Tepsisi kapatılıyor.`n`nÇıkış yaparken JARVIS sunucusu da kapatılsın mı?`n`n[Evet] = Sunucu ve Tepsiyi Kapat`n[Hayır] = Sunucuyu Çalışır Bırak, Tepsiden Çık`n[İptal] = Vazgeç",
-            "ACCIO JARVIS Tray Çıkış",
+            "Sistem Tepsisi kapatılıyor.`n`nÇıkış yaparken LUNA sunucusu da kapatılsın mı?`n`n[Evet] = Sunucu ve Tepsiyi Kapat`n[Hayır] = Sunucuyu Çalışır Bırak, Tepsiden Çık`n[İptal] = Vazgeç",
+            "ACCIO LUNA Tray Çıkış",
             [System.Windows.Forms.MessageBoxButtons]::YesNoCancel,
             [System.Windows.Forms.MessageBoxIcon]::Question
         )
@@ -356,7 +356,7 @@ $pollTimer.Start()
 Update-TrayMenuStatus
 
 # Başlangıç bildirimi
-$notifyIcon.ShowBalloonTip(2000, "ACCIO JARVIS Tray", "JARVIS Sistem Tepsisi hazır.", [System.Windows.Forms.ToolTipIcon]::Info)
+$notifyIcon.ShowBalloonTip(2000, "ACCIO LUNA Tray", "LUNA Sistem Tepsisi hazır.", [System.Windows.Forms.ToolTipIcon]::Info)
 
 # -----------------------------------------------------------------------------
 # 8. Windows Forms Mesaj Döngüsü

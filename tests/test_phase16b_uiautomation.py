@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V16 — Phase 16B Modern Windows UI Automation Focused Validation Tests
+ACCIO LUNA V16 — Phase 16B Modern Windows UI Automation Focused Validation Tests
 Verifies:
 1. File and backup existence
 2. Allowlist security boundaries (Settings, Calc, disallowed process blocking)
@@ -15,20 +15,20 @@ import os
 import sys
 import time
 
-PROJECT_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+PROJECT_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
 sys.path.insert(0, PROJECT_DIR)
 
-from jarvis_computer_use import (
+from luna_computer_use import (
     ALLOWED_APP_NAMES,
     DesktopAwareness,
     UIElementInspector,
     UIAutomationInspector
 )
-from jarvis_agent_engine import ToolRegistry, PermissionLevel
+from luna_agent_engine import ToolRegistry, PermissionLevel
 
-BACKUP_CU = os.path.join(PROJECT_DIR, "jarvis_computer_use.py.bak_phase16b_20261114")
-BACKUP_AGENT = os.path.join(PROJECT_DIR, "jarvis_agent_engine.py.bak_phase16b_20261114")
-UIA_PS1 = os.path.join(PROJECT_DIR, "jarvis_uia_inspect.ps1")
+BACKUP_CU = os.path.join(PROJECT_DIR, "luna_computer_use.py.bak_phase16b_20261114")
+BACKUP_AGENT = os.path.join(PROJECT_DIR, "luna_agent_engine.py.bak_phase16b_20261114")
+UIA_PS1 = os.path.join(PROJECT_DIR, "luna_uia_inspect.ps1")
 
 def test_phase16b():
     print("======================================================================")
@@ -48,9 +48,9 @@ def test_phase16b():
             print(f"  [FAIL] {desc}")
 
     # 1. Backups and File Existence
-    check("jarvis_computer_use.py backup exists", os.path.exists(BACKUP_CU) and os.path.getsize(BACKUP_CU) > 3000)
-    check("jarvis_agent_engine.py backup exists", os.path.exists(BACKUP_AGENT) and os.path.getsize(BACKUP_AGENT) > 10000)
-    check("jarvis_uia_inspect.ps1 exists", os.path.exists(UIA_PS1))
+    check("luna_computer_use.py backup exists", os.path.exists(BACKUP_CU) and os.path.getsize(BACKUP_CU) > 3000)
+    check("luna_agent_engine.py backup exists", os.path.exists(BACKUP_AGENT) and os.path.getsize(BACKUP_AGENT) > 10000)
+    check("luna_uia_inspect.ps1 exists", os.path.exists(UIA_PS1))
 
     # 2. Allowlist Security & Modern Apps Support
     check("Allowlist includes systemsettings.exe (Windows Settings)", "systemsettings.exe" in ALLOWED_APP_NAMES)
@@ -98,10 +98,10 @@ def test_phase16b():
     check("UIAutomationInspector.inspect_window_uia executed safely", uia_supported_test or True)
 
     # 5. Sensitive & Password Input Masking Check
-    # Verify that jarvis_uia_inspect.ps1 explicitly masks sensitive/password fields
+    # Verify that luna_uia_inspect.ps1 explicitly masks sensitive/password fields
     with open(UIA_PS1, "r", encoding="utf-8") as f:
         ps1_code = f.read()
-    check("jarvis_uia_inspect.ps1 masks passwords ($isPass or *pass* -> GIZLENDI)",
+    check("luna_uia_inspect.ps1 masks passwords ($isPass or *pass* -> GIZLENDI)",
           "$isSensitive = $isPass" in ps1_code and "[GIZLENDI / MASKED]" in ps1_code)
 
     # 6. Fallback to Win32 EnumChildWindows
@@ -123,7 +123,7 @@ def test_phase16b():
         DesktopAwareness.get_foreground_window_info = orig_fg
 
     # 7. Agent Engine Tool Definition & PermissionLevel.READ_ONLY
-    with open(os.path.join(PROJECT_DIR, "jarvis_agent_engine.py"), "r", encoding="utf-8") as f:
+    with open(os.path.join(PROJECT_DIR, "luna_agent_engine.py"), "r", encoding="utf-8") as f:
         agent_code = f.read()
     check("inspect_window_ui is registered with PermissionLevel.READ_ONLY",
           'name="inspect_window_ui"' in agent_code and 'permission_level=PermissionLevel.READ_ONLY' in agent_code)
@@ -131,7 +131,7 @@ def test_phase16b():
           'use_uia = bool(args.get("use_uia", True))' in agent_code or 'use_uia' in agent_code)
 
     # 8. Server endpoint /api/computer_use/inspect_ui parameter support
-    with open(os.path.join(PROJECT_DIR, "jarvis_server.py"), "r", encoding="utf-8") as f:
+    with open(os.path.join(PROJECT_DIR, "luna_server.py"), "r", encoding="utf-8") as f:
         server_code = f.read()
     check("/api/computer_use/inspect_ui passes use_uia and max_elements to inspector",
           'UIElementInspector.inspect_active_window_elements(use_uia=use_uia' in server_code)

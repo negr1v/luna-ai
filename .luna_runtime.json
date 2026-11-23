@@ -1,9 +1,9 @@
 ﻿{
-    "schema":  "jarvis_launcher_v1",
+    "schema":  "luna_launcher_v1",
     "pid":  11208,
     "creationTimeUtc":  "2026-11-23T15:48:41.0127970Z",
     "executablePath":  "C:\\Users\\negr1\\AppData\\Roaming\\Accio\\pre-install\\bd5ff2c6816a\\python\\python.exe",
-    "scriptPath":  "C:\\Users\\negr1\\Projeler\\ACCIO-JARVIS\\jarvis_server.py",
+    "scriptPath":  "C:\\Users\\negr1\\Projeler\\LUNA-AI\\luna_server.py",
     "host":  "127.0.0.1",
     "port":  7860,
     "launchedAt":  "2026-11-23T15:48:41.6531104Z"

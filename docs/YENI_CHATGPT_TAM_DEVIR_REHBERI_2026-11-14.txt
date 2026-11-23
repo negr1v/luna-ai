@@ -1,7 +1,7 @@
 # ==============================================================================
-# ZERO CORE OS (ACCIO-JARVIS) V4 -> V15 TAM DEVIR REHBERI (HANDOFF GUIDE)
+# ZERO CORE OS (LUNA-AI) V4 -> V15 TAM DEVIR REHBERI (HANDOFF GUIDE)
 # TARIH: 2026-11-14
-# PROJE KONUMU: C:\Users\negr1\Projeler\ACCIO-JARVIS
+# PROJE KONUMU: C:\Users\negr1\Projeler\LUNA-AI
 # HEDEF DONANIM: Intel Core i5-8250U / 8 GB RAM / Windows 10/11
 # ==============================================================================
 
@@ -9,17 +9,17 @@
 - Kullanici buyuk promptlar atsa bile ASLA tek seferde hepsini calistirma.
 - Islemleri kucuk mantiksal parcalara bol (Part 1, Part 2, ...).
 - Her adimda kullanicidan "gec" / "uygula" onayi bekle.
-- Buyuk dosyalari (jarvis_server.py 6500+ satir, index.html 15000+ satir) gereksiz yere bastan sona grep/read ile tarayip token/zaman harcama.
+- Buyuk dosyalari (luna_server.py 6500+ satir, index.html 15000+ satir) gereksiz yere bastan sona grep/read ile tarayip token/zaman harcama.
 - Ciktilari sohbette kisa, net ve rapor seklinde tut; gereksiz dosya olusturma.
 
 ------------------------------------------------------------------------------
 1. MIMARI TEMEL VE KORUNACAK SISTEMLER (NON-NEGOTIABLES)
 ------------------------------------------------------------------------------
 * aiohttp Backend (http://127.0.0.1:7860): Tek process, asenkron REST + SSE. Kesinlikle Electron veya harici agir sunucularla DEGISTIRILMEYECEK.
-* Atomik JSON Depolama: jarvis_memory.json ve jarvis_tasks.json revizyon tokenlari (ETag), atomik yaz-degistir (write-replace) ve .bak mekanizmasiyla korunur. Kesinlikle ChromaDB, Pinecone vb. agirlastirici vektor veritabanlari EKLENMEYECEK (8 GB RAM'i bogar).
+* Atomik JSON Depolama: luna_memory.json ve luna_tasks.json revizyon tokenlari (ETag), atomik yaz-degistir (write-replace) ve .bak mekanizmasiyla korunur. Kesinlikle ChromaDB, Pinecone vb. agirlastirici vektor veritabanlari EKLENMEYECEK (8 GB RAM'i bogar).
 * Canvas 2D Cyber Orb: index.html icindeki 60 FPS ses-duyarli gorsellestirici korunacak. Three.js veya WebGL'e tasinmayacak.
 * Sifir-RAM Ses Mimari: Web Speech API (tr-TR) tarayici uzerinden ses tanima + Microsoft Edge-TTS (tr-TR-EmelNeural) sunucu uzerinden ses sentezi + Canli Barge-in (soz kesme). PyTorch/Kokoro/Whisper gibi agir yerel ses modelleri KESINLIKLE YUKLENMEYECEK.
-* Ajan ve Masaustu Farkindaligi: jarvis_agent_engine.py (V11/V12) ve jarvis_computer_use.py (V13 Windows User32 ctypes) cekirdek omurgadir.
+* Ajan ve Masaustu Farkindaligi: luna_agent_engine.py (V11/V12) ve luna_computer_use.py (V13 Windows User32 ctypes) cekirdek omurgadir.
 
 ------------------------------------------------------------------------------
 2. V14 ACIK KAYNAK ISTIHBARAT DENETIMI OZETI VE ALINAN KARARLAR
@@ -39,8 +39,8 @@
 3. MEVCUT DURUM VE EN SON YAPILAN ISLEMLER (PHASE 15A.1)
 ------------------------------------------------------------------------------
 * Dosya Yedekleri:
-  - C:\Users\negr1\Projeler\ACCIO-JARVIS\jarvis_server.py.bak_phase15a1_20261114_105408
-* jarvis_server.py Yapilan Degisiklikler:
+  - C:\Users\negr1\Projeler\LUNA-AI\luna_server.py.bak_phase15a1_20261114_105408
+* luna_server.py Yapilan Degisiklikler:
   - PAID_MODEL_AUTHORIZATIONS sozlugu ve PAID_AUTH_TTL_SECONDS = 120 eklendi.
   - get_model_cost_category(model_id): Modelin 'free', 'paid' veya 'unknown' durumunu tespit eder.
   - create_paid_model_authorization(model_id, provider): Tek kullanimlik pauth_ tokeni uretir.
@@ -59,7 +59,7 @@
      c) Token ikinci kez kullanildiginda (reused) reddedildigini,
      d) Token baska model icin kullanildiginda reddedildigini,
      e) Ucretsiz modellerin hicbir onay istemeden calistigini dogrula.
-2. Phase 15A.2: Terminal Permission Gate (jarvis_agent_engine.py):
+2. Phase 15A.2: Terminal Permission Gate (luna_agent_engine.py):
    - TaskState.TERMINAL_DENIED durumunu ekle.
    - Reddedilen izinlerde gorevi kalici olarak kapat, LLM alternatif aramasin.
 3. Phase 15A.3: Free-First Catalog & Concurrency Gate:
@@ -75,7 +75,7 @@ Yeni sohbette devam etmek icin bu dosyayi referans gostererek kaldigin yerden de
     15A/15B/15C/15D tamamlandi. Gercek sonraki adim Bolum 6'dadir.
  ------------------------------------------------------------------------------
 
- A. JARVIS / ZERO CORE OS (EN ONCELIKLI)
+ A. LUNA / ZERO CORE OS (EN ONCELIKLI)
  1. V3->V9 7 adimlik sinematik donusum TAMAMLANDI (11.14 gece):
     - Holografik HUD, cam efektleri, neon sidebar, 500px 10 durumlu Orb
       (IDLE/LISTENING/THINKING/PROCESSING/SPEAKING/EXECUTING/ANALYZING/
@@ -265,7 +265,7 @@ Yeni sohbette devam etmek icin bu dosyayi referans gostererek kaldigin yerden de
  3. DUSUK KREDI PROTOKOLU (kalici): parca parca; her adimda "gec/uygula" onayi;
     hedefli diff; dev dosyalari bastan sona tarama; testleri ajan CALISTIRMAZ
  4. DEVIR DOSYASI KATALOGU:
-    - ANA: C:\Users\negr1\Projeler\ACCIO-JARVIS\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-14.txt
+    - ANA: C:\Users\negr1\Projeler\LUNA-AI\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-14.txt
     - C:\Users\negr1\Desktop\Yeni klasör\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-09.txt
     - C:\Users\negr1\Downloads\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-09.txt
     - C:\Users\negr1\Desktop\Yeni klasör\: DEVIR-DOSYASI.md, DEVİR-DOSYASI.md,
@@ -282,13 +282,13 @@ Yeni sohbette devam etmek icin bu dosyayi referans gostererek kaldigin yerden de
  ------------------------------------------------------------------------------
  6. SIRADAKI ADIMLAR (ONCELIK SIRASI)
  ------------------------------------------------------------------------------
- 1. JARVIS — 15D Quick Catalog Fix kalantini BITIR:
-    a) jarvis_server.py icinde DEPRECATED_MODELS / lifecycle / pricing yapisini
+ 1. LUNA — 15D Quick Catalog Fix kalantini BITIR:
+    a) luna_server.py icinde DEPRECATED_MODELS / lifecycle / pricing yapisini
        OKU ve dogrula (qwen/qwen3.8-27b ve gpt-oss-120b hali)
     b) lifecycle (ACTIVE/PREVIEW/DEPRECATED) ile pricing (FREE/PAID/UNKNOWN)
        ayrisin; ucretli model "deprecated" diye degil, onay kilidi ile engellensin
     c) Model Hub etiketleri + test_phase15d guncellensin; kullanici calistirir
- 2. JARVIS — 15A.2 (TaskState.TERMINAL_DENIED, jarvis_agent_engine.py)
+ 2. LUNA — 15A.2 (TaskState.TERMINAL_DENIED, luna_agent_engine.py)
     yapilip yapilmedigi DOGRULANSIN (15A final test 7/7 gecmistir ama bu
     madde o sohbette dogrudan gorunmedi)
  3. DONANIM — Abinin 11.14 sabahi parca alimini yapip yapmadigini SOR;
@@ -300,5 +300,5 @@ Yeni sohbette devam etmek icin bu dosyayi referans gostererek kaldigin yerden de
  6. OYUN — 18.11.2026 yama gunu: Rose ACMA, guncelleme beklenir
 
  Yeni sohbette devam:
-   "C:\Users\negr1\Projeler\ACCIO-JARVIS\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-14.txt
+   "C:\Users\negr1\Projeler\LUNA-AI\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-14.txt
    dosyasini oku, Bolum 6'dan devam et, dusuk kredi kurallarina uy."

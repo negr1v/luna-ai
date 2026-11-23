@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 7 Live Integration Acceptance Suite
+ACCIO LUNA V4.0 — Phase 7 Live Integration Acceptance Suite
 Focus: Live Server (Port 7868), Headless Chrome E2E DOM Render,
        Live Automation CRUD, Gaming Mode Telemetry, Queue Drain & 409,
        Persistent Restart Recovery, Zero Production Data Mutation.
@@ -17,7 +17,7 @@ import urllib.error
 import subprocess
 import unittest
 
-import jarvis_server
+import luna_server
 
 PORT = 7868
 BASE_URL = f"http://127.0.0.1:{PORT}"
@@ -26,7 +26,7 @@ CHROME_PATH = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
 class Phase7LiveAcceptanceRunner:
     def __init__(self):
-        self.temp_dir = tempfile.TemporaryDirectory(prefix="jarvis_phase7_live_")
+        self.temp_dir = tempfile.TemporaryDirectory(prefix="luna_phase7_live_")
         self.test_tasks_file = os.path.join(self.temp_dir.name, "isolated_tasks.json")
         self.test_mem_file = os.path.join(self.temp_dir.name, "isolated_memory.json")
         self.test_cfg_file = os.path.join(self.temp_dir.name, "isolated_cfg.json")
@@ -53,23 +53,23 @@ class Phase7LiveAcceptanceRunner:
         self.site = None
 
     def start_server(self):
-        jarvis_server.TASKS_FILE = self.test_tasks_file
-        jarvis_server.MEMORY_FILE = self.test_mem_file
-        jarvis_server.CONFIG_FILE = self.test_cfg_file
-        jarvis_server.TELEGRAM_FILE = self.test_tg_file
-        jarvis_server.AUTOMATIONS_FILE = self.test_auto_file
-        jarvis_server.NOTIFICATIONS_FILE = self.test_notif_file
-        jarvis_server.OVERFLOW_COUNT = 0
-        jarvis_server.EXPIRED_COUNT = 0
-        jarvis_server.DEFERRED_NOTIFICATIONS = []
+        luna_server.TASKS_FILE = self.test_tasks_file
+        luna_server.MEMORY_FILE = self.test_mem_file
+        luna_server.CONFIG_FILE = self.test_cfg_file
+        luna_server.TELEGRAM_FILE = self.test_tg_file
+        luna_server.AUTOMATIONS_FILE = self.test_auto_file
+        luna_server.NOTIFICATIONS_FILE = self.test_notif_file
+        luna_server.OVERFLOW_COUNT = 0
+        luna_server.EXPIRED_COUNT = 0
+        luna_server.DEFERRED_NOTIFICATIONS = []
 
         def run_loop():
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
-            app = jarvis_server.create_app()
-            self.runner = jarvis_server.web.AppRunner(app)
+            app = luna_server.create_app()
+            self.runner = luna_server.web.AppRunner(app)
             self.loop.run_until_complete(self.runner.setup())
-            self.site = jarvis_server.web.TCPSite(self.runner, "127.0.0.1", PORT)
+            self.site = luna_server.web.TCPSite(self.runner, "127.0.0.1", PORT)
             self.loop.run_until_complete(self.site.start())
             self.loop.run_forever()
 

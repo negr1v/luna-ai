@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS V15 - PHASE 15C LIVE MEMORY INTELLIGENCE TESTS
+LUNA-AI V15 - PHASE 15C LIVE MEMORY INTELLIGENCE TESTS
 Verifies:
 1. Context-aware memory retrieval and relevance/importance scoring.
 2. Topic-based memory search.
@@ -17,7 +17,7 @@ from aiohttp import web
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from jarvis_server import (
+from luna_server import (
     calculate_memory_relevance,
     search_memory_intelligence,
     extract_conversation_memory_candidates,

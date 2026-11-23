@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V16 — Phase 16A Windows System Tray Focused Validation Tests
+ACCIO LUNA V16 — Phase 16A Windows System Tray Focused Validation Tests
 Verifies:
 1. Tray integration files & backup existence
 2. PowerShell script syntax and AST parsing
@@ -15,12 +15,12 @@ import os
 import subprocess
 import sys
 
-PROJECT_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
-START_SCRIPT = os.path.join(PROJECT_DIR, "start_jarvis.ps1")
-TRAY_SCRIPT = os.path.join(PROJECT_DIR, "jarvis_tray.ps1")
-TRAY_BAT = os.path.join(PROJECT_DIR, "JARVIS-TRAY.bat")
-BACKUP_PS1 = os.path.join(PROJECT_DIR, "start_jarvis.ps1.bak_phase16a_20261114")
-BACKUP_SERVER = os.path.join(PROJECT_DIR, "jarvis_server.py.bak_phase16a_20261114")
+PROJECT_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
+START_SCRIPT = os.path.join(PROJECT_DIR, "start_luna.ps1")
+TRAY_SCRIPT = os.path.join(PROJECT_DIR, "luna_tray.ps1")
+TRAY_BAT = os.path.join(PROJECT_DIR, "LUNA-TRAY.bat")
+BACKUP_PS1 = os.path.join(PROJECT_DIR, "start_luna.ps1.bak_phase16a_20261114")
+BACKUP_SERVER = os.path.join(PROJECT_DIR, "luna_server.py.bak_phase16a_20261114")
 
 def test_phase16a():
     print("======================================================================")
@@ -40,11 +40,11 @@ def test_phase16a():
             print(f"  [FAIL] {desc}")
 
     # 1. File existence and backup verification
-    check("start_jarvis.ps1 exists", os.path.exists(START_SCRIPT))
-    check("jarvis_tray.ps1 exists", os.path.exists(TRAY_SCRIPT))
-    check("JARVIS-TRAY.bat exists", os.path.exists(TRAY_BAT))
-    check("start_jarvis.ps1 backup exists", os.path.exists(BACKUP_PS1) and os.path.getsize(BACKUP_PS1) > 5000)
-    check("jarvis_server.py backup exists", os.path.exists(BACKUP_SERVER) and os.path.getsize(BACKUP_SERVER) > 100000)
+    check("start_luna.ps1 exists", os.path.exists(START_SCRIPT))
+    check("luna_tray.ps1 exists", os.path.exists(TRAY_SCRIPT))
+    check("LUNA-TRAY.bat exists", os.path.exists(TRAY_BAT))
+    check("start_luna.ps1 backup exists", os.path.exists(BACKUP_PS1) and os.path.getsize(BACKUP_PS1) > 5000)
+    check("luna_server.py backup exists", os.path.exists(BACKUP_SERVER) and os.path.getsize(BACKUP_SERVER) > 100000)
 
     # 2. PowerShell syntax verification using PS Parser
     ps_syntax_cmd = [
@@ -59,10 +59,10 @@ def test_phase16a():
         """
     ]
     res = subprocess.run(ps_syntax_cmd, capture_output=True, text=True)
-    check("start_jarvis.ps1 and jarvis_tray.ps1 have valid PowerShell AST syntax",
+    check("start_luna.ps1 and luna_tray.ps1 have valid PowerShell AST syntax",
           "SYNTAX_OK" in res.stdout)
 
-    # 3. start_jarvis.ps1 -Action Status verification
+    # 3. start_luna.ps1 -Action Status verification
     status_cmd = [
         "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
         "-File", START_SCRIPT, "-Action", "Status"
@@ -80,31 +80,31 @@ def test_phase16a():
                     break
     except Exception:
         pass
-    check("start_jarvis.ps1 -Action Status returns valid JSON payload", status_parsed)
+    check("start_luna.ps1 -Action Status returns valid JSON payload", status_parsed)
 
-    # 4. Read jarvis_tray.ps1 content for structural feature requirements
+    # 4. Read luna_tray.ps1 content for structural feature requirements
     with open(TRAY_SCRIPT, "r", encoding="utf-8") as f:
         tray_code = f.read()
 
-    # Feature 1: Minimize JARVIS to system tray
+    # Feature 1: Minimize LUNA to system tray
     check("F1: Win32 ShowWindow / SW_HIDE minimize to tray implemented",
           "Win32TrayHelper" in tray_code and "ShowWindow" in tray_code and "SW_HIDE" in tray_code)
 
-    # Feature 2: Tray icon with Open JARVIS action
-    check("F2: Open JARVIS / Kokpiti Aç action implemented in context menu",
+    # Feature 2: Tray icon with Open LUNA action
+    check("F2: Open LUNA / Kokpiti Aç action implemented in context menu",
           "openDashboardItem" in tray_code and "Start-Process $DashboardUrl" in tray_code)
 
     # Feature 3: Show/hide main dashboard
     check("F3: Show/hide console toggle action implemented",
           "toggleConsoleItem" in tray_code and "IsWindowVisible" in tray_code and "SW_RESTORE" in tray_code)
 
-    # Feature 4: Start/stop JARVIS through tray menu
+    # Feature 4: Start/stop LUNA through tray menu
     check("F4: Start and Stop server actions implemented in context menu",
           "startServerItem" in tray_code and "stopServerItem" in tray_code and "-Action Start" in tray_code and "-Action Stop" in tray_code)
 
     # Feature 5: Display server running status
     check("F5: Live server running status indicator and timer implemented",
-          "statusMenuItem" in tray_code and "Get-JarvisServerState" in tray_code and "pollTimer" in tray_code)
+          "statusMenuItem" in tray_code and "Get-LunaServerState" in tray_code and "pollTimer" in tray_code)
 
     # Feature 6: Graceful application shutdown
     check("F6: Graceful shutdown with user confirmation and notifyIcon disposal",
@@ -115,16 +115,16 @@ def test_phase16a():
           "if ($serverState.IsRunning) { Start-Process $DashboardUrl }" in tray_code or
           "$serverState.IsRunning" in tray_code)
 
-    # Feature 8: Prevent duplicate JARVIS processes
-    check("F8: Single-instance mutex for tray (ACCIO_JARVIS_TRAY_MUTEX)",
-          "ACCIO_JARVIS_TRAY_MUTEX" in tray_code and "System.Threading.Mutex" in tray_code)
+    # Feature 8: Prevent duplicate LUNA processes
+    check("F8: Single-instance mutex for tray (LUNA_AI_TRAY_MUTEX)",
+          "LUNA_AI_TRAY_MUTEX" in tray_code and "System.Threading.Mutex" in tray_code)
 
     # Requirement checks
-    check("Req: Optional tray execution via start_jarvis.ps1 -Action Tray",
+    check("Req: Optional tray execution via start_luna.ps1 -Action Tray",
           '-Action "Tray"' in open(START_SCRIPT, "r", encoding="utf-8").read() or
           "-eq \"Tray\"" in open(START_SCRIPT, "r", encoding="utf-8").read())
     check("Req: Dynamic lightweight icon generator without disk image files",
-          "Create-JarvisTrayIcon" in tray_code and "System.Drawing.Bitmap" in tray_code)
+          "Create-LunaTrayIcon" in tray_code and "System.Drawing.Bitmap" in tray_code)
 
     print(f"\n======================================================================")
     print(f"RESULTS: {passed} / {total} tests passed.")

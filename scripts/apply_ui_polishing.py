@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS UI Polishing & Sidebar Streamlining Script
+LUNA-AI UI Polishing & Sidebar Streamlining Script
 1. Premium Cyber-Glass Button & Chip Styling (High-end gradients, glow, micro-interactions)
 2. Cohesive Quick Chips Bar (Data Sources, YKS, Telegram, AM5, Ekran, Study Mommy, Anime Kızı)
 3. Streamlined Left Sidebar: groups related categories logically, removes visual clutter
@@ -13,11 +13,11 @@ import sys
 import re
 import subprocess
 
-ROOT = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+ROOT = r"C:\Users\negr1\Projeler\LUNA-AI"
 HTML_PATH = os.path.join(ROOT, "index.html")
-DIST_HTML_PATH = os.path.join(ROOT, "dist", "ACCIO-JARVIS-PORTABLE", "app", "index.html")
+DIST_HTML_PATH = os.path.join(ROOT, "dist", "LUNA-AI-PORTABLE", "app", "index.html")
 
-print("[*] ACCIO-JARVIS UI Kalite & Sadeleştirme güncellemesi başlatılıyor...")
+print("[*] LUNA-AI UI Kalite & Sadeleştirme güncellemesi başlatılıyor...")
 
 if not os.path.exists(HTML_PATH):
     print(f"[!] HATA: {HTML_PATH} bulunamadı!")
@@ -295,7 +295,7 @@ if os.path.exists(DIST_HTML_PATH):
 # Syntax check
 node_test = '''
 const fs = require('fs');
-const html = fs.readFileSync('C:/Users/negr1/Projeler/ACCIO-JARVIS/index.html', 'utf8');
+const html = fs.readFileSync('C:/Users/negr1/Projeler/LUNA-AI/index.html', 'utf8');
 const scriptRegex = /<script>([\s\S]*?)<\/script>/gi;
 let match, count = 0;
 while ((match = scriptRegex.exec(html)) !== null) {

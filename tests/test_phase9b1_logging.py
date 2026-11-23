@@ -1,6 +1,6 @@
 """
 Phase 9B.1D — Rotating Logging & Startup Integration Acceptance Tests
-ACCIO JARVIS V4.0
+ACCIO LUNA V4.0
 
 Validates:
 1. Runtime log file configuration and path.
@@ -32,16 +32,16 @@ import errno
 import io
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import jarvis_server
+import luna_server
 
 class TestPhase9B1Logging(unittest.TestCase):
 
     def setUp(self):
-        self.original_handlers = list(logging.getLogger("jarvis").handlers)
-        self.test_dir = tempfile.mkdtemp(prefix="jarvis_log_test_")
+        self.original_handlers = list(logging.getLogger("luna").handlers)
+        self.test_dir = tempfile.mkdtemp(prefix="luna_log_test_")
 
     def tearDown(self):
-        logger = logging.getLogger("jarvis")
+        logger = logging.getLogger("luna")
         for h in list(logger.handlers):
             h.close()
             logger.removeHandler(h)
@@ -56,17 +56,17 @@ class TestPhase9B1Logging(unittest.TestCase):
 
     def test_01_log_file_configuration_and_constants(self):
         """1, 2, 3, 4: Confirms LOG_FILE, 2 MB max size, 5 backups, and UTF-8 encoding."""
-        self.assertEqual(jarvis_server.LOG_MAX_BYTES, 2 * 1024 * 1024)
-        self.assertEqual(jarvis_server.LOG_BACKUP_COUNT, 5)
-        self.assertTrue(jarvis_server.LOG_FILE.endswith("jarvis_runtime.log"))
+        self.assertEqual(luna_server.LOG_MAX_BYTES, 2 * 1024 * 1024)
+        self.assertEqual(luna_server.LOG_BACKUP_COUNT, 5)
+        self.assertTrue(luna_server.LOG_FILE.endswith("luna_runtime.log"))
 
         test_log_file = os.path.join(self.test_dir, "test_conf.log")
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file):
-            logger = logging.getLogger("jarvis")
+        with patch.object(luna_server, "LOG_FILE", test_log_file):
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
-            log = jarvis_server.setup_logging()
+            log = luna_server.setup_logging()
             file_handlers = [h for h in log.handlers if isinstance(h, RotatingFileHandler)]
             self.assertEqual(len(file_handlers), 1)
             fh = file_handlers[0]
@@ -77,33 +77,33 @@ class TestPhase9B1Logging(unittest.TestCase):
     def test_05_log_format_contains_timestamp_level_and_message(self):
         """5. Format includes asctime, levelname, name and message."""
         test_log_file = os.path.join(self.test_dir, "format_test.log")
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file):
-            logger = logging.getLogger("jarvis")
+        with patch.object(luna_server, "LOG_FILE", test_log_file):
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
-            log = jarvis_server.setup_logging()
+            log = luna_server.setup_logging()
             log.info("FORMAT_VERIFICATION_MESSAGE")
 
             with open(test_log_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
             self.assertIn("[INFO]", content)
-            self.assertIn("[jarvis]", content)
+            self.assertIn("[luna]", content)
             self.assertIn("FORMAT_VERIFICATION_MESSAGE", content)
 
     def test_06_idempotent_setup_logging_no_duplicates(self):
         """6, 7: Repeated setup_logging calls do not duplicate handlers or messages."""
         test_log_file = os.path.join(self.test_dir, "idempotent.log")
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file):
-            logger = logging.getLogger("jarvis")
+        with patch.object(luna_server, "LOG_FILE", test_log_file):
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
             # Call multiple times
-            jarvis_server.setup_logging()
-            jarvis_server.setup_logging()
-            log = jarvis_server.setup_logging()
+            luna_server.setup_logging()
+            luna_server.setup_logging()
+            log = luna_server.setup_logging()
 
             file_handlers = [h for h in log.handlers if isinstance(h, RotatingFileHandler)]
             console_handlers = [h for h in log.handlers if isinstance(h, logging.StreamHandler) and not isinstance(h, RotatingFileHandler)]
@@ -121,15 +121,15 @@ class TestPhase9B1Logging(unittest.TestCase):
         """8, 9: File rotation and backup retention limit work as expected."""
         test_log_file = os.path.join(self.test_dir, "rotating.log")
         # Use small maxBytes (100 bytes) and 3 backups for testing rotation mechanics
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file), \
-             patch.object(jarvis_server, "LOG_MAX_BYTES", 120), \
-             patch.object(jarvis_server, "LOG_BACKUP_COUNT", 3):
+        with patch.object(luna_server, "LOG_FILE", test_log_file), \
+             patch.object(luna_server, "LOG_MAX_BYTES", 120), \
+             patch.object(luna_server, "LOG_BACKUP_COUNT", 3):
 
-            logger = logging.getLogger("jarvis")
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
-            log = jarvis_server.setup_logging()
+            log = luna_server.setup_logging()
 
             # Write enough lines to force multiple rotations
             for i in range(25):
@@ -145,14 +145,14 @@ class TestPhase9B1Logging(unittest.TestCase):
     def test_10_console_output_functional(self):
         """10. Console StreamHandler outputs formatted log messages."""
         test_log_file = os.path.join(self.test_dir, "console_test.log")
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file):
-            logger = logging.getLogger("jarvis")
+        with patch.object(luna_server, "LOG_FILE", test_log_file):
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
             captured = io.StringIO()
             with patch("sys.stdout", captured):
-                log = jarvis_server.setup_logging()
+                log = luna_server.setup_logging()
                 log.info("CONSOLE_STREAM_TEST")
 
             self.assertIn("[INFO]", captured.getvalue())
@@ -160,12 +160,12 @@ class TestPhase9B1Logging(unittest.TestCase):
 
     def test_11_file_handler_failure_retains_console_fallback(self):
         """11. File handler initialization failure retains console fallback without crashing."""
-        logger = logging.getLogger("jarvis")
+        logger = logging.getLogger("luna")
         for h in list(logger.handlers):
             logger.removeHandler(h)
 
-        with patch("jarvis_server.RotatingFileHandler", side_effect=PermissionError("Mock Permission Denied")):
-            log = jarvis_server.setup_logging()
+        with patch("luna_server.RotatingFileHandler", side_effect=PermissionError("Mock Permission Denied")):
+            log = luna_server.setup_logging()
             self.assertIsNotNone(log)
             has_console = any(isinstance(h, logging.StreamHandler) and not isinstance(h, RotatingFileHandler) for h in log.handlers)
             self.assertTrue(has_console)
@@ -173,32 +173,32 @@ class TestPhase9B1Logging(unittest.TestCase):
     def test_12_and_14_startup_and_shutdown_logged(self):
         """12, 14: safe_start_server logs startup and normal shutdown events."""
         test_log_file = os.path.join(self.test_dir, "startup_shutdown.log")
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file):
-            logger = logging.getLogger("jarvis")
+        with patch.object(luna_server, "LOG_FILE", test_log_file):
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
             with patch("aiohttp.web.run_app", return_value=None):
-                jarvis_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
+                luna_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
 
             with open(test_log_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            self.assertIn("JARVIS sunucusu başlatılıyor: http://127.0.0.1:7860", content)
-            self.assertIn("JARVIS sunucusu normal şekilde durduruldu.", content)
+            self.assertIn("LUNA sunucusu başlatılıyor: http://127.0.0.1:7860", content)
+            self.assertIn("LUNA sunucusu normal şekilde durduruldu.", content)
 
     def test_13_port_conflict_logged(self):
         """13. Port conflict is logged as ERROR before sys.exit(1)."""
         test_log_file = os.path.join(self.test_dir, "conflict.log")
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file):
-            logger = logging.getLogger("jarvis")
+        with patch.object(luna_server, "LOG_FILE", test_log_file):
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
             err = OSError(errno.EADDRINUSE, "Address already in use")
             with patch("aiohttp.web.run_app", side_effect=err):
                 with self.assertRaises(SystemExit):
-                    jarvis_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
+                    luna_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
 
             with open(test_log_file, "r", encoding="utf-8") as f:
                 content = f.read()
@@ -210,18 +210,18 @@ class TestPhase9B1Logging(unittest.TestCase):
     def test_15_secrets_never_exposed_in_operational_logs(self):
         """15. Secret credentials are not leaked into runtime logs."""
         test_log_file = os.path.join(self.test_dir, "secrets.log")
-        with patch.object(jarvis_server, "LOG_FILE", test_log_file):
-            logger = logging.getLogger("jarvis")
+        with patch.object(luna_server, "LOG_FILE", test_log_file):
+            logger = logging.getLogger("luna")
             for h in list(logger.handlers):
                 logger.removeHandler(h)
 
-            log = jarvis_server.setup_logging()
+            log = luna_server.setup_logging()
 
             fake_groq = "gsk_testSECRET1234567890"
             fake_tg_token = "123456789:ABCdefGHIjklMNOpqrSTUvwxYZ_12345678"
 
             # Use mask_secrets on operational messages
-            safe_msg = jarvis_server.mask_secrets(f"Worker report key={fake_groq} token={fake_tg_token}")
+            safe_msg = luna_server.mask_secrets(f"Worker report key={fake_groq} token={fake_tg_token}")
             log.info(safe_msg)
 
             with open(test_log_file, "r", encoding="utf-8") as f:

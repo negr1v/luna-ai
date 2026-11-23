@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 8B.4 Automated Test Suite
+ACCIO LUNA V4.0 — Phase 8B.4 Automated Test Suite
 Focus: Comprehensive Secret Masking & Information Disclosure Audit
 """
 
@@ -14,21 +14,21 @@ from unittest.mock import patch, AsyncMock
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
-import jarvis_server
+import luna_server
 
 
 class Phase8B4SecretMaskingTest(AioHTTPTestCase):
 
     async def get_application(self):
-        return jarvis_server.create_app()
+        return luna_server.create_app()
 
     def setUp(self):
         super().setUp()
         self.test_dir = tempfile.mkdtemp(prefix="phase8b4_test_")
-        self.test_config_file = os.path.join(self.test_dir, "jarvis_config.json")
-        self.test_memory_file = os.path.join(self.test_dir, "jarvis_memory.json")
-        self.test_tasks_file = os.path.join(self.test_dir, "jarvis_tasks.json")
-        self.test_tg_file = os.path.join(self.test_dir, "jarvis_telegram.json")
+        self.test_config_file = os.path.join(self.test_dir, "luna_config.json")
+        self.test_memory_file = os.path.join(self.test_dir, "luna_memory.json")
+        self.test_tasks_file = os.path.join(self.test_dir, "luna_tasks.json")
+        self.test_tg_file = os.path.join(self.test_dir, "luna_telegram.json")
 
         self.initial_config = {
             "groq_api_key": "gsk_prod_secret_key_1234567890",
@@ -49,28 +49,28 @@ class Phase8B4SecretMaskingTest(AioHTTPTestCase):
         with open(self.test_tg_file, "w", encoding="utf-8") as f:
             json.dump([], f)
 
-        self.orig_cfg_file = jarvis_server.CONFIG_FILE
-        self.orig_mem_file = jarvis_server.MEMORY_FILE
-        self.orig_tasks_file = jarvis_server.TASKS_FILE
-        self.orig_tg_file = jarvis_server.TELEGRAM_FILE
+        self.orig_cfg_file = luna_server.CONFIG_FILE
+        self.orig_mem_file = luna_server.MEMORY_FILE
+        self.orig_tasks_file = luna_server.TASKS_FILE
+        self.orig_tg_file = luna_server.TELEGRAM_FILE
 
-        jarvis_server.CONFIG_FILE = self.test_config_file
-        jarvis_server.MEMORY_FILE = self.test_memory_file
-        jarvis_server.TASKS_FILE = self.test_tasks_file
-        jarvis_server.TELEGRAM_FILE = self.test_tg_file
+        luna_server.CONFIG_FILE = self.test_config_file
+        luna_server.MEMORY_FILE = self.test_memory_file
+        luna_server.TASKS_FILE = self.test_tasks_file
+        luna_server.TELEGRAM_FILE = self.test_tg_file
 
     def tearDown(self):
-        jarvis_server.CONFIG_FILE = self.orig_cfg_file
-        jarvis_server.MEMORY_FILE = self.orig_mem_file
-        jarvis_server.TASKS_FILE = self.orig_tasks_file
-        jarvis_server.TELEGRAM_FILE = self.orig_tg_file
+        luna_server.CONFIG_FILE = self.orig_cfg_file
+        luna_server.MEMORY_FILE = self.orig_mem_file
+        luna_server.TASKS_FILE = self.orig_tasks_file
+        luna_server.TELEGRAM_FILE = self.orig_tg_file
 
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
         super().tearDown()
 
     async def tearDownAsync(self):
-        await jarvis_server.stop_telegram_worker()
+        await luna_server.stop_telegram_worker()
         await super().tearDownAsync()
 
     # =========================================================================
@@ -80,38 +80,38 @@ class Phase8B4SecretMaskingTest(AioHTTPTestCase):
     def test_01_telegram_token_redaction(self):
         """Test 01: Telegram bot token regex pattern is cleanly masked."""
         raw = "Failed to connect to Telegram via 123456789:ABCdefGHIjklMNOpqrSTUvwxYZ_12345678"
-        masked = jarvis_server.mask_secrets(raw)
+        masked = luna_server.mask_secrets(raw)
         self.assertNotIn("123456789:ABCdefGHIjklMNOpqrSTUvwxYZ_12345678", masked)
         self.assertIn("***TELEGRAM_TOKEN_REDACTED***", masked)
 
     def test_02_groq_and_openai_key_redaction(self):
         """Test 02: Groq (gsk_...) and OpenAI (sk-...) API keys are masked."""
         raw_groq = "Authorization failed for gsk_secretkey1234567890abcdef"
-        masked_groq = jarvis_server.mask_secrets(raw_groq)
+        masked_groq = luna_server.mask_secrets(raw_groq)
         self.assertNotIn("gsk_secretkey1234567890abcdef", masked_groq)
         self.assertIn("gsk_***REDACTED***", masked_groq)
 
         raw_openai = "Connecting with sk-proj-12345678901234567890abcdef"
-        masked_openai = jarvis_server.mask_secrets(raw_openai)
+        masked_openai = luna_server.mask_secrets(raw_openai)
         self.assertNotIn("sk-proj-12345678901234567890abcdef", masked_openai)
         self.assertIn("sk-***REDACTED***", masked_openai)
 
     def test_03_bearer_and_authorization_header_redaction(self):
         """Test 03: Bearer tokens and Basic auth headers in logs/errors are masked."""
         raw_bearer = "Upstream response error: Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-        masked_bearer = jarvis_server.mask_secrets(raw_bearer)
+        masked_bearer = luna_server.mask_secrets(raw_bearer)
         self.assertNotIn("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9", masked_bearer)
         self.assertIn("Bearer ***TOKEN_REDACTED***", masked_bearer)
 
         raw_basic = "Proxy Auth: Basic dXNlcm5hbWU6cGFzc3dvcmQxMjM="
-        masked_basic = jarvis_server.mask_secrets(raw_basic)
+        masked_basic = luna_server.mask_secrets(raw_basic)
         self.assertNotIn("dXNlcm5hbWU6cGFzc3dvcmQxMjM=", masked_basic)
         self.assertIn("Basic ***AUTH_REDACTED***", masked_basic)
 
     def test_04_json_and_key_value_secret_masking(self):
         """Test 04: Key-value secret patterns in JSON strings are masked."""
         raw_json = '{"api_key": "supersecretkey999", "password": "mypassword123", "status": "ok"}'
-        masked_json = jarvis_server.mask_secrets(raw_json)
+        masked_json = luna_server.mask_secrets(raw_json)
         self.assertNotIn("supersecretkey999", masked_json)
         self.assertNotIn("mypassword123", masked_json)
         self.assertIn('"status": "ok"', masked_json)
@@ -130,7 +130,7 @@ class Phase8B4SecretMaskingTest(AioHTTPTestCase):
                 {"name": "neg1"}
             ]
         }
-        masked = jarvis_server.mask_dict_secrets(data)
+        masked = luna_server.mask_dict_secrets(data)
         self.assertEqual(masked["auth"]["api_key"], "***REDACTED***")
         self.assertEqual(masked["auth"]["public_name"], "Luna")
         self.assertEqual(masked["credentials"][0]["bot_token"], "***REDACTED***")
@@ -145,7 +145,7 @@ class Phase8B4SecretMaskingTest(AioHTTPTestCase):
             "Telegram üzerinden mesajlaşma köprüsü aktif mi?"
         ]
         for text in normal_texts:
-            self.assertEqual(jarvis_server.mask_secrets(text), text)
+            self.assertEqual(luna_server.mask_secrets(text), text)
 
     # =========================================================================
     # 2. CONFIG GET/POST & PRESERVATION SAFETY
@@ -185,20 +185,20 @@ class Phase8B4SecretMaskingTest(AioHTTPTestCase):
 
         groq_raw = saved_cfg.get("groq_api_key")
         tg_raw = saved_cfg.get("telegram_bot_token")
-        groq_val = jarvis_server.unprotect_secret(groq_raw) if hasattr(jarvis_server, "unprotect_secret") else groq_raw
-        tg_val = jarvis_server.unprotect_secret(tg_raw) if hasattr(jarvis_server, "unprotect_secret") else tg_raw
+        groq_val = luna_server.unprotect_secret(groq_raw) if hasattr(luna_server, "unprotect_secret") else groq_raw
+        tg_val = luna_server.unprotect_secret(tg_raw) if hasattr(luna_server, "unprotect_secret") else tg_raw
         self.assertEqual(groq_val, "gsk_prod_secret_key_1234567890")
         self.assertEqual(tg_val, "123456789:ABCdefGHIjklMNOpqrSTUvwxYZ_12345678")
         self.assertEqual(saved_cfg.get("edge_voice"), "tr-TR-AhmetNeural")
 
     async def test_09_unknown_or_dynamic_secret_keys_detected(self):
         """Test 09: Dynamic keys matching is_secret_key are identified and protected."""
-        self.assertTrue(jarvis_server.is_secret_key("new_custom_api_key"))
-        self.assertTrue(jarvis_server.is_secret_key("third_party_secret"))
-        self.assertTrue(jarvis_server.is_secret_key("oauth_access_token"))
-        self.assertTrue(jarvis_server.is_secret_key("db_password"))
-        self.assertFalse(jarvis_server.is_secret_key("tts_engine"))
-        self.assertFalse(jarvis_server.is_secret_key("groq_model"))
+        self.assertTrue(luna_server.is_secret_key("new_custom_api_key"))
+        self.assertTrue(luna_server.is_secret_key("third_party_secret"))
+        self.assertTrue(luna_server.is_secret_key("oauth_access_token"))
+        self.assertTrue(luna_server.is_secret_key("db_password"))
+        self.assertFalse(luna_server.is_secret_key("tts_engine"))
+        self.assertFalse(luna_server.is_secret_key("groq_model"))
 
     # =========================================================================
     # 3. ERROR & LOGGING ISOLATION

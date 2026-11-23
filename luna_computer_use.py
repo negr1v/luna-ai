@@ -1,5 +1,5 @@
 """
-ZERO CORE OS (ACCIO-JARVIS) V4 - Windows Desktop Awareness & Computer Use Engine (V13)
+ZERO CORE OS (LUNA-AI) V4 - Windows Desktop Awareness & Computer Use Engine (V13)
 Güvenli, modüler, allowlist tabanlı ve yerel Windows User32/Accessibility API destekli masaüstü kontrol çekirdeği.
 """
 
@@ -11,7 +11,7 @@ import logging
 from ctypes import wintypes
 from typing import Dict, Any, List, Optional, Tuple
 
-logger = logging.getLogger("jarvis.computer_use")
+logger = logging.getLogger("luna.computer_use")
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
@@ -120,7 +120,7 @@ class UIAutomationInspector:
         import subprocess
         import json
 
-        script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "jarvis_uia_inspect.ps1")
+        script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "luna_uia_inspect.ps1")
         if not os.path.exists(script_path):
             return []
 
@@ -454,9 +454,9 @@ class UIAutomationActionController:
             }
 
         # 5. Native PowerShell UIAutomation Yürütücüsünü Çağırma
-        script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "jarvis_uia_action.ps1")
+        script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "luna_uia_action.ps1")
         if not os.path.exists(script_path):
-            return {"status": "error", "message": "jarvis_uia_action.ps1 betiği bulunamadı."}
+            return {"status": "error", "message": "luna_uia_action.ps1 betiği bulunamadı."}
 
         cmd = [
             "powershell.exe",

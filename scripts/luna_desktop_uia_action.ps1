@@ -1,5 +1,5 @@
 <#
- ACCIO JARVIS ULTRA Desktop Agent V1 fixed semantic UIA executor.
+ ACCIO LUNA ULTRA Desktop Agent V1 fixed semantic UIA executor.
  It accepts only exact UI Automation identities, requires exactly one match,
  and deliberately has no Win32 or coordinate fallback.
 #>

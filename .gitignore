@@ -1,4 +1,4 @@
-# Luna AI / ACCIO-JARVIS Git Ignore
+# Luna AI / LUNA-AI Git Ignore
 
 # Heavy local AI / speech models (1.3+ GB)
 models/
@@ -12,7 +12,7 @@ __pycache__/
 # Archives and logs
 *.zip
 *.log
-jarvis_runtime.log
+luna_runtime.log
 
 # Temporary and extra training files
 temp_att/

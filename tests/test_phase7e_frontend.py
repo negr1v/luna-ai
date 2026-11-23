@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 7E Automated Test Suite
+ACCIO LUNA V4.0 — Phase 7E Automated Test Suite
 Focus: Command Center Automation & Gaming Mode UI, Safe DOM Rendering,
        Schedule & Action Type Handling, Notification Queue Telemetry,
        No Duplicate Requests, Intact Voice & Task Controls.

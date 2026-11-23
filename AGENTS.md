@@ -11,7 +11,7 @@ This repository is governed by the Luna AI Multi-Agent Architecture.
 
 ## Core Operational Rules
 
-1. **Targeted Diff Policy:** Avoid full-file rewrites on large files (`index.html`, `jarvis_server.py`). Always locate target code blocks via search/grep and perform surgical edits.
+1. **Targeted Diff Policy:** Avoid full-file rewrites on large files (`index.html`, `luna_server.py`). Always locate target code blocks via search/grep and perform surgical edits.
 2. **Zero-Token Waste:** Never run blind tests or loops in background. Provide single-line PowerShell verification commands.
 3. **No Credential Exposure:** Never print, log, or commit `.env`, API keys, or secret tokens.
 4. **Clean Git Tree:** Implementations, tests, documentation, and assets must reside in their respective designated directories (`docs/`, `tests/`, `scripts/`, `assets/`, `static/`).

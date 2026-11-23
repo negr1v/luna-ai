@@ -1,6 +1,6 @@
 """
 Phase 9B.1B — Safe Port & Startup Management Tests
-ACCIO JARVIS V4.0
+ACCIO LUNA V4.0
 
 Validates:
 1. Default host (127.0.0.1) and port (7860) configuration.
@@ -20,18 +20,18 @@ import os
 import errno
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import jarvis_server
+import luna_server
 from aiohttp import web
 
 class TestPhase9B1Startup(unittest.TestCase):
 
     def test_01_default_host_and_port(self):
         """1. Normal startup defaults to port 7860 and host 127.0.0.1."""
-        self.assertEqual(jarvis_server.PORT, 7860)
+        self.assertEqual(luna_server.PORT, 7860)
 
         with patch("aiohttp.web.run_app") as mock_run:
             app = MagicMock()
-            jarvis_server.safe_start_server(app)
+            luna_server.safe_start_server(app)
             mock_run.assert_called_once_with(app, host="127.0.0.1", port=7860)
 
     def test_02_address_in_use_error_handled_cleanly(self):
@@ -41,7 +41,7 @@ class TestPhase9B1Startup(unittest.TestCase):
             captured_out = io.StringIO()
             with patch("sys.stdout", captured_out):
                 with self.assertRaises(SystemExit) as cm:
-                    jarvis_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
+                    luna_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
                 self.assertEqual(cm.exception.code, 1)
 
             output = captured_out.getvalue()
@@ -58,7 +58,7 @@ class TestPhase9B1Startup(unittest.TestCase):
             captured_out = io.StringIO()
             with patch("sys.stdout", captured_out):
                 with self.assertRaises(SystemExit) as cm:
-                    jarvis_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
+                    luna_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
                 self.assertEqual(cm.exception.code, 1)
 
             output = captured_out.getvalue()
@@ -71,12 +71,12 @@ class TestPhase9B1Startup(unittest.TestCase):
 
         with patch("aiohttp.web.run_app", side_effect=err):
             with self.assertRaises(OSError) as cm:
-                jarvis_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
+                luna_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
             self.assertEqual(cm.exception.errno, errno.EACCES)
 
     def test_05_create_app_remains_compatible(self):
         """5. create_app() returns valid aiohttp web.Application with all existing routes."""
-        app = jarvis_server.create_app()
+        app = luna_server.create_app()
         self.assertIsInstance(app, web.Application)
         route_paths = [r.resource.canonical for r in app.router.routes() if r.resource is not None]
         self.assertIn("/", route_paths)
@@ -92,7 +92,7 @@ class TestPhase9B1Startup(unittest.TestCase):
                  patch("psutil.Process.kill") as mock_kill, \
                  patch("os.kill") as mock_os_kill:
                 with self.assertRaises(SystemExit):
-                    jarvis_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
+                    luna_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
 
                 mock_terminate.assert_not_called()
                 mock_kill.assert_not_called()
@@ -109,7 +109,7 @@ class TestPhase9B1Startup(unittest.TestCase):
 
         with patch("aiohttp.web.run_app", side_effect=track_run_app):
             with self.assertRaises(SystemExit):
-                jarvis_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
+                luna_server.safe_start_server(MagicMock(), host="127.0.0.1", port=7860)
 
         self.assertEqual(len(recorded_calls), 1)
         self.assertEqual(recorded_calls[0], ("127.0.0.1", 7860))

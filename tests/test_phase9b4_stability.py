@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 9B.4B Automated Test Suite
+ACCIO LUNA V4.0 — Phase 9B.4B Automated Test Suite
 Focus: Frontend DOM Conversation Bounding (Max 60 bubbles) & Telegram Polling In-Flight Guard.
 """
 
@@ -218,7 +218,7 @@ runTest().then(result => {{
 
         // Simulate streaming start: User message + empty assistant bubble
         appendBubble("Yeni Soru", "user");
-        const streamingBubble = appendBubble("", "assistant", "JARVIS");
+        const streamingBubble = appendBubble("", "assistant", "LUNA");
 
         const bubbles = transcript.querySelectorAll('.msg-bubble');
         const isStreamingBubblePresent = transcript.children.includes(streamingBubble);

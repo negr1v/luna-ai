@@ -1,4 +1,4 @@
-# Luna AI (ACCIO-JARVIS) - Proje Devir ve Geliştirici Kılavuzu
+# Luna AI (LUNA-AI) - Proje Devir ve Geliştirici Kılavuzu
 
 Bu paket, **Luna AI** masaüstü asistanının web ve arayüz çekirdeğini içerir.
 
@@ -20,6 +20,6 @@ Bu paket, **Luna AI** masaüstü asistanının web ve arayüz çekirdeğini içe
 
 ## 🚀 Başlatma
 ```bash
-python jarvis_server.py --port 7860
+python luna_server.py --port 7860
 ```
 Tarayıcıdan: `http://127.0.0.1:7860`

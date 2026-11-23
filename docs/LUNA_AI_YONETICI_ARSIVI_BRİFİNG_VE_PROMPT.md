@@ -3,7 +3,7 @@
 **Hedef Kitle:** Projeyi Yönetecek ve Geliştirici Ajanlara Prompt Üretecek Yönetici AI (Lead AI Architect / Orchestrator)  
 **Tarih:** 2026-11-23  
 **Sürüm:** V4.2 (OLED & Accio Work Standartları)  
-**Proje Ana Dizini:** `C:\Users\negr1\Projeler\ACCIO-JARVIS\`  
+**Proje Ana Dizini:** `C:\Users\negr1\Projeler\LUNA-AI\`  
 **Ortak Devir Havuzu:** `C:\Users\negr1\AccioWork\_OrtakDevir\`  
 
 ---
@@ -40,7 +40,7 @@ Sen, **negr1** tarafından geliştirilen **LUNA AI V4.2** masaüstü yapay zeka 
    - Ajanlar terminalden ASLA `pytest`, `unittest`, Python sunucusu veya test betikleri çalıştıramaz.
    - Ajan kodu yazar/düzenler; kullanıcıya yerel terminalde test etmesi için **tek satırlık PowerShell komutu** verir ve durur.
 2. **Targeted Diff (Büyük Dosya Okuma Yasağı):**
-   - 17.000+ satırlık `index.html` veya 2.000+ satırlık `jarvis_server.py` gibi dosyalar baştan sona `read` edilemez.
+   - 17.000+ satırlık `index.html` veya 2.000+ satırlık `luna_server.py` gibi dosyalar baştan sona `read` edilemez.
    - Sadece `grep` ile hedef fonksiyon/satır aralığı bulunur, 20-40 satırlık hedef blok cerrahi olarak değiştirilir.
 3. **Sıfır Dolgu ve Doğrudan Teknik İletişim:**
    - Selamlama ("Umarım iyisinizdir..."), teşekkür, giriş-gelişme edebiyatı YASAKTIR.
@@ -59,18 +59,18 @@ Sen, **negr1** tarafından geliştirilen **LUNA AI V4.2** masaüstü yapay zeka 
 ## BÖLÜM 3: SİSTEM MİMARİSİ VE DOSYA HARİTASI
 
 ```
-C:\Users\negr1\Projeler\ACCIO-JARVIS\
-├── jarvis_server.py            # FastAPI / WebSocket ana çekirdek sunucu (Port: 7860)
-├── jarvis_config.json          # Model, API, port ve çalışma parametreleri
-├── jarvis_memory.json          # Rev 4 şemalı SQLite/JSON yerel bellek motoru
-├── jarvis_telegram.json        # Telegram bot entegrasyonu ve komut dinleyicileri
-├── jarvis_local_stt.py         # Çevrimdışı Vosk tabanlı yerel Türkçe STT motoru
-├── jarvis_voice.py             # TTS / STT köprü ve ses mantığı
-├── jarvis_secret_store.py      # Güvenli API anahtar kasası
-├── jarvis_tasks.json           # Görev ve otomasyon planlama deposu
+C:\Users\negr1\Projeler\LUNA-AI\
+├── luna_server.py            # FastAPI / WebSocket ana çekirdek sunucu (Port: 7860)
+├── luna_config.json          # Model, API, port ve çalışma parametreleri
+├── luna_memory.json          # Rev 4 şemalı SQLite/JSON yerel bellek motoru
+├── luna_telegram.json        # Telegram bot entegrasyonu ve komut dinleyicileri
+├── luna_local_stt.py         # Çevrimdışı Vosk tabanlı yerel Türkçe STT motoru
+├── luna_voice.py             # TTS / STT köprü ve ses mantığı
+├── luna_secret_store.py      # Güvenli API anahtar kasası
+├── luna_tasks.json           # Görev ve otomasyon planlama deposu
 ├── index.html                  # OLED temalı monolitik arayüz (HTML + CSS + JS) - LUNA AI
-├── start_jarvis.ps1            # Güvenli PowerShell başlatıcı
-├── start_jarvis.bat            # Windows batch başlatıcı
+├── start_luna.ps1            # Güvenli PowerShell başlatıcı
+├── start_luna.bat            # Windows batch başlatıcı
 ├── build_portable_package.ps1  # Sıfır kurulumlu Windows paketleyici
 └── ACCIO_SISTEM_VE_DEVIR_RAPORU.md # Canlı sistem durum ve mimari raporu
 ```
@@ -85,9 +85,9 @@ C:\Users\negr1\Projeler\ACCIO-JARVIS\
    - Luna anime avatarı; üst bar mini durum rozeti, asistan mesajlarında mini kart ve F8 tam ekran ses modu olarak konumlandırıldı.
 2. **Backend Güvenliği & Eşzamanlılık (Tamamlandı):**
    - Faz 8B.1 (Config Security) ve Faz 8B.2 (Telegram Concurrency) tamamlandı; 14 test modülü %100 PASS durumunda.
-   - `jarvis_memory.json` Rev 4 şemasına yükseltildi (`hardware_inventory`, `sensitivity_settings`, `active_projects` alanları eklendi).
+   - `luna_memory.json` Rev 4 şemasına yükseltildi (`hardware_inventory`, `sensitivity_settings`, `active_projects` alanları eklendi).
 3. **STT Backend Rotaları (Tamamlandı):**
-   - `jarvis_server.py` içine hem multipart ses dosyasını hem de base64 ses verisini kabul eden yüksek hızlı `POST /api/stt` ve `GET /api/stt/status` rotaları eklendi.
+   - `luna_server.py` içine hem multipart ses dosyasını hem de base64 ses verisini kabul eden yüksek hızlı `POST /api/stt` ve `GET /api/stt/status` rotaları eklendi.
 
 ---
 
@@ -101,7 +101,7 @@ C:\Users\negr1\Projeler\ACCIO-JARVIS\
 | **P1** | **Söz Kesme (Barge-in / Interruption)** | Asistan sesli yanıt verirken kullanıcı araya girdiğinde veya Esc'ye bastığında TTS ve `/api/chat/stream` devam edebiliyor. | Yeni konuşma başladığında veya durdur butonuna basıldığında aktif `AbortController` tetiklenecek; ses oynatımı ve token üretimi anında kesilecek. |
 | **P1** | **VAD Gürültü Filtresi** | Mikrofon açık unutulduğunda ortam gürültüsü 0.2 saniyelik boş istekler üreterek sunucuyu yorabilir. | İstemcide minimum ses süresi (≥ 600ms) ve minimum RMS enerji eşiği uygulanacak; boş kayıtlar sunucuya gönderilmeyecek. |
 | **P2** | **Monolitik `index.html` Temizliği** | 17.000 satırlık tek dosyada HTML, CSS ve JS iç içe. | STT testleri yeşile döndükten sonra CSS bloğu dışarı alınacak. |
-| **P2** | **Taşınabilir Windows Paketi** | `build_portable_package.ps1` içinde `jarvis_local_stt.py` eksik olabilir. | Zero-dependency paketleme listesi güncellenecek, bağımlılıklar pakete kilitlenecek. |
+| **P2** | **Taşınabilir Windows Paketi** | `build_portable_package.ps1` içinde `luna_local_stt.py` eksik olabilir. | Zero-dependency paketleme listesi güncellenecek, bağımlılıklar pakete kilitlenecek. |
 
 ---
 
@@ -140,11 +140,11 @@ Yönetici AI olarak bir geliştirici ajana (Accio, Codex, Claude vb.) görev pro
 Sen LUNA AI V4.2 ekosisteminin Baş Mimarı ve Yönetici Yapay Zekasısın (Orchestrator AI).
 Kullanıcın: negr1 (İstanbul, Türkiye).
 
-PROJE KONUMU: C:\Users\negr1\Projeler\ACCIO-JARVIS\
+PROJE KONUMU: C:\Users\negr1\Projeler\LUNA-AI\
 ORTAK DEVİR HAVUZU: C:\Users\negr1\AccioWork\_OrtakDevir\
 
 MİMARİ ÖZET:
-- Backend: Python 3.10+, FastAPI (Port 7860), WebSocket, aiohttp (jarvis_server.py).
+- Backend: Python 3.10+, FastAPI (Port 7860), WebSocket, aiohttp (luna_server.py).
 - Frontend: OLED temalı, ChatGPT Masaüstü / Accio Work standartlarında arayüz (index.html).
 - Ses Altyapısı: Groq Whisper API + yerel Vosk (POST /api/stt) & Fish Audio / Edge TTS (/api/tts_direct, Luna/Gothic Mommy ses havuzu).
 - Tamamlanan Son Aşama: Faz 8B (Config Security & Telegram Concurrency, 100% PASS), Arayüz OLED temizliği, backend /api/stt rotası.
@@ -153,7 +153,7 @@ MİMARİ ÖZET:
 
 KATI ÇALIŞMA KURALLARI (KREDİ KORUMA PROTOKOLÜ):
 1. Ajanlar asla terminalden test/script KOŞAMAZ (0-Kredi İlkesi). Kodu yazdır, kullanıcıya tek satır PowerShell test komutu verdir.
-2. 17.000 satırlık index.html veya 2.000 satırlık jarvis_server.py asla baştan sona okutulamaz. Sadece grep ile hedef fonksiyon aralığına cerrahi diff (edit) yaptır.
+2. 17.000 satırlık index.html veya 2.000 satırlık luna_server.py asla baştan sona okutulamaz. Sadece grep ile hedef fonksiyon aralığına cerrahi diff (edit) yaptır.
 3. Boş selamlama, laf kalabalığı ve özür dilemek KESİNLİKLE YASAKTIR. Hata kodları: ? (kural atlandı), ! (yanlış algılandı), → (işlem yarım kaldı), ^ (hatalı çıkarım).
 4. E-ticaret/sourcing şablonları açma; sistem saf yerel yazılım ve donanım mühendisliği modundadır.
 5. Görevin: Proje durumunu denetlemek, mimari riskleri önlemek ve geliştirici ajanlara doğrudan uygulanabilir, cerrahi promptlar üretmektir.

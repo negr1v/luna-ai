@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 8B.1 Automated Test Suite
+ACCIO LUNA V4.0 — Phase 8B.1 Automated Test Suite
 Focus: Config API Security, Secret Protection, Input Validation, Atomic Persistence & Locking.
 """
 
@@ -15,7 +15,7 @@ from unittest.mock import patch
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
-import jarvis_server
+import luna_server
 
 
 class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
@@ -23,8 +23,8 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
     async def get_application(self):
         # Create an app pointing to our isolated configuration file
         app = web.Application()
-        app.router.add_get("/api/config", jarvis_server.handle_get_config)
-        app.router.add_post("/api/config", jarvis_server.handle_save_config)
+        app.router.add_get("/api/config", luna_server.handle_get_config)
+        app.router.add_post("/api/config", luna_server.handle_save_config)
         return app
 
     def setUp(self):
@@ -50,15 +50,15 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
             json.dump(self.initial_config, f, indent=2)
 
         # Redirect server paths
-        self.orig_config_file = jarvis_server.CONFIG_FILE
-        self.orig_base_dir = jarvis_server.BASE_DIR
-        jarvis_server.CONFIG_FILE = self.test_config_file
+        self.orig_config_file = luna_server.CONFIG_FILE
+        self.orig_base_dir = luna_server.BASE_DIR
+        luna_server.CONFIG_FILE = self.test_config_file
 
         super().setUp()
 
     def tearDown(self):
         super().tearDown()
-        jarvis_server.CONFIG_FILE = self.orig_config_file
+        luna_server.CONFIG_FILE = self.orig_config_file
         if hasattr(self, "test_dir") and os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
 
@@ -236,7 +236,7 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
         # 1. Simulate write failure during atomic replace
         with patch("os.replace", side_effect=IOError("Simulated disk write failure")):
             with self.assertRaises(IOError):
-                jarvis_server.save_config({"tts_engine": "edge_tts"})
+                luna_server.save_config({"tts_engine": "edge_tts"})
 
         # Original config file must be intact and non-empty
         self.assertTrue(os.path.exists(self.test_config_file))
@@ -284,7 +284,7 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
 
     def test_12_existing_frontend_settings_behavior_remains_functional(self):
         """Test 12: Verify index.html settings markup, safe placeholders, and empty payload logic."""
-        index_path = os.path.join(jarvis_server.BASE_DIR, "index.html")
+        index_path = os.path.join(luna_server.BASE_DIR, "index.html")
         with open(index_path, "r", encoding="utf-8") as f:
             html = f.read()
 

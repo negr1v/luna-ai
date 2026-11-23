@@ -10,18 +10,18 @@ import json
 import unittest
 import subprocess
 
-BASE_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
-PACKAGE_DIR = os.path.join(BASE_DIR, "dist", "ACCIO-JARVIS-PORTABLE")
+BASE_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
+PACKAGE_DIR = os.path.join(BASE_DIR, "dist", "LUNA-AI-PORTABLE")
 
 class TestPhase16EPackaging(unittest.TestCase):
 
     def setUp(self):
-        self.backup_server = os.path.join(BASE_DIR, "jarvis_server.py.bak_phase16e_20261114")
-        self.backup_agent = os.path.join(BASE_DIR, "jarvis_agent_engine.py.bak_phase16e_20261114")
-        self.backup_start = os.path.join(BASE_DIR, "start_jarvis.ps1.bak_phase16e_20261114")
+        self.backup_server = os.path.join(BASE_DIR, "luna_server.py.bak_phase16e_20261114")
+        self.backup_agent = os.path.join(BASE_DIR, "luna_agent_engine.py.bak_phase16e_20261114")
+        self.backup_start = os.path.join(BASE_DIR, "start_luna.ps1.bak_phase16e_20261114")
 
     def test_01_backup_verification(self):
-        """Doğrulama 1: jarvis_server.py, jarvis_agent_engine.py ve start_jarvis.ps1 yedekleri mevcut."""
+        """Doğrulama 1: luna_server.py, luna_agent_engine.py ve start_luna.ps1 yedekleri mevcut."""
         self.assertTrue(os.path.exists(self.backup_server), "Server backup missing")
         self.assertTrue(os.path.exists(self.backup_agent), "Agent backup missing")
         self.assertTrue(os.path.exists(self.backup_start), "Start script backup missing")
@@ -40,13 +40,13 @@ class TestPhase16EPackaging(unittest.TestCase):
 
         required_app_files = [
             "index.html",
-            "jarvis_server.py",
-            "jarvis_agent_engine.py",
-            "jarvis_computer_use.py",
-            "jarvis_tray.ps1",
-            "jarvis_uia_inspect.ps1",
-            "jarvis_uia_action.ps1",
-            "start_jarvis.ps1"
+            "luna_server.py",
+            "luna_agent_engine.py",
+            "luna_computer_use.py",
+            "luna_tray.ps1",
+            "luna_uia_inspect.ps1",
+            "luna_uia_action.ps1",
+            "start_luna.ps1"
         ]
         for f in required_app_files:
             p = os.path.join(app_dir, f)
@@ -54,21 +54,21 @@ class TestPhase16EPackaging(unittest.TestCase):
             self.assertGreater(os.path.getsize(p), 0, f"Empty app file: {f}")
 
         required_data_files = [
-            "jarvis_memory.json",
-            "jarvis_config.json",
-            "jarvis_tasks.json",
-            "jarvis_notifications.json"
+            "luna_memory.json",
+            "luna_config.json",
+            "luna_tasks.json",
+            "luna_notifications.json"
         ]
         for f in required_data_files:
             p = os.path.join(data_dir, f)
             self.assertTrue(os.path.exists(p), f"Missing data file: {f}")
 
         required_launchers = [
-            "START-JARVIS.bat",
+            "START-LUNA.bat",
             "START-TRAY.bat",
-            "STATUS-JARVIS.bat",
-            "STOP-JARVIS.bat",
-            "RECOVER-JARVIS.bat",
+            "STATUS-LUNA.bat",
+            "STOP-LUNA.bat",
+            "RECOVER-LUNA.bat",
             "start_portable.ps1",
             "README.txt"
         ]
@@ -78,7 +78,7 @@ class TestPhase16EPackaging(unittest.TestCase):
 
     def test_03_data_separation_and_secret_sanitization(self):
         """Doğrulama 3: data/ altındaki yapılandırmada gizli API anahtarları temizlenmiş."""
-        cfg_path = os.path.join(PACKAGE_DIR, "data", "jarvis_config.json")
+        cfg_path = os.path.join(PACKAGE_DIR, "data", "luna_config.json")
         with open(cfg_path, "r", encoding="utf-8-sig") as f:
             cfg = json.load(f)
 
@@ -87,27 +87,27 @@ class TestPhase16EPackaging(unittest.TestCase):
             val = cfg.get(k, "")
             self.assertEqual(val, "", f"Secret key {k} should be sanitized in package")
 
-        mem_path = os.path.join(PACKAGE_DIR, "data", "jarvis_memory.json")
+        mem_path = os.path.join(PACKAGE_DIR, "data", "luna_memory.json")
         with open(mem_path, "r", encoding="utf-8-sig") as f:
             mem = json.load(f)
         self.assertIn("user_name", mem)
         self.assertIn("notes", mem)
 
     def test_04_path_resolution_with_custom_data_dir(self):
-        """Doğrulama 4: JARVIS_DATA_DIR ortam değişkeni server ve agent motoru tarafından benimsenir."""
+        """Doğrulama 4: LUNA_DATA_DIR ortam değişkeni server ve agent motoru tarafından benimsenir."""
         custom_data_dir = os.path.join(PACKAGE_DIR, "data")
         env_copy = os.environ.copy()
-        env_copy["JARVIS_DATA_DIR"] = custom_data_dir
+        env_copy["LUNA_DATA_DIR"] = custom_data_dir
 
         # Test script running python code to verify DATA_DIR resolution
         code = (
             "import os, sys\n"
             f"sys.path.insert(0, r'{os.path.join(PACKAGE_DIR, 'app')}')\n"
-            "import jarvis_server\n"
-            "print('DATA_DIR:', jarvis_server.DATA_DIR)\n"
-            "print('MEMORY_FILE:', jarvis_server.MEMORY_FILE)\n"
-            f"assert jarvis_server.DATA_DIR == r'{custom_data_dir}'\n"
-            f"assert jarvis_server.MEMORY_FILE == os.path.join(r'{custom_data_dir}', 'jarvis_memory.json')\n"
+            "import luna_server\n"
+            "print('DATA_DIR:', luna_server.DATA_DIR)\n"
+            "print('MEMORY_FILE:', luna_server.MEMORY_FILE)\n"
+            f"assert luna_server.DATA_DIR == r'{custom_data_dir}'\n"
+            f"assert luna_server.MEMORY_FILE == os.path.join(r'{custom_data_dir}', 'luna_memory.json')\n"
         )
 
         res = subprocess.run([sys.executable, "-c", code], env=env_copy, capture_output=True, text=True)
@@ -125,7 +125,7 @@ class TestPhase16EPackaging(unittest.TestCase):
         ]
         res = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
         self.assertEqual(res.returncode, 0)
-        self.assertIn("ACCIO JARVIS V16", res.stdout)
+        self.assertIn("ACCIO LUNA V16", res.stdout)
         self.assertIn("Durum", res.stdout)
 
     def test_06_portable_powershell_recovery(self):
@@ -150,7 +150,7 @@ class TestPhase16EPackaging(unittest.TestCase):
         code = (
             "import os, sys\n"
             f"sys.path.insert(0, r'{app_path}')\n"
-            "from jarvis_agent_engine import AgentController, PermissionLevel\n"
+            "from luna_agent_engine import AgentController, PermissionLevel\n"
             f"ctrl = AgentController(r'{app_path}', data_dir=r'{data_path}')\n"
             "tool_invoke = ctrl.registry.get('invoke_ui_element')\n"
             "tool_set = ctrl.registry.get('set_ui_element_value')\n"

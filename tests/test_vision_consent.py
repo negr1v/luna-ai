@@ -11,9 +11,9 @@ from aiohttp.test_utils import TestClient, TestServer
 # Import-time storage is isolated too.
 test_data = tempfile.TemporaryDirectory()
 unittest.addModuleCleanup(test_data.cleanup)
-with patch.dict(os.environ, {"JARVIS_DATA_DIR": test_data.name}):
-    import jarvis_server as server
-for handler in logging.getLogger("jarvis").handlers:
+with patch.dict(os.environ, {"LUNA_DATA_DIR": test_data.name}):
+    import luna_server as server
+for handler in logging.getLogger("luna").handlers:
     if getattr(handler, "baseFilename", "").startswith(test_data.name):
         unittest.addModuleCleanup(handler.close)
 

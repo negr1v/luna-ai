@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS Full System & UI Upgrade:
+LUNA-AI Full System & UI Upgrade:
 1. Real High-Res Anime Art Characters (Pink Hair, Braid Mommy, Brown Hair) with Switcher
 2. Fixed Data Sources & Graph Button (Opens modal directly)
 3. Fixed & Renamed Live Blackboard ("Canlı Ders Tahtası" instead of "Şefkatli Ders")
 4. Real Windows Gaming Optimization Engine (RAM free, mouse accel disable, GameDVR off, transparency off)
-5. Static route /static in jarvis_server.py
+5. Static route /static in luna_server.py
 6. Full sync to portable dist
 """
 
@@ -14,17 +14,17 @@ import sys
 import re
 import subprocess
 
-ROOT = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
-SERVER_PATH = os.path.join(ROOT, "jarvis_server.py")
+ROOT = r"C:\Users\negr1\Projeler\LUNA-AI"
+SERVER_PATH = os.path.join(ROOT, "luna_server.py")
 HTML_PATH = os.path.join(ROOT, "index.html")
 
-DIST_SERVER_PATH = os.path.join(ROOT, "dist", "ACCIO-JARVIS-PORTABLE", "app", "jarvis_server.py")
-DIST_HTML_PATH = os.path.join(ROOT, "dist", "ACCIO-JARVIS-PORTABLE", "app", "index.html")
+DIST_SERVER_PATH = os.path.join(ROOT, "dist", "LUNA-AI-PORTABLE", "app", "luna_server.py")
+DIST_HTML_PATH = os.path.join(ROOT, "dist", "LUNA-AI-PORTABLE", "app", "index.html")
 
-print("[*] ACCIO-JARVIS Tam Güncelleme Başlatılıyor...")
+print("[*] LUNA-AI Tam Güncelleme Başlatılıyor...")
 
 # =========================================================================
-# 1. UPDATE jarvis_server.py : Real Windows Gaming Optimizer & Static Route
+# 1. UPDATE luna_server.py : Real Windows Gaming Optimizer & Static Route
 # =========================================================================
 with open(SERVER_PATH, "r", encoding="utf-8") as f:
     server_code = f.read()
@@ -198,7 +198,7 @@ js_fixes = '''
   
   // 1. Data Sources & Graph Butonu Doğrudan Bağlantısı
   document.getElementById('chipDataSourcesBtn')?.addEventListener('click', () => {
-    const modal = document.getElementById('openJarvisDataSourcesModal');
+    const modal = document.getElementById('openLunaDataSourcesModal');
     if (modal) {
       modal.style.display = 'flex';
       if (typeof renderDataSourcesList === 'function') renderDataSourcesList();
@@ -230,14 +230,14 @@ js_fixes = '''
       const img = document.getElementById('animeAvatarImg');
       if (img && src) {
         img.src = src;
-        localStorage.setItem('jarvis_active_avatar_src', src);
+        localStorage.setItem('luna_active_avatar_src', src);
         showNotification(`Karakter Değiştirildi: ${name}`, 'info');
       }
     });
   });
 
   // Kayıtlı Karakteri Yükle
-  const savedAvatar = localStorage.getItem('jarvis_active_avatar_src');
+  const savedAvatar = localStorage.getItem('luna_active_avatar_src');
   if (savedAvatar) {
     const img = document.getElementById('animeAvatarImg');
     if (img) img.src = savedAvatar;
@@ -266,18 +266,18 @@ js_fixes = '''
   // Ses Durumunda Dalga Animasyonu
   const voicePulseEl = document.getElementById('avatarVoicePulse');
   const blushOverlayEl = document.getElementById('avatarBlushOverlay');
-  window.addEventListener('jarvis_speaking_start', () => {
+  window.addEventListener('luna_speaking_start', () => {
     if (voicePulseEl) voicePulseEl.style.opacity = '1';
     if (blushOverlayEl) blushOverlayEl.style.opacity = '0.7';
   });
-  window.addEventListener('jarvis_speaking_end', () => {
+  window.addEventListener('luna_speaking_end', () => {
     if (voicePulseEl) voicePulseEl.style.opacity = '0';
     if (blushOverlayEl) blushOverlayEl.style.opacity = '0.4';
   });
 '''
 
 if "ZERO OS - DATA SOURCES, TAHTA & GAMING MODE ENGINE" not in html:
-    html = html.replace("// OPENJARVIS HITL APPROVAL BELL ENGINE", js_fixes + "\n  // OPENJARVIS HITL APPROVAL BELL ENGINE", 1)
+    html = html.replace("// OPENLUNA HITL APPROVAL BELL ENGINE", js_fixes + "\n  // OPENLUNA HITL APPROVAL BELL ENGINE", 1)
     print("[+] Buton onarımları, karakter seçici ve oyun modu JS kodları eklendi.")
 
 with open(HTML_PATH, "w", encoding="utf-8") as f:
@@ -292,7 +292,7 @@ print("[✓] index.html başarıyla güncellendi.")
 # Syntax check
 node_test = '''
 const fs = require('fs');
-const html = fs.readFileSync('C:/Users/negr1/Projeler/ACCIO-JARVIS/index.html', 'utf8');
+const html = fs.readFileSync('C:/Users/negr1/Projeler/LUNA-AI/index.html', 'utf8');
 const scriptRegex = /<script>([\s\S]*?)<\/script>/gi;
 let match, count = 0;
 while ((match = scriptRegex.exec(html)) !== null) {

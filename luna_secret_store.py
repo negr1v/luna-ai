@@ -1,4 +1,4 @@
-"""Small Windows DPAPI wrapper for local ACCIO JARVIS secrets.
+"""Small Windows DPAPI wrapper for local ACCIO LUNA secrets.
 
 The DPAPI user scope intentionally makes encrypted values unavailable when a
 portable configuration is copied to a different Windows user or machine.
@@ -76,7 +76,7 @@ def protect_secret(value: str) -> str:
     input_blob, _input_buffer = _to_blob(value.encode("utf-8"))
     output_blob = DATA_BLOB()
     if not crypt32.CryptProtectData(
-        ctypes.byref(input_blob), "ACCIO JARVIS secret", None, None, None,
+        ctypes.byref(input_blob), "ACCIO LUNA secret", None, None, None,
         CRYPTPROTECT_UI_FORBIDDEN, ctypes.byref(output_blob),
     ):
         raise _last_error("encryption")

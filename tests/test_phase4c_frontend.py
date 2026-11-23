@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 4 / Stage 4C
+ACCIO LUNA V4.0 — Phase 4 / Stage 4C
 Frontend Task Engine Integration & Security Acceptance Tests.
 
 Validates:

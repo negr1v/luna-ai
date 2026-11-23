@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 6 Automated Test Suite
+ACCIO LUNA V4.0 — Phase 6 Automated Test Suite
 Focus: System Telemetry, Command Center Integration, Polling Lifecycle, Zero Data Leakage
 """
 
@@ -18,14 +18,14 @@ from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from unittest.mock import patch, MagicMock
 
 # Import the server under test
-import jarvis_server
+import luna_server
 
 class Phase6TelemetryBackendTest(AioHTTPTestCase):
     async def get_application(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.mock_memory_path = os.path.join(self.temp_dir.name, "jarvis_memory.json")
-        self.mock_tasks_path = os.path.join(self.temp_dir.name, "jarvis_tasks.json")
-        self.mock_config_path = os.path.join(self.temp_dir.name, "jarvis_config.json")
+        self.mock_memory_path = os.path.join(self.temp_dir.name, "luna_memory.json")
+        self.mock_tasks_path = os.path.join(self.temp_dir.name, "luna_tasks.json")
+        self.mock_config_path = os.path.join(self.temp_dir.name, "luna_config.json")
 
         with open(self.mock_memory_path, "w", encoding="utf-8") as f:
             json.dump({
@@ -44,18 +44,18 @@ class Phase6TelemetryBackendTest(AioHTTPTestCase):
             ], f)
 
         with open(self.mock_config_path, "w", encoding="utf-8") as f:
-            json.dump(jarvis_server.DEFAULT_CONFIG, f)
+            json.dump(luna_server.DEFAULT_CONFIG, f)
 
         # Patch storage paths to isolated temp directory
-        self.p_mem = patch("jarvis_server.MEMORY_FILE", self.mock_memory_path)
-        self.p_task = patch("jarvis_server.TASKS_FILE", self.mock_tasks_path)
-        self.p_cfg = patch("jarvis_server.CONFIG_FILE", self.mock_config_path)
+        self.p_mem = patch("luna_server.MEMORY_FILE", self.mock_memory_path)
+        self.p_task = patch("luna_server.TASKS_FILE", self.mock_tasks_path)
+        self.p_cfg = patch("luna_server.CONFIG_FILE", self.mock_config_path)
         self.p_mem.start()
         self.p_task.start()
         self.p_cfg.start()
 
         app = web.Application()
-        app.router.add_get("/api/system_metrics", jarvis_server.handle_system_metrics)
+        app.router.add_get("/api/system_metrics", luna_server.handle_system_metrics)
         return app
 
     def tearDown(self):

@@ -1,6 +1,6 @@
 ﻿
 # ==============================================================================
-# ZERO CORE OS (ACCIO-JARVIS) V4 - AUTONOMOUS AGENT API HANDLERS (V12)
+# ZERO CORE OS (LUNA-AI) V4 - AUTONOMOUS AGENT API HANDLERS (V12)
 # ==============================================================================
 import os, sys, time, asyncio, uuid, mimetypes
 mimetypes.add_type("image/webp", ".webp")
@@ -9,20 +9,20 @@ from enum import Enum
 from contextlib import asynccontextmanager
 from aiohttp import web
 try:
-    from jarvis_agent_engine import AgentController, TaskState, PermissionLevel
+    from luna_agent_engine import AgentController, TaskState, PermissionLevel
     GLOBAL_AGENT_CONTROLLER = AgentController(os.path.dirname(os.path.abspath(__file__)))
 except Exception as _agent_import_err:
     print(f"[Agent Engine Import Hatası]: {_agent_import_err}")
     GLOBAL_AGENT_CONTROLLER = None
 try:
-    from jarvis_developer_agent import DeveloperAgent, DeveloperAgentError
+    from luna_developer_agent import DeveloperAgent, DeveloperAgentError
 except Exception as _developer_agent_import_err:
     print(f"[Developer Agent Import Hatası]: {_developer_agent_import_err}")
     DeveloperAgent = None
     DeveloperAgentError = Exception
 GLOBAL_DEVELOPER_AGENT = None
 try:
-    from jarvis_desktop_agent import DesktopAgent, DesktopAgentError
+    from luna_desktop_agent import DesktopAgent, DesktopAgentError
 except Exception as _desktop_agent_import_err:
     print(f"[Desktop Agent Import Hatası]: {_desktop_agent_import_err}")
     DesktopAgent = None
@@ -197,7 +197,7 @@ async def handle_agent_events(request):
     })
 
 # ==============================================================================
-# ACCIO JARVIS ULTRA - DEVELOPER AGENT V1 API
+# ACCIO LUNA ULTRA - DEVELOPER AGENT V1 API
 # ==============================================================================
 def _developer_agent_unavailable_response():
     return web.json_response({"status": "error", "message": "Developer Agent kullanılamıyor."}, status=503)
@@ -342,7 +342,7 @@ async def handle_developer_approve_restore(request):
         return web.json_response({"status": "error", "message": _developer_error_message(exc)}, status=409)
 
 # ============================================================================== 
-# ACCIO JARVIS ULTRA - DESKTOP AGENT V1 API
+# ACCIO LUNA ULTRA - DESKTOP AGENT V1 API
 # ============================================================================== 
 def _desktop_agent_unavailable_response():
     return web.json_response({"status": "error", "message": "Desktop Agent kullanılamıyor."}, status=503)
@@ -444,7 +444,7 @@ async def handle_desktop_reject_action(request):
 async def handle_cu_active_window(request):
     """GET /api/computer_use/active_window - Masaüstü ön plan pencere ve uygulama bilgisini döner."""
     try:
-        from jarvis_computer_use import DesktopAwareness
+        from luna_computer_use import DesktopAwareness
         info = DesktopAwareness.get_foreground_window_info()
         return web.json_response(info)
     except Exception as e:
@@ -453,7 +453,7 @@ async def handle_cu_active_window(request):
 async def handle_cu_inspect_ui(request):
     """GET /api/computer_use/inspect_ui - Ön plandaki pencerenin buton ve modern UIA/Win32 kontrollerini döner."""
     try:
-        from jarvis_computer_use import UIElementInspector
+        from luna_computer_use import UIElementInspector
         use_uia = request.query.get("use_uia", "true").lower() in ("true", "1", "yes")
         try:
             max_elem = min(50, max(5, int(request.query.get("max_elements", 30))))
@@ -466,7 +466,7 @@ async def handle_cu_inspect_ui(request):
 
 
 """
-Accio Jarvis & Luna — Evrensel Otonom Sesli Komuta Merkezi (v4.0 Subject-Shinji Edition)
+Accio Luna & Luna — Evrensel Otonom Sesli Komuta Merkezi (v4.0 Subject-Shinji Edition)
 Tüm Yetenekler:
 - Evrensel Soru-Cevap (Kod, Oyun, Bilim, Felsefe, YKS, Donanim, Gunluk Hayat)
 - Subject Shinji / Luna Dinamik Kisiligi (Tatli, zeki, koruyucu, odak denetleyici)
@@ -500,7 +500,7 @@ import tempfile
 import webbrowser
 import urllib.parse
 import ipaddress
-from jarvis_secret_store import (
+from luna_secret_store import (
     SecretStorageError,
     is_protected_secret,
     protect_secret,
@@ -510,7 +510,7 @@ from jarvis_secret_store import (
 PORT = 7860
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Phase 16E: Portable Data Separation Gate
-DATA_DIR = os.environ.get("JARVIS_DATA_DIR") or (
+DATA_DIR = os.environ.get("LUNA_DATA_DIR") or (
     os.path.join(os.path.dirname(BASE_DIR), "data") if os.path.isdir(os.path.join(os.path.dirname(BASE_DIR), "data"))
     else (os.path.join(BASE_DIR, "data") if os.path.isdir(os.path.join(BASE_DIR, "data")) else BASE_DIR)
 )
@@ -526,17 +526,17 @@ if DesktopAgent is not None:
     except Exception as _desktop_agent_init_err:
         print(f"[Desktop Agent Başlatma Hatası]: {_desktop_agent_init_err}")
         GLOBAL_DESKTOP_AGENT = None
-LOG_FILE = os.path.join(DATA_DIR, "jarvis_runtime.log")
+LOG_FILE = os.path.join(DATA_DIR, "luna_runtime.log")
 LOG_MAX_BYTES = 2 * 1024 * 1024  # 2 MB
 LOG_BACKUP_COUNT = 5
 
 def setup_logging():
     """
     Phase 9B.1C: Idempotent Rotating Runtime Logging.
-    Logger 'jarvis' writes to jarvis_runtime.log (max 2 MB, 5 backups, UTF-8).
+    Logger 'luna' writes to luna_runtime.log (max 2 MB, 5 backups, UTF-8).
     Includes console handler and avoids duplicate handlers on repeated calls.
     """
-    logger = logging.getLogger("jarvis")
+    logger = logging.getLogger("luna")
     logger.setLevel(logging.INFO)
 
     has_file = any(isinstance(h, RotatingFileHandler) for h in logger.handlers)
@@ -576,7 +576,7 @@ GAME_WINDOW_TOKENS = {
 
 MAX_DEFERRED_NOTIFICATIONS = 20
 NOTIFICATION_TTL_SECONDS = 7200  # 2 hours max retention
-NOTIFICATIONS_FILE = os.path.join(DATA_DIR, "jarvis_notifications.json")
+NOTIFICATIONS_FILE = os.path.join(DATA_DIR, "luna_notifications.json")
 DEFERRED_NOTIFICATIONS = []
 NOTIFICATIONS_LOCK = asyncio.Lock()
 OVERFLOW_COUNT = 0
@@ -860,7 +860,7 @@ def is_protected_path(path: str) -> bool:
 
     return False
 
-CONFIG_FILE = os.path.join(DATA_DIR, "jarvis_config.json")
+CONFIG_FILE = os.path.join(DATA_DIR, "luna_config.json")
 CONFIG_THREAD_LOCK = threading.RLock()
 CONFIG_ASYNC_LOCK = asyncio.Lock()
 CONFIG_SECRET_KEYS = frozenset({
@@ -1178,8 +1178,8 @@ def detect_hardware_baseline_profile() -> PerformanceProfile:
 
 class AdaptivePerformanceController:
     """
-    ACCIO JARVIS ULTRA — Hardware-Aware Adaptive Performance Controller.
-    - System identity remains ACCIO JARVIS ULTRA.
+    ACCIO LUNA ULTRA — Hardware-Aware Adaptive Performance Controller.
+    - System identity remains ACCIO LUNA ULTRA.
     - Uses BALANCED as the initial baseline on the detected i5-8250U / 8 GB / UHD 620 system.
     - Maintains 60 FPS target when resources permit.
     - Dynamically increases Orb quality & particles to ULTRA when headroom permits.
@@ -1230,7 +1230,7 @@ class AdaptivePerformanceController:
                 "orb_particles": 64,
                 "orb_fps_limit": 60,
                 "reduce_glow": False,
-                "description": "ACCIO JARVIS ULTRA — Maksimum 60 FPS görsel detay modu"
+                "description": "ACCIO LUNA ULTRA — Maksimum 60 FPS görsel detay modu"
             }
         }
 
@@ -1330,9 +1330,9 @@ class AdaptivePerformanceController:
         }
 
 ADAPTIVE_PERFORMANCE_CONTROLLER = AdaptivePerformanceController()
-MEMORY_FILE = os.path.join(DATA_DIR, "jarvis_memory.json")
-TASKS_FILE = os.path.join(DATA_DIR, "jarvis_tasks.json")
-TELEGRAM_FILE = os.path.join(DATA_DIR, "jarvis_telegram.json")
+MEMORY_FILE = os.path.join(DATA_DIR, "luna_memory.json")
+TASKS_FILE = os.path.join(DATA_DIR, "luna_tasks.json")
+TELEGRAM_FILE = os.path.join(DATA_DIR, "luna_telegram.json")
 # Phase 8B.2: Telegram Concurrency, Outbound, Polling & Lifecycle Locks
 TELEGRAM_ASYNC_LOCK = asyncio.Lock()
 TELEGRAM_OUTBOUND_LOCK = asyncio.Lock()
@@ -1342,8 +1342,8 @@ TELEGRAM_UPDATE_OFFSET = 0
 PROCESSED_UPDATE_IDS = set()
 TELEGRAM_WORKER_TASK = None
 TELEGRAM_WORKER_RUNNING = False
-CANDIDATES_FILE = os.path.join(DATA_DIR, "jarvis_memory_candidates.json")
-JOURNAL_FILE = os.path.join(DATA_DIR, "jarvis_memory_journal.json")
+CANDIDATES_FILE = os.path.join(DATA_DIR, "luna_memory_candidates.json")
+JOURNAL_FILE = os.path.join(DATA_DIR, "luna_memory_journal.json")
 ACTIVITY_LOGS = []
 
 def log_activity(event_type, details):
@@ -1836,7 +1836,7 @@ def calculate_memory_relevance(entry: dict, query: str = "", topic: Optional[str
 
 def search_memory_intelligence(query: str = "", topic: Optional[str] = None, limit: int = 10, min_score: float = 0.10, memory_data: Optional[dict] = None) -> list:
     """
-    Performs context-aware topic/relevance memory retrieval over jarvis_memory.json.
+    Performs context-aware topic/relevance memory retrieval over luna_memory.json.
     Returns ranked memory entries with relevance_score attached.
     """
     mem = memory_data if memory_data is not None else load_memory()
@@ -1984,7 +1984,7 @@ def load_tasks_result() -> tuple[list, bool]:
     If file doesn't exist, returns (get_default_tasks(), False).
     If file exists and is valid list, returns (normalized_list, False).
     If file is corrupt or invalid:
-        Attempts auto-recovery from jarvis_tasks.json.bak.
+        Attempts auto-recovery from luna_tasks.json.bak.
         If recovered: returns (normalized_recovered_list, False).
         If recovery fails: returns ([], True) (fail closed).
     """
@@ -2026,7 +2026,7 @@ def save_tasks(tasks: list) -> bool:
     - Serialized under TASKS_THREAD_LOCK.
     - Validates tasks is a list of valid dictionaries.
     - If TASKS_FILE exists:
-        * If primary is valid -> creates verified backup in jarvis_tasks.json.bak.
+        * If primary is valid -> creates verified backup in luna_tasks.json.bak.
         * If primary is corrupt:
             Attempts recovery from backup first to establish a valid baseline.
             If recovery succeeds: creates verified backup of that restored baseline.
@@ -2329,7 +2329,7 @@ def execute_desktop_tool(name, args, tool_call_id: str = None):
         return {"status": "ok", "active_window": title, "message": f"Şu an aktif pencere: {title}"}
 
     elif name == "capture_screen_analysis":
-        temp_dir = tempfile.mkdtemp(prefix="jarvis_screen_")
+        temp_dir = tempfile.mkdtemp(prefix="luna_screen_")
         temp_file = os.path.join(temp_dir, "screen.jpg")
         try:
             temp_path_normalized = temp_file.replace("\\", "/")
@@ -2646,7 +2646,7 @@ def execute_desktop_tool(name, args, tool_call_id: str = None):
 
     elif name == "post_telegram_alert":
         text = args.get("text", "")
-        sender = args.get("sender", "@JarvisAsistanBot")
+        sender = args.get("sender", "@LunaAsistanBot")
         category = args.get("category", "deal")
         msgs = load_telegram_messages()
         new_msg = {
@@ -2672,9 +2672,9 @@ def execute_desktop_tool(name, args, tool_call_id: str = None):
     elif name == "open_app":
         target = args.get("target") if isinstance(args, dict) else None
         if target == "kokpit":
-            kokpit_path = os.path.abspath(os.path.join(BASE_DIR, "ACCIO-JARVIS-KOKPIT.html"))
+            kokpit_path = os.path.abspath(os.path.join(BASE_DIR, "LUNA-AI-KOKPIT.html"))
             webbrowser.open(f"file:///{kokpit_path.replace(os.sep, '/')}")
-            return {"status": "ok", "message": "Accio Jarvis Kokpiti tarayicida acildi."}
+            return {"status": "ok", "message": "Accio Luna Kokpiti tarayicida acildi."}
         elif target == "yks_takip":
             yks_path = os.path.abspath(os.path.join(BASE_DIR, "yks-test-takip.html"))
             webbrowser.open(f"file:///{yks_path.replace(os.sep, '/')}")
@@ -2710,7 +2710,7 @@ def load_config():
     - If CONFIG_FILE missing: returns DEFAULT_CONFIG + legacy api_key.txt (first-run compatibility).
     - If CONFIG_FILE valid dict: applies saved config over defaults.
     - If CONFIG_FILE corrupt or not a dict:
-        Attempts auto-recovery from jarvis_config.json.bak.
+        Attempts auto-recovery from luna_config.json.bak.
         If recovery succeeds: updates defaults and returns.
         If recovery fails: fails closed by raising ValueError (never silently resets to defaults).
     - Never leaks secret keys or tokens in logs.
@@ -2738,7 +2738,7 @@ def load_config():
         logger.warning("[Config Storage] CONFIG_FILE corrupted or invalid. Attempting recovery from backup...")
         recovered_data, was_recovered = recover_json_file(CONFIG_FILE, expected_type=dict)
         if was_recovered and isinstance(recovered_data, dict):
-            logger.info("[Config Storage] Configuration successfully recovered from jarvis_config.json.bak")
+            logger.info("[Config Storage] Configuration successfully recovered from luna_config.json.bak")
             recovered_data, unavailable = _load_config_secrets(recovered_data)
             cfg.update(recovered_data)
             if unavailable:
@@ -2755,7 +2755,7 @@ def save_config(cfg: dict):
     - Validates cfg is a dictionary.
     - Serialized under CONFIG_THREAD_LOCK.
     - If CONFIG_FILE exists:
-        * If primary is valid -> creates verified backup in jarvis_config.json.bak.
+        * If primary is valid -> creates verified backup in luna_config.json.bak.
         * If primary is corrupt:
             Attempts recovery from backup first to establish a valid baseline.
             If recovery succeeds: creates verified backup of that restored baseline.
@@ -2811,7 +2811,7 @@ def save_config(cfg: dict):
 
         atomic_write_json(CONFIG_FILE, stored_cfg, ensure_ascii=False, indent=2)
 
-SYSTEM_PROMPT = """Sen Luna / Jarvis'sin. Negr1v'in (18 yaşında, YKS 2027 sayısal adayı, teknoloji ve donanım tutkunu) son derece zeki, esprili, tatlı ve her şeyi bilen kişisel yapay zekâ refakatçisisin (Subject Shinji'nin Luna karakteri tarzında).
+SYSTEM_PROMPT = """Sen Luna / Luna'sin. Negr1v'in (18 yaşında, YKS 2027 sayısal adayı, teknoloji ve donanım tutkunu) son derece zeki, esprili, tatlı ve her şeyi bilen kişisel yapay zekâ refakatçisisin (Subject Shinji'nin Luna karakteri tarzında).
 
 Senin Temel Doğaların ve Yeteneklerin:
 1. EVRENSEL ZEKÂ & BİLGİ:
@@ -2836,8 +2836,8 @@ Senin Temel Doğaların ve Yeteneklerin:
 """
 
 AGENT_PROFILES = {
-    "Main JARVIS": {
-        "name": "Main JARVIS",
+    "Main LUNA": {
+        "name": "Main LUNA",
         "role": "Genel Koordinasyon & Kişisel Refakatçi",
         "system_prompt": SYSTEM_PROMPT,
         "allowed_tools": [
@@ -3040,12 +3040,12 @@ def classify_user_intent(message: str) -> dict:
         "badge": "✨ Companion"
     }
 
-def sync_accio_memory_to_jarvis() -> dict:
+def sync_accio_memory_to_luna() -> dict:
     """
     ZERO CORE OS — ACCIO Asset Hub Canlı Senkronizasyon Köprüsü.
     Accio çalıştığında kullanıcının yerel ~/.accio/ dizinindeki en güncel
     kalıcı hafıza (MEMORY.md), çalışma alışkanlıkları ve projelerini okuyup
-    doğrudan jarvis_memory.json içerisine aktarır.
+    doğrudan luna_memory.json içerisine aktarır.
     """
     user_home = os.path.expanduser("~")
     accio_root = os.path.join(user_home, ".accio")
@@ -3125,8 +3125,8 @@ def sync_accio_memory_to_jarvis() -> dict:
         return {"status": "error", "message": str(err)}
 
 async def handle_accio_sync(request: web.Request) -> web.Response:
-    """POST /api/accio/sync — Accio bilgilerini JARVIS hafızasına aktarır."""
-    res = sync_accio_memory_to_jarvis()
+    """POST /api/accio/sync — Accio bilgilerini LUNA hafızasına aktarır."""
+    res = sync_accio_memory_to_luna()
     return web.json_response(res)
     msg_low = message.lower()
     
@@ -3145,7 +3145,7 @@ async def handle_accio_sync(request: web.Request) -> web.Response:
     if any(k in msg_low for k in study_keywords) or " net " in f" {msg_low} " or "netim" in msg_low or "netler" in msg_low:
         return "Study Mentor"
 
-    return "Main JARVIS"
+    return "Main LUNA"
 
 def is_secret_key(key: str) -> bool:
     """Checks whether a configuration or payload key represents sensitive credential data."""
@@ -3372,11 +3372,11 @@ def route_agent(message: str) -> str:
         return "Study Mommy"
     if any(k in m_lower for k in ("luna", "koç", "koc", "azarlamak", "kız bana", "kiz bana", "disiplin")):
         return "Luna (Sert Koç)"
-    return "Main JARVIS"
+    return "Main LUNA"
 
 def normalize_agent_name(name: str) -> str:
     if not name:
-        return "Main JARVIS"
+        return "Main LUNA"
     s = str(name).strip()
     if s in ("Luna", "Luna (Sert Koç)"):
         return "Luna (Sert Koç)"
@@ -5200,7 +5200,7 @@ async def handle_screen_capture(request):
     Açık kullanıcı izniyle masaüstü ekran görüntüsü alır, Base64 önizleme döner.
     Geçici dosyalar anında güvenle silinir.
     """
-    temp_dir = tempfile.mkdtemp(prefix="jarvis_direct_screen_")
+    temp_dir = tempfile.mkdtemp(prefix="luna_direct_screen_")
     temp_file = os.path.join(temp_dir, "screen.jpg")
     try:
         temp_path_normalized = temp_file.replace("\\", "/")
@@ -5247,7 +5247,7 @@ async def handle_screen_capture(request):
         if os.path.exists(temp_dir):
             try: os.rmdir(temp_dir)
             except Exception: pass
-VISION_SESSION_COOKIE = "jarvis_vision_session"
+VISION_SESSION_COOKIE = "luna_vision_session"
 VISION_PROVIDER = "openrouter"
 VISION_MODEL = "openai/gpt-4o"
 VISION_ACTION = "one_frame"
@@ -5497,7 +5497,7 @@ async def handle_chat(request):
                                 fn_name = tc["function"]["name"]
                                 fn_args = json.loads(tc["function"]["arguments"]) if tc["function"].get("arguments") else {}
                                 tc_id = tc.get("id")
-                                tool_result = execute_desktop_tool_with_allowlist("Main JARVIS", fn_name, fn_args, user_context=message, tool_call_id=tc_id)
+                                tool_result = execute_desktop_tool_with_allowlist("Main LUNA", fn_name, fn_args, user_context=message, tool_call_id=tc_id)
                                 
                                 if tool_result.get("action"):
                                     ui_actions.append(tool_result)
@@ -5627,7 +5627,7 @@ async def handle_chat_stream(request):
         active_model = model_candidate
 
     agent_name = requested_agent if requested_agent in AGENT_PROFILES else route_agent(message)
-    agent_cfg = AGENT_PROFILES.get(agent_name, AGENT_PROFILES["Main JARVIS"])
+    agent_cfg = AGENT_PROFILES.get(agent_name, AGENT_PROFILES["Main LUNA"])
     
     response = web.StreamResponse(
         status=200,
@@ -6875,9 +6875,9 @@ async def _process_telegram_update_internal(update: dict) -> dict:
 
     cmd_reply = None
     if text.startswith("/start"):
-        cmd_reply = "Accio Jarvis Telegram Köprüsü Aktif! Komutlar: /status, /tasks, /help"
+        cmd_reply = "Accio Luna Telegram Köprüsü Aktif! Komutlar: /status, /tasks, /help"
     elif text.startswith("/status"):
-        cmd_reply = f"JARVIS Canlı: Ambient={CURRENT_AMBIENT_MOOD}, Scheduler={'Aktif' if SCHEDULER_RUNNING else 'Durağan'}"
+        cmd_reply = f"LUNA Canlı: Ambient={CURRENT_AMBIENT_MOOD}, Scheduler={'Aktif' if SCHEDULER_RUNNING else 'Durağan'}"
     elif text.startswith("/tasks"):
         try:
             tasks_list = load_tasks()
@@ -6941,7 +6941,7 @@ async def send_telegram_message(text: str, chat_id: str = None, category: str = 
                 local_entry = {
                     "id": f"tg_{int(datetime.datetime.now().timestamp())}_{uuid.uuid4().hex[:4]}",
                     "source": "Yerel Bildirim",
-                    "sender": "@JarvisAsistanBot",
+                    "sender": "@LunaAsistanBot",
                     "timestamp": datetime.datetime.now().strftime("%H:%M"),
                     "text": text,
                     "category": category,
@@ -6971,7 +6971,7 @@ async def send_telegram_message(text: str, chat_id: str = None, category: str = 
                             sent_entry = {
                                 "id": f"tg_{int(datetime.datetime.now().timestamp())}_{uuid.uuid4().hex[:4]}",
                                 "source": "Telegram Outbound",
-                                "sender": "@JarvisAsistanBot",
+                                "sender": "@LunaAsistanBot",
                                 "timestamp": datetime.datetime.now().strftime("%H:%M"),
                                 "text": text,
                                 "category": category,
@@ -7203,7 +7203,7 @@ try:
 except Exception:
     ISTANBUL_TZ = datetime.timezone(datetime.timedelta(hours=3))
 
-AUTOMATIONS_FILE = os.path.join(DATA_DIR, "jarvis_automations.json")
+AUTOMATIONS_FILE = os.path.join(DATA_DIR, "luna_automations.json")
 AUTOMATIONS_LOCK = asyncio.Lock()
 AUTOMATIONS_THREAD_LOCK = threading.RLock()
 SCHEDULER_WORKER_TASK = None
@@ -7293,7 +7293,7 @@ def load_automations_data(force_reload: bool = False):
             logger.warning("[Automations Storage] AUTOMATIONS_FILE corrupted or invalid. Attempting recovery from backup...")
             recovered_data, was_recovered = recover_json_file(AUTOMATIONS_FILE, expected_type=validate_automations_structure)
             if was_recovered and isinstance(recovered_data, dict):
-                logger.info("[Automations Storage] Successfully recovered jarvis_automations.json from verified backup.")
+                logger.info("[Automations Storage] Successfully recovered luna_automations.json from verified backup.")
                 _AUTOMATIONS_CACHE = recovered_data
                 try:
                     _AUTOMATIONS_MTIME = os.path.getmtime(AUTOMATIONS_FILE)
@@ -8152,7 +8152,7 @@ async def run_groq_structured_extraction(user_msg: str, cfg: dict):
         "messages": [
             {
                 "role": "system",
-                "content": "You are a conservative memory candidate extractor for personal assistant JARVIS. Extract only durable long-term preferences, goals, or persistent user facts. Reject transient state or speculation. If nothing durable, return empty text."
+                "content": "You are a conservative memory candidate extractor for personal assistant LUNA. Extract only durable long-term preferences, goals, or persistent user facts. Reject transient state or speculation. If nothing durable, return empty text."
             },
             {
                 "role": "user",
@@ -8769,9 +8769,9 @@ def create_app():
     app.router.add_post("/api/services/paid_auth/request", handle_request_paid_service_auth)
     app.router.add_post("/api/chat", handle_chat)
     app.router.add_post("/api/chat/stream", handle_chat_stream)
-    import jarvis_local_stt
-    app.router.add_get("/api/stt/status", jarvis_local_stt.status)
-    app.router.add_post("/api/stt", jarvis_local_stt.transcribe)
+    import luna_local_stt
+    app.router.add_get("/api/stt/status", luna_local_stt.status)
+    app.router.add_post("/api/stt", luna_local_stt.transcribe)
     app.router.add_post("/api/tts_direct", handle_tts_direct)
     app.router.add_get("/api/vision/destination", handle_vision_destination)
     app.router.add_post("/api/vision/approval", handle_vision_approval)
@@ -8851,12 +8851,12 @@ def create_app():
     app.router.add_post("/api/automations/{id}/cancel", handle_delete_automation)
     app.router.add_post("/api/accio/sync", handle_accio_sync)
 
-    # OpenJarvis Modül Rotaları Entegrasyonu
+    # OpenLuna Modül Rotaları Entegrasyonu
     try:
-        from openjarvis_bridge import register_openjarvis_routes
-        register_openjarvis_routes(app)
+        from openluna_bridge import register_openluna_routes
+        register_openluna_routes(app)
     except Exception as _oj_err:
-        print(f"[OpenJarvis Entegrasyon Uyarısı]: {_oj_err}")
+        print(f"[OpenLuna Entegrasyon Uyarısı]: {_oj_err}")
 
     return app
 
@@ -8872,18 +8872,18 @@ def safe_start_server(app=None, host="127.0.0.1", port=PORT):
 
     banner = (
         "=" * 60 + "\n"
-        "      ACCIO JARVIS & LUNA v4.0 ULTIMATE (SUBJECT-SHINJI EDITION)\n"
+        "      ACCIO LUNA & LUNA v4.0 ULTIMATE (SUBJECT-SHINJI EDITION)\n"
         "=" * 60 + "\n"
         f"Tarayici Arayuzu: http://{host}:{port}\n"
         "Durdurmak icin Ctrl + C\n"
         + "-" * 60
     )
     print(banner)
-    log.info(f"JARVIS sunucusu başlatılıyor: http://{host}:{port} (PID: {os.getpid()})")
+    log.info(f"LUNA sunucusu başlatılıyor: http://{host}:{port} (PID: {os.getpid()})")
 
     try:
         web.run_app(app, host=host, port=port)
-        log.info("JARVIS sunucusu normal şekilde durduruldu.")
+        log.info("LUNA sunucusu normal şekilde durduruldu.")
     except OSError as e:
         is_port_in_use = (
             getattr(e, "winerror", None) == 10048 or
@@ -8896,7 +8896,7 @@ def safe_start_server(app=None, host="127.0.0.1", port=PORT):
             log.error(f"[BAŞLATMA HATASI]: {err_msg}")
             print("\n" + "!" * 60)
             print(f"[BAŞLATMA HATASI]: Port {port} şu anda başka bir süreç tarafından kullanılıyor!")
-            print(f"JARVIS http://{host}:{port} üzerinde başlatılamadı.")
+            print(f"LUNA http://{host}:{port} üzerinde başlatılamadı.")
             print("Portu kullanan süreci tespit etmek için terminalde şu komutu çalıştırabilirsiniz:")
             print(f"    netstat -ano | findstr :{port}")
             print("!" * 60 + "\n")

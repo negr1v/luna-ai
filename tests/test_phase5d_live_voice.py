@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 5 / Stage 5D
+ACCIO LUNA V4.0 — Phase 5 / Stage 5D
 Full End-to-End Live Voice Lifecycle Acceptance Test Suite.
 
 Executes:
@@ -43,12 +43,12 @@ BASE_URL = f"http://127.0.0.1:{PORT}"
 CHROME_PATH = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 INDEX_FILE = os.path.join(BASE_DIR, "index.html")
 
-import jarvis_server
+import luna_server
 
 
 class LiveVoiceAcceptanceRunner:
     def __init__(self):
-        self.temp_dir = tempfile.TemporaryDirectory(prefix="jarvis_stage5d_")
+        self.temp_dir = tempfile.TemporaryDirectory(prefix="luna_stage5d_")
         self.test_tasks_file = os.path.join(self.temp_dir.name, "isolated_tasks.json")
         self.test_mem_file = os.path.join(self.temp_dir.name, "isolated_memory.json")
         self.test_cfg_file = os.path.join(self.temp_dir.name, "isolated_cfg.json")
@@ -69,18 +69,18 @@ class LiveVoiceAcceptanceRunner:
         self.site = None
 
     def start_server(self):
-        jarvis_server.TASKS_FILE = self.test_tasks_file
-        jarvis_server.MEMORY_FILE = self.test_mem_file
-        jarvis_server.CONFIG_FILE = self.test_cfg_file
-        jarvis_server.TELEGRAM_FILE = self.test_tg_file
+        luna_server.TASKS_FILE = self.test_tasks_file
+        luna_server.MEMORY_FILE = self.test_mem_file
+        luna_server.CONFIG_FILE = self.test_cfg_file
+        luna_server.TELEGRAM_FILE = self.test_tg_file
 
         def run_loop():
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
-            app = jarvis_server.create_app()
-            self.runner = jarvis_server.web.AppRunner(app)
+            app = luna_server.create_app()
+            self.runner = luna_server.web.AppRunner(app)
             self.loop.run_until_complete(self.runner.setup())
-            self.site = jarvis_server.web.TCPSite(self.runner, "127.0.0.1", PORT)
+            self.site = luna_server.web.TCPSite(self.runner, "127.0.0.1", PORT)
             self.loop.run_until_complete(self.site.start())
             self.loop.run_forever()
 
@@ -130,7 +130,7 @@ class LiveVoiceAcceptanceRunner:
 
 def run_all_checks():
     print("=" * 70)
-    print("  ACCIO JARVIS V4.0 — STAGE 5D LIVE VOICE ACCEPTANCE SUITE")
+    print("  ACCIO LUNA V4.0 — STAGE 5D LIVE VOICE ACCEPTANCE SUITE")
     print("=" * 70)
 
     runner = LiveVoiceAcceptanceRunner()
@@ -167,7 +167,7 @@ def run_all_checks():
 
         # Check 2: Live HTTP TTS Direct API Endpoint
         print("\n[Section 3] Live HTTP /api/tts_direct Endpoint Verification...")
-        status, data = runner.request("POST", "/api/tts_direct", {"text": "Jarvis ses motoru testi."})
+        status, data = runner.request("POST", "/api/tts_direct", {"text": "Luna ses motoru testi."})
         assert status == 200, f"Expected HTTP 200 from /api/tts_direct, got {status}: {data}"
         assert "audio_base64" in data and "text" in data, f"Expected audio_base64 and text in response, got: {data}"
         audio_b64 = data.get("audio_base64")
@@ -301,7 +301,7 @@ def run_all_checks():
           // Step 13: Spoken barge-in interruption ("dur")
           isSpeaking = true;
           setCoreState('SPEAKING');
-          const spoken = 'dur jarvis';
+          const spoken = 'dur luna';
           if (spoken.includes('dur') || spoken.includes('tamam') || spoken.includes('kes') || spoken.includes('yeter')) {
             interruptSpeech();
           }

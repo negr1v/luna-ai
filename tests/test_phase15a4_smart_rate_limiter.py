@@ -19,7 +19,7 @@ from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from jarvis_server import (
+from luna_server import (
     SmartProviderRateLimiter,
     ProviderRateLimitState,
     RateLimitExceededException,
@@ -131,7 +131,7 @@ class TestPhase15A4SmartRateLimiter(unittest.IsolatedAsyncioTestCase):
 
 from aiohttp.test_utils import AioHTTPTestCase
 from aiohttp import web
-from jarvis_server import handle_chat
+from luna_server import handle_chat
 
 class TestChatRateLimitHTTP(AioHTTPTestCase):
     async def get_application(self):

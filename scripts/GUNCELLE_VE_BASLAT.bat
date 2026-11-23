@@ -1,9 +1,9 @@
 @echo off
-title ACCIO-JARVIS - Temiz Baslatici
+title LUNA-AI - Temiz Baslatici
 cd /d "%~dp0"
 
 echo ========================================================
-echo        ACCIO-JARVIS GUNCELLEME VE BASLATMA
+echo        LUNA-AI GUNCELLEME VE BASLATMA
 echo ========================================================
 echo 1. Eski calisan sunucu temizleniyor (Port 7860)...
 
@@ -22,11 +22,11 @@ set "ACCIO_PY=C:\Users\negr1\AppData\Roaming\Accio\pre-install\bd5ff2c6816a\pyth
 echo 3. Tarayici aciliyor...
 start "" "http://127.0.0.1:7860"
 
-echo 4. JARVIS Sunucusu Baslatiliyor...
+echo 4. LUNA Sunucusu Baslatiliyor...
 if exist "%ACCIO_PY%" (
-    "%ACCIO_PY%" jarvis_server.py
+    "%ACCIO_PY%" luna_server.py
 ) else (
-    python jarvis_server.py
+    python luna_server.py
 )
 
 pause

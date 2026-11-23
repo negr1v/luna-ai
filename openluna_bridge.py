@@ -1,13 +1,13 @@
 """
-openjarvis_bridge.py
-ACCIO-JARVIS ve OpenJarvis Modülleri Arasındaki API ve Entegrasyon Köprüsü.
+openluna_bridge.py
+LUNA-AI ve OpenLuna Modülleri Arasındaki API ve Entegrasyon Köprüsü.
 
 Bu modül:
-- `openjarvis_executor` (Python CodeAct)
-- `openjarvis_researcher` (Deep Research)
-- `openjarvis_digest` (Morning Digest)
+- `openluna_executor` (Python CodeAct)
+- `openluna_researcher` (Deep Research)
+- `openluna_digest` (Morning Digest)
 
-bileşenlerini tek bir çatı altında birleştirir ve aiohttp (jarvis_server.py)
+bileşenlerini tek bir çatı altında birleştirir ve aiohttp (luna_server.py)
 uyumlu handler'lar sunar.
 """
 
@@ -15,17 +15,17 @@ from __future__ import annotations
 
 import json
 from aiohttp import web
-from openjarvis_executor import OpenJarvisExecutor
-from openjarvis_researcher import OpenJarvisResearcher
-from openjarvis_digest import OpenJarvisDigest
+from openluna_executor import OpenLunaExecutor
+from openluna_researcher import OpenLunaResearcher
+from openluna_digest import OpenLunaDigest
 
-executor = OpenJarvisExecutor(timeout_sec=15)
-researcher = OpenJarvisResearcher()
-digest = OpenJarvisDigest()
+executor = OpenLunaExecutor(timeout_sec=15)
+researcher = OpenLunaResearcher()
+digest = OpenLunaDigest()
 
-async def handle_openjarvis_execute(request: web.Request) -> web.Response:
+async def handle_openluna_execute(request: web.Request) -> web.Response:
     """
-    POST /api/openjarvis/execute
+    POST /api/openluna/execute
     JSON gövdesi: {"code": "print('hello')"} veya {"text": "```python\nprint(1+1)\n```"}
     """
     try:
@@ -48,9 +48,9 @@ async def handle_openjarvis_execute(request: web.Request) -> web.Response:
     return web.json_response(res)
 
 
-async def handle_openjarvis_research(request: web.Request) -> web.Response:
+async def handle_openluna_research(request: web.Request) -> web.Response:
     """
-    POST /api/openjarvis/research
+    POST /api/openluna/research
     JSON gövdesi: {"topic": "araştırma konusu"}
     """
     try:
@@ -70,9 +70,9 @@ async def handle_openjarvis_research(request: web.Request) -> web.Response:
     })
 
 
-async def handle_openjarvis_digest(request: web.Request) -> web.Response:
+async def handle_openluna_digest(request: web.Request) -> web.Response:
     """
-    GET /api/openjarvis/digest
+    GET /api/openluna/digest
     Sabah brifingini sesli metin (TTS) ve görsel markdown rapor olarak döner.
     """
     spoken = digest.generate_spoken_briefing()
@@ -87,15 +87,15 @@ async def handle_openjarvis_digest(request: web.Request) -> web.Response:
     })
 
 
-def register_openjarvis_routes(app: web.Application) -> None:
-    """jarvis_server.py aiohttp uygulamasına OpenJarvis rotalarını ekler."""
-    app.router.add_post("/api/openjarvis/execute", handle_openjarvis_execute)
-    app.router.add_post("/api/openjarvis/research", handle_openjarvis_research)
-    app.router.add_get("/api/openjarvis/digest", handle_openjarvis_digest)
-    print("[OpenJarvis Bridge] Rotalar başarıyla kaydedildi: /api/openjarvis/(execute|research|digest)")
+def register_openluna_routes(app: web.Application) -> None:
+    """luna_server.py aiohttp uygulamasına OpenLuna rotalarını ekler."""
+    app.router.add_post("/api/openluna/execute", handle_openluna_execute)
+    app.router.add_post("/api/openluna/research", handle_openluna_research)
+    app.router.add_get("/api/openluna/digest", handle_openluna_digest)
+    print("[OpenLuna Bridge] Rotalar başarıyla kaydedildi: /api/openluna/(execute|research|digest)")
 
 
 if __name__ == "__main__":
     app = web.Application()
-    register_openjarvis_routes(app)
-    print("OpenJarvis Bridge tekil çalıştırma testi başarılı.")
+    register_openluna_routes(app)
+    print("OpenLuna Bridge tekil çalıştırma testi başarılı.")

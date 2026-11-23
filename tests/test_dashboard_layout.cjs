@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
       await page.setViewportSize({width,height});
       await page.evaluate(() => scrollTo(0, 0));
       await page.locator('#animeAvatarImg').waitFor();
-      if (phase.includes('after')) await page.waitForFunction(() => localStorage.getItem('jarvis_active_avatar_char') && document.getElementById('animeAvatarImg').naturalWidth > 0);
+      if (phase.includes('after')) await page.waitForFunction(() => localStorage.getItem('luna_active_avatar_char') && document.getElementById('animeAvatarImg').naturalWidth > 0);
       else await page.waitForFunction(() => document.getElementById('animeAvatarImg').complete);
       console.log('avatar', await page.locator('#animeAvatarImg').evaluate(e=>({src:e.src,width:e.naturalWidth})));
       await page.screenshot({path:path.join(__dirname, 'dashboard-' + phase + '-' + width + '.png')});

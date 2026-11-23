@@ -2,7 +2,7 @@
   {
     "id": "tg_1794145770_2c0d",
     "source": "Telegram Outbound",
-    "sender": "@JarvisAsistanBot",
+    "sender": "@LunaAsistanBot",
     "timestamp": "16:49",
     "text": "Msg 2",
     "category": "deal",
@@ -11,7 +11,7 @@
   {
     "id": "tg_1794145770_5831",
     "source": "Telegram Outbound",
-    "sender": "@JarvisAsistanBot",
+    "sender": "@LunaAsistanBot",
     "timestamp": "16:49",
     "text": "Msg 1",
     "category": "deal",
@@ -20,7 +20,7 @@
   {
     "id": "tg_1794145711_6232",
     "source": "Yerel Bildirim",
-    "sender": "@JarvisAsistanBot",
+    "sender": "@LunaAsistanBot",
     "timestamp": "16:48",
     "text": "Msg 1",
     "category": "deal",

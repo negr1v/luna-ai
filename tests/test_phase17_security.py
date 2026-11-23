@@ -8,8 +8,8 @@ from unittest.mock import AsyncMock, patch
 
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
-import jarvis_server as server
-from jarvis_secret_store import is_protected_secret, protect_secret, unprotect_secret
+import luna_server as server
+from luna_secret_store import is_protected_secret, protect_secret, unprotect_secret
 
 
 class TestPaidTtsAuthorization(unittest.IsolatedAsyncioTestCase):
@@ -87,7 +87,7 @@ class TestPaidTtsAuthorization(unittest.IsolatedAsyncioTestCase):
 class TestDpapiSecretStorage(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.config_path = Path(self.temp_dir.name) / "jarvis_config.json"
+        self.config_path = Path(self.temp_dir.name) / "luna_config.json"
         self.original_config_file = server.CONFIG_FILE
         self.original_base_dir = server.BASE_DIR
         server.CONFIG_FILE = str(self.config_path)

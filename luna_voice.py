@@ -1,5 +1,5 @@
 """
-Accio Jarvis — Sesli Etkilesimli Asistan (Zero-VRAM, Ultra-Lightweight)
+Accio Luna — Sesli Etkilesimli Asistan (Zero-VRAM, Ultra-Lightweight)
 Mimari:
 - STT: Google Speech Recognition (Ucretsiz, Turkce)
 - LLM: Groq / OpenAI / Gemini API (Ultra-hizli, Llama 3.3 70B veya GPT)
@@ -166,7 +166,7 @@ def get_llm_response(prompt, conversation_history, api_key):
 
 def main():
     print("=" * 60)
-    print("      ACCIO JARVIS — SESLI ILETISIM SISTEMI (v1.0)")
+    print("      ACCIO LUNA — SESLI ILETISIM SISTEMI (v1.0)")
     print("=" * 60)
     print("Ses Motoru: Microsoft Edge Neural (tr-TR-AhmetNeural)")
     print("Girdi: sounddevice + Google Speech Recognition (STT)")
@@ -220,7 +220,7 @@ def main():
         if not GROQ_API_KEY:
             ans = f"Sesini duydum Negr1: '{user_text}'. Bir Groq API anahtari girersen sana dogrudan yanit verebilirim."
         else:
-            print("[Jarvis]: Yanit uretiliyor...")
+            print("[Luna]: Yanit uretiliyor...")
             ans = get_llm_response(user_text, history, GROQ_API_KEY)
             history.append({"role": "user", "content": user_text})
             history.append({"role": "assistant", "content": ans})

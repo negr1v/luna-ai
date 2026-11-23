@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    ACCIO JARVIS V16 — Phase 16B: Native Windows UIAutomation Tree Inspector
+    ACCIO LUNA V16 — Phase 16B: Native Windows UIAutomation Tree Inspector
 .DESCRIPTION
     Hafif .NET System.Windows.Automation tabanlı erişilebilirlik ağacı okuyucusu.
     Modern Windows uygulamalarını (Ayarlar, Hesap Makinesi, UWP/XAML) güvenle denetler.

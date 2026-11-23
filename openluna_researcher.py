@@ -1,10 +1,10 @@
 """
-openjarvis_researcher.py
-ACCIO-JARVIS için OpenJarvis tabanlı Çok Kaynaklı Derin Araştırma ve Sentez Motoru.
+openluna_researcher.py
+LUNA-AI için OpenLuna tabanlı Çok Kaynaklı Derin Araştırma ve Sentez Motoru.
 
-OpenJarvis'in `DeepResearchAgent` stratejisinden uyarlanmıştır:
+OpenLuna'in `DeepResearchAgent` stratejisinden uyarlanmıştır:
 - Gelen araştırma konusunu analiz edip alt hedeflere böler.
-- Yerel JARVIS veritabanını (görevler, hafıza, bildirimler) tarar.
+- Yerel LUNA veritabanını (görevler, hafıza, bildirimler) tarar.
 - Sonuçları kaynak göstererek (inline citation) yapılandırılmış araştırma raporu haline getirir.
 """
 
@@ -17,12 +17,12 @@ from typing import Dict, Any, List
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-class OpenJarvisResearcher:
+class OpenLunaResearcher:
     def __init__(self, project_dir: str = PROJECT_DIR):
         self.project_dir = project_dir
-        self.tasks_file = os.path.join(project_dir, "jarvis_tasks.json")
-        self.memory_file = os.path.join(project_dir, "jarvis_memory.json")
-        self.notifications_file = os.path.join(project_dir, "jarvis_notifications.json")
+        self.tasks_file = os.path.join(project_dir, "luna_tasks.json")
+        self.memory_file = os.path.join(project_dir, "luna_memory.json")
+        self.notifications_file = os.path.join(project_dir, "luna_notifications.json")
 
     def _read_json_safe(self, filepath: str) -> Any:
         if not os.path.exists(filepath):
@@ -34,7 +34,7 @@ class OpenJarvisResearcher:
             return []
 
     def classify_query(self, query: str) -> str:
-        """Sorguyu OpenJarvis sınıflarına göre etiketler."""
+        """Sorguyu OpenLuna sınıflarına göre etiketler."""
         q = query.lower()
         if any(w in q for w in ["görev", "task", "yapılacak", "aksiyon", "todo"]):
             return "task_finder"
@@ -45,7 +45,7 @@ class OpenJarvisResearcher:
         return "cross_source_synthesis"
 
     def search_local_knowledge(self, query: str) -> Dict[str, List[Any]]:
-        """Mevcut JARVIS yerel veritabanında arama yapar."""
+        """Mevcut LUNA yerel veritabanında arama yapar."""
         terms = [t.strip().lower() for t in query.split() if len(t.strip()) > 2]
         matches: Dict[str, List[Any]] = {
             "tasks": [],
@@ -80,20 +80,20 @@ class OpenJarvisResearcher:
         return matches
 
     def generate_research_report(self, topic: str) -> str:
-        """OpenJarvis formatında kaynaklı derin araştırma raporu üretir."""
+        """OpenLuna formatında kaynaklı derin araştırma raporu üretir."""
         category = self.classify_query(topic)
         local_results = self.search_local_knowledge(topic)
 
         now_str = datetime.now().strftime("%d.%m.%Y %H:%M")
         report = []
-        report.append(f"# [OPENJARVIS DEEP RESEARCH RAPORU]")
+        report.append(f"# [OPENLUNA DEEP RESEARCH RAPORU]")
         report.append(f"**Araştırma Konusu:** {topic}")
         report.append(f"**Tarih/Saat:** {now_str}")
         report.append(f"**Sorgu Türü:** {category.upper()}\n")
 
         # Eşleşen Görevler
         if local_results["tasks"]:
-            report.append("### 📌 İlişkili Görev Kayıtları [Kaynak: jarvis_tasks.json]")
+            report.append("### 📌 İlişkili Görev Kayıtları [Kaynak: luna_tasks.json]")
             for t in local_results["tasks"][:5]:
                 status = "Tamamlandı" if t.get("completed") else "Bekliyor"
                 report.append(f"- **{t.get('title', 'İsimsiz')}** ({status}) - {t.get('description', '')}")
@@ -101,14 +101,14 @@ class OpenJarvisResearcher:
 
         # Eşleşen Hafıza
         if local_results["memory"]:
-            report.append("### 🧠 Kalıcı Sistem Hafızası [Kaynak: jarvis_memory.json]")
+            report.append("### 🧠 Kalıcı Sistem Hafızası [Kaynak: luna_memory.json]")
             for m in local_results["memory"][:5]:
                 report.append(f"- **{m.get('key', 'Bilgi')}:** {m.get('value', '')}")
             report.append("")
 
         # Eşleşen Bildirimler
         if local_results["notifications"]:
-            report.append("### 🔔 Bildirim ve Olay Geçmişi [Kaynak: jarvis_notifications.json]")
+            report.append("### 🔔 Bildirim ve Olay Geçmişi [Kaynak: luna_notifications.json]")
             for n in local_results["notifications"][:5]:
                 report.append(f"- {n.get('text', '')}")
             report.append("")
@@ -119,14 +119,14 @@ class OpenJarvisResearcher:
         # Canlı Web ve GitHub Araştırma Özeti Eklentisi (Phase 3 Web Research Engine)
         report.append("\n### 🌐 Canlı Web & GitHub Kaynak Entegrasyonu")
         report.append(f"- **Hedef Sorgu:** `{topic}`")
-        report.append(f"- **Analiz Modu:** Multi-hop Web & Repositories Synthesizer (OpenJarvis Engine)")
+        report.append(f"- **Analiz Modu:** Multi-hop Web & Repositories Synthesizer (OpenLuna Engine)")
         report.append(f"- **Durum:** Dış kaynak verileri sentezlendi ve araştırma geçmişine kaydedildi.")
 
-        report.append("\n---\n*Rapor OpenJarvis Multi-Hop Sentez Protokolü ile derlenmiştir.*")
+        report.append("\n---\n*Rapor OpenLuna Multi-Hop Sentez Protokolü ile derlenmiştir.*")
         return "\n".join(report)
 
 
 if __name__ == "__main__":
-    researcher = OpenJarvisResearcher()
+    researcher = OpenLunaResearcher()
     sample = researcher.generate_research_report("YKS çalışma programı donanım")
     print(sample)

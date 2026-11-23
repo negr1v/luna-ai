@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 9B.4C.1 Long-Run Stability Test Suite
+ACCIO LUNA V4.0 — Phase 9B.4C.1 Long-Run Stability Test Suite
 Focus: Deterministic long-run stability validation for conversation DOM bounding (5,000 insertions),
        Telegram in-flight polling guard (1,000 cycles), multi-failure resilience & timer discipline.
 """
@@ -167,7 +167,7 @@ runTest().then(result => {{
         let countViolations = 0;
 
         for (let i = 1; i <= 5000; i++) {
-          appendBubble(`MSG_${i}`, i % 2 === 0 ? 'assistant' : 'user', i % 2 === 0 ? 'JARVIS' : null);
+          appendBubble(`MSG_${i}`, i % 2 === 0 ? 'assistant' : 'user', i % 2 === 0 ? 'LUNA' : null);
           const currentBubbles = transcript.querySelectorAll('.msg-bubble');
           if (currentBubbles.length > maxBubbleCountObserved) {
             maxBubbleCountObserved = currentBubbles.length;

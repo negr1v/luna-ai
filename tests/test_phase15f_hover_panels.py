@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS V15 - PHASE 15F HOVER PANELS VALIDATION TEST
+LUNA-AI V15 - PHASE 15F HOVER PANELS VALIDATION TEST
 Verifies:
 1. index.html contains #zeroHoverPanelsBar and all 6 panel triggers.
 2. Contains #hpCardWrapper and #hpCard with mode toggle, nav shortcut, and close buttons.

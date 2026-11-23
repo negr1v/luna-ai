@@ -1,5 +1,5 @@
 """
-ZERO CORE OS (ACCIO-JARVIS) V4 - Autonomous Agent Core Engine (V11/V12)
+ZERO CORE OS (LUNA-AI) V4 - Autonomous Agent Core Engine (V11/V12)
 Modüler, güvenli, izin denetimli ve mevcut aiohttp backend'i ile tam entegre otonom ajan çekirdeği.
 """
 
@@ -15,7 +15,7 @@ from typing import Dict, Any, List, Optional, Callable, Tuple
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 
-logger = logging.getLogger("jarvis.agent")
+logger = logging.getLogger("luna.agent")
 
 class TaskState(str, Enum):
     CREATED = "CREATED"
@@ -360,14 +360,14 @@ class AgentController:
     """Otonom ajan döngüsünün beyni: Planlama, İzin Yönetimi, Yürütme ve HUD Olayları."""
     def __init__(self, project_dir: str, data_dir: Optional[str] = None):
         self.project_dir = project_dir
-        self.data_dir = data_dir or os.environ.get("JARVIS_DATA_DIR") or (
+        self.data_dir = data_dir or os.environ.get("LUNA_DATA_DIR") or (
             os.path.join(os.path.dirname(project_dir), "data") if os.path.isdir(os.path.join(os.path.dirname(project_dir), "data"))
             else (os.path.join(project_dir, "data") if os.path.isdir(os.path.join(project_dir, "data")) else project_dir)
         )
         self.registry = ToolRegistry()
         self.planner = TaskPlanner(self.registry)
         self.event_mgr = AgentEventManager()
-        self.audit = AuditLogger(os.path.join(self.data_dir, "jarvis_agent_audit.jsonl"))
+        self.audit = AuditLogger(os.path.join(self.data_dir, "luna_agent_audit.jsonl"))
         self.tasks: Dict[str, AgentTask] = {}
         self.active_task_id: Optional[str] = None
         self._register_default_tools()
@@ -436,7 +436,7 @@ class AgentController:
         async def _tool_app_status(args):
             return {
                 "status": "ok",
-                "app": "ZERO CORE OS (ACCIO-JARVIS) V4",
+                "app": "ZERO CORE OS (LUNA-AI) V4",
                 "version": "4.0-V12",
                 "engine": "Autonomous Agent Engine v12.0",
                 "active_tasks": len(self.tasks)
@@ -453,7 +453,7 @@ class AgentController:
 
         # 3. Görevleri Listele
         async def _tool_list_tasks(args):
-            tasks_file = os.path.join(self.data_dir, "jarvis_tasks.json")
+            tasks_file = os.path.join(self.data_dir, "luna_tasks.json")
             if os.path.exists(tasks_file):
                 try:
                     with open(tasks_file, "r", encoding="utf-8") as f:
@@ -474,7 +474,7 @@ class AgentController:
 
         # 4. İzinli Belleği Oku
         async def _tool_read_memory(args):
-            mem_file = os.path.join(self.data_dir, "jarvis_memory.json")
+            mem_file = os.path.join(self.data_dir, "luna_memory.json")
             if os.path.exists(mem_file):
                 try:
                     with open(mem_file, "r", encoding="utf-8") as f:
@@ -572,7 +572,7 @@ class AgentController:
 
         # 7. Aktif Pencere ve Masaüstü Farkındalığı (V13)
         async def _tool_active_window(args):
-            from jarvis_computer_use import DesktopAwareness
+            from luna_computer_use import DesktopAwareness
             return DesktopAwareness.get_foreground_window_info()
 
         self.registry.register(ToolDefinition(
@@ -586,7 +586,7 @@ class AgentController:
 
         # 8. Pencere UI Elemanlarını Denetleme (V13 / V16 UIA Genişletmesi)
         async def _tool_inspect_ui(args):
-            from jarvis_computer_use import UIElementInspector
+            from luna_computer_use import UIElementInspector
             use_uia = bool(args.get("use_uia", True)) if isinstance(args, dict) else True
             max_elem = int(args.get("max_elements", 30)) if isinstance(args, dict) else 30
             return UIElementInspector.inspect_active_window_elements(use_uia=use_uia, max_elements=max_elem)
@@ -602,7 +602,7 @@ class AgentController:
 
         # 9. Güvenli Metin Yazma (V13 - Açık Onay Zorunlu)
         async def _tool_safe_type(args):
-            from jarvis_computer_use import SafeComputerController, DesktopAwareness
+            from luna_computer_use import SafeComputerController, DesktopAwareness
             text = args.get("text", "")
             fg = DesktopAwareness.get_foreground_window_info()
             if not fg.get("is_allowed"):
@@ -624,7 +624,7 @@ class AgentController:
 
         # 10. UIA Eylem Önizleme (Phase 16D - Salt Okunur Güvenlik Özeti)
         async def _tool_preview_ui_action(args):
-            from jarvis_computer_use import UIAutomationActionController, DesktopAwareness
+            from luna_computer_use import UIAutomationActionController, DesktopAwareness
             fg = DesktopAwareness.get_foreground_window_info()
             hwnd = int(args.get("hwnd", fg.get("hwnd", 0)))
             action = args.get("action", "Invoke")
@@ -644,7 +644,7 @@ class AgentController:
 
         # 11. UIA InvokePattern Buton Tetikleme (Phase 16D - Açık Kullanıcı Onayı Zorunlu)
         async def _tool_invoke_ui_element(args):
-            from jarvis_computer_use import UIAutomationActionController, DesktopAwareness
+            from luna_computer_use import UIAutomationActionController, DesktopAwareness
             if args.get("automation_id") == self.PENDING_UI_SELECTOR or args.get("name") == self.PENDING_UI_SELECTOR:
                 return {"status": "blocked", "reason": "target_selection_required",
                         "message": "Gerçek bir UI hedefi seçilmeden eylem yürütülemez."}
@@ -674,7 +674,7 @@ class AgentController:
 
         # 12. UIA ValuePattern Metin Girişi (Phase 16D - Açık Kullanıcı Onayı Zorunlu)
         async def _tool_set_ui_value(args):
-            from jarvis_computer_use import UIAutomationActionController, DesktopAwareness
+            from luna_computer_use import UIAutomationActionController, DesktopAwareness
             if args.get("automation_id") == self.PENDING_UI_SELECTOR or args.get("name") == self.PENDING_UI_SELECTOR:
                 return {"status": "blocked", "reason": "target_selection_required",
                         "message": "Gerçek bir UI hedefi seçilmeden eylem yürütülemez."}
@@ -746,7 +746,7 @@ class AgentController:
     def _capture_desktop_target(self, step: TaskStep) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
         """Capture and validate the real foreground target; never trust a supplied hwnd alone."""
         try:
-            from jarvis_computer_use import DesktopAwareness
+            from luna_computer_use import DesktopAwareness
             current = DesktopAwareness.get_foreground_window_info()
         except Exception:
             return None, "TARGET_UNAVAILABLE"

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS V15 - PHASE 15D SMART AI MODEL HUB TESTS (UPDATED)
+LUNA-AI V15 - PHASE 15D SMART AI MODEL HUB TESTS (UPDATED)
 Verifies:
 1. Recommends models based on task type (chat, coding, reasoning, vision, tool calling).
 2. Model info completeness (provider, cost category, capabilities, availability, context capacity, lifecycle, pricing).
@@ -22,7 +22,7 @@ from aiohttp import web
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from jarvis_server import (
+from luna_server import (
     SmartModelAdvisor,
     AI_MODEL_CATALOG,
     DEPRECATED_MODELS,
@@ -163,8 +163,8 @@ class TestSmartModelHubHTTP(AioHTTPTestCase):
         data = await resp.json()
         self.assertNotEqual(data.get("error_code"), "MODEL_DEPRECATED")
 
-    @patch("jarvis_server.save_config")
-    @patch("jarvis_server.load_config")
+    @patch("luna_server.save_config")
+    @patch("luna_server.load_config")
     async def test_07_manual_selection_of_valid_model(self, mock_load, mock_save):
         """Geçerli bir model seçildiğinde HTTP 200 döndüğünü ve konfigürasyona yazıldığını doğrula."""
         mock_load.return_value = {"openrouter_api_key": "sk-or-test-key", "groq_api_key": "gsk-test-key"}

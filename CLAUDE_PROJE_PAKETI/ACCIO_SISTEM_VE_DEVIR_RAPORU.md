@@ -19,7 +19,7 @@ Son geliştirme turlarında sistem genel kullanıcı deneyimi ve stabilite odakl
 
 2. **Ses Altyapısı (STT & TTS) Durumu:**
    - **TTS:** Fish Audio / Edge TTS destekli `/api/tts_direct` uç noktası stabil. Görev bitimlerinde ve molalarda devreye giren "Gothic Mommy" övgü/motivasyon seslendirme havuzu eklendi.
-   - **STT (Yeni):** `jarvis_server.py` içine Groq Whisper (`whisper-large-v3-turbo`) destekli yüksek hızlı `POST /api/stt` rotası yazıldı. Ayrıca yerel çevrimdışı Vosk desteği (`jarvis_local_stt.py`) sunucuya bağlandı.
+   - **STT (Yeni):** `luna_server.py` içine Groq Whisper (`whisper-large-v3-turbo`) destekli yüksek hızlı `POST /api/stt` rotası yazıldı. Ayrıca yerel çevrimdışı Vosk desteği (`luna_local_stt.py`) sunucuya bağlandı.
    - **Sorun:** Tarayıcı tarafındaki eski `webkitSpeechRecognition` API'si ve tıklanmayan "Türkçe paket kur" butonu devreden çıkarılıp, istemcinin `MediaRecorder` ile doğrudan yerel `/api/stt` rotasına bağlanması gerekiyor.
 
 ---
@@ -50,7 +50,7 @@ Son geliştirme turlarında sistem genel kullanıcı deneyimi ve stabilite odakl
 ### C. Bellek ve Dosya Şişmesi (Monolitik Risk)
 1. **`index.html` (15.200 Satır):**
    - Tek bir dosyada HTML, CSS ve JavaScript iç içe olduğu için DOM üzerinde yapılan cerrahi müdahaleler bazen beklenmedik yan etkilere yol açabiliyor.
-   - *Çözüm:* Testler geçip ses motoru canlıda doğrulandıktan hemen sonra CSS bloğu `jarvis_oled.css` olarak dışarı alınmalı.
+   - *Çözüm:* Testler geçip ses motoru canlıda doğrulandıktan hemen sonra CSS bloğu `luna_oled.css` olarak dışarı alınmalı.
 
 ---
 
@@ -70,7 +70,7 @@ Son geliştirme turlarında sistem genel kullanıcı deneyimi ve stabilite odakl
 - **Hedef:** Yeni `/api/stt` ve güncel frontend'in 7860 portunda çalışmasını sağlamak.
 - **Komut:**
   ```powershell
-  Set-Location "C:\Users\negr1\Projeler\ACCIO-JARVIS"; powershell -ExecutionPolicy Bypass -File .\start_jarvis.ps1
+  Set-Location "C:\Users\negr1\Projeler\LUNA-AI"; powershell -ExecutionPolicy Bypass -File .\start_luna.ps1
   ```
 
 ### [AŞAMA 3] Gelişmiş VAD & Ses Kesme Entegrasyonu
@@ -78,7 +78,7 @@ Son geliştirme turlarında sistem genel kullanıcı deneyimi ve stabilite odakl
 - Web Audio API `AnalyserNode` üzerinden gerçek zamanlı mik seviyesi ile anime kızının halosu senkronize edilmeye devam edilecek.
 
 ### [AŞAMA 4] Taşınabilir Paketleme (Zero-Dependency Portable)
-- `dist/ACCIO-JARVIS-PORTABLE` klasörünün tek tıklamayla (.bat / .exe) her Windows bilgisayarda sıfır kurulumla çalışacak hale getirilmesi.
+- `dist/LUNA-AI-PORTABLE` klasörünün tek tıklamayla (.bat / .exe) her Windows bilgisayarda sıfır kurulumla çalışacak hale getirilmesi.
 - Embedded Python çalışma zamanı ile sistem Python'ına bağımlılığın sıfırlanması.
 
 ---
@@ -89,7 +89,7 @@ Son geliştirme turlarında sistem genel kullanıcı deneyimi ve stabilite odakl
    - `index.html`, CSS ve istemci JavaScript dosyalarını düzenler.
    - Node.js tabanlı izole testleri (`test_voice_composer_ui.cjs`, `test_avatar_speech_ui.cjs`, `test_fix_pack2_ui.cjs`) çalıştırıp yeşil olduğunu teyit eder.
 2. **ACCIO:**
-   - Sunucu tarafı mimari rotaları (`jarvis_server.py`), API entegrasyonlarını, taşınabilir dağıtım senkronizasyonunu yönetir.
+   - Sunucu tarafı mimari rotaları (`luna_server.py`), API entegrasyonlarını, taşınabilir dağıtım senkronizasyonunu yönetir.
    - Asla terminalden ağır test veya kontrolsüz script koşturmaz (0-Kredi İlkesi).
    - Kullanıcıya canlı doğrulama için tek satırlık pratik PowerShell komutları sunar.
 

@@ -16,26 +16,26 @@ def run_subprocess_restart_test():
 
     # 1. Verify live production file is untouched
     orig_hash = "01d5f8469eef9e31b59874ba907dda9b512cc8ac28c6773580af8bb753537f81"
-    with open("jarvis_memory.json", "rb") as f:
+    with open("luna_memory.json", "rb") as f:
         cur_hash = hashlib.sha256(f.read()).hexdigest()
-    assert cur_hash == orig_hash, "CRITICAL: Live jarvis_memory.json modified!"
+    assert cur_hash == orig_hash, "CRITICAL: Live luna_memory.json modified!"
 
-    test_dir = tempfile.mkdtemp(prefix="jarvis_subproc_test_")
+    test_dir = tempfile.mkdtemp(prefix="luna_subproc_test_")
     isolated_mem = os.path.join(test_dir, "isolated_memory.json")
-    shutil.copy2("jarvis_memory.json.v3.bak", isolated_mem)
+    shutil.copy2("luna_memory.json.v3.bak", isolated_mem)
 
-    # Helper script to run jarvis on custom port and memory file
+    # Helper script to run luna on custom port and memory file
     runner_script = os.path.join(test_dir, "run_server.py")
     test_port = 8765
     with open(runner_script, "w", encoding="utf-8") as f:
         f.write(f"""
 import sys, os
 sys.path.insert(0, {repr(os.path.abspath("."))})
-import jarvis_server
+import luna_server
 from aiohttp import web
 
-jarvis_server.MEMORY_FILE = {repr(isolated_mem)}
-app = jarvis_server.create_app()
+luna_server.MEMORY_FILE = {repr(isolated_mem)}
+app = luna_server.create_app()
 web.run_app(app, port={test_port}, handle_signals=False)
 """)
 

@@ -1,5 +1,5 @@
 """
-ZERO CORE OS (ACCIO-JARVIS) V15 - PHASE 15A.2 TEST SUITE
+ZERO CORE OS (LUNA-AI) V15 - PHASE 15A.2 TEST SUITE
 Test: Intelligent Free-Provider-First Router, Capabilities & Paid Protection Continuity
 """
 
@@ -8,11 +8,11 @@ import os
 import unittest
 from unittest.mock import patch
 
-PROJECT_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+PROJECT_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
 if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)
 
-from jarvis_server import (
+from luna_server import (
     AI_MODEL_CATALOG,
     COST_FREE_ZERO_PRICE,
     COST_FREE_TIER_QUOTA,
@@ -110,8 +110,8 @@ class TestPhase15A2FreeRouter(AioHTTPTestCase):
             "openrouter_api_key": "sk-or-test",
             "groq_api_key": "gsk-test"
         }
-        with patch("jarvis_server.load_config", return_value=mock_cfg):
-            with patch("jarvis_server.select_free_first_model", return_value=("meta-llama/llama-3.3-70b-instruct:free", {}, "ok")):
+        with patch("luna_server.load_config", return_value=mock_cfg):
+            with patch("luna_server.select_free_first_model", return_value=("meta-llama/llama-3.3-70b-instruct:free", {}, "ok")):
                 resp = await self.client.post("/api/chat", json=payload)
                 # Ücretsiz model seçildiği için 402 onay istememeli
                 self.assertNotEqual(resp.status, 402)

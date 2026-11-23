@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 4 / Stage 4D
+ACCIO LUNA V4.0 — Phase 4 / Stage 4D
 Final Integrated Live Task Engine Acceptance Test Suite.
 
 Runs on live port 7860 using isolated temporary task storage.
@@ -27,7 +27,7 @@ import threading
 from unittest.mock import patch
 
 from aiohttp import web
-import jarvis_server
+import luna_server
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PORT = 7860
@@ -36,7 +36,7 @@ CHROME_PATH = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
 class LiveAcceptanceRunner:
     def __init__(self):
-        self.temp_dir = tempfile.TemporaryDirectory(prefix="jarvis_stage4d_")
+        self.temp_dir = tempfile.TemporaryDirectory(prefix="luna_stage4d_")
         self.test_tasks_file = os.path.join(self.temp_dir.name, "isolated_tasks.json")
         self.test_mem_file = os.path.join(self.temp_dir.name, "isolated_memory.json")
         self.test_cfg_file = os.path.join(self.temp_dir.name, "isolated_cfg.json")
@@ -66,15 +66,15 @@ class LiveAcceptanceRunner:
         self.site = None
 
     def start_server(self):
-        jarvis_server.TASKS_FILE = self.test_tasks_file
-        jarvis_server.MEMORY_FILE = self.test_mem_file
-        jarvis_server.CONFIG_FILE = self.test_cfg_file
-        jarvis_server.TELEGRAM_FILE = self.test_tg_file
+        luna_server.TASKS_FILE = self.test_tasks_file
+        luna_server.MEMORY_FILE = self.test_mem_file
+        luna_server.CONFIG_FILE = self.test_cfg_file
+        luna_server.TELEGRAM_FILE = self.test_tg_file
 
         def run_loop():
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
-            app = jarvis_server.create_app()
+            app = luna_server.create_app()
             self.runner = web.AppRunner(app)
             self.loop.run_until_complete(self.runner.setup())
             self.site = web.TCPSite(self.runner, "127.0.0.1", PORT)
@@ -135,7 +135,7 @@ class LiveAcceptanceRunner:
 
 def run_stage4d_acceptance():
     print("=" * 70)
-    print("  ACCIO JARVIS V4.0 — STAGE 4D LIVE ACCEPTANCE TEST")
+    print("  ACCIO LUNA V4.0 — STAGE 4D LIVE ACCEPTANCE TEST")
     print("=" * 70)
 
     runner = LiveAcceptanceRunner()
@@ -146,7 +146,7 @@ def run_stage4d_acceptance():
         print("\n[Section 2] Server Startup & Process Verification...")
         runner.start_server()
         status, headers, body = runner.request("GET", "/")
-        assert status == 200 and "Accio Jarvis" in body, "Homepage failed to load"
+        assert status == 200 and "Accio Luna" in body, "Homepage failed to load"
         print(f"  -> Server running cleanly on {BASE_URL} (Isolated Temp Storage: {runner.test_tasks_file})")
         results["server_status"] = "OK - Port 7860 bound to isolated temporary storage"
 
@@ -258,8 +258,8 @@ def run_stage4d_acceptance():
         print("\n[Section 5] HTTP & Agent Concurrency & Idempotency...")
         # 1. Concurrent HTTP add racing with Agent add
         def agent_add_call(sub, cid):
-            return jarvis_server.execute_desktop_tool_with_allowlist(
-                agent_name="Main JARVIS",
+            return luna_server.execute_desktop_tool_with_allowlist(
+                agent_name="Main LUNA",
                 tool_name="manage_tasks",
                 args={"action": "add", "subject": sub, "duration": 40},
                 user_context=f"Bunu görevlerime ekle {sub}",
@@ -331,7 +331,7 @@ def run_stage4d_acceptance():
         print("  -> XSS Ingestion: Malicious subject safely stored as plain text.")
 
         # 2. Unauthorized agents
-        unauth_res = jarvis_server.execute_desktop_tool_with_allowlist(
+        unauth_res = luna_server.execute_desktop_tool_with_allowlist(
             agent_name="Study Mentor",
             tool_name="manage_tasks",
             args={"action": "list"}
@@ -340,8 +340,8 @@ def run_stage4d_acceptance():
         print("  -> Authorization: Unauthorized agent strictly denied manage_tasks.")
 
         # 3. Intent filtering: casual conversation
-        casual_res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        casual_res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Biyoloji çalışmam lazım"},
             user_context="Bugün biyoloji çalışmam lazım."

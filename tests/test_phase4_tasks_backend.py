@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 4 / Stage 4A
+ACCIO LUNA V4.0 — Phase 4 / Stage 4A
 Isolated Backend Tests for Task Engine Persistence, Normalization, Concurrency, and REST API.
 
 Covers at minimum:
@@ -36,7 +36,7 @@ from unittest.mock import patch, MagicMock
 from aiohttp.test_utils import AioHTTPTestCase
 from aiohttp import web
 
-import jarvis_server
+import luna_server
 
 
 class Phase4Stage4ABackendTest(AioHTTPTestCase):
@@ -53,10 +53,10 @@ class Phase4Stage4ABackendTest(AioHTTPTestCase):
         with open(self.test_tasks_file, "w", encoding="utf-8") as f:
             json.dump(self.initial_tasks, f, ensure_ascii=False, indent=2)
 
-        self.p_task_file = patch("jarvis_server.TASKS_FILE", self.test_tasks_file)
+        self.p_task_file = patch("luna_server.TASKS_FILE", self.test_tasks_file)
         self.p_task_file.start()
 
-        return jarvis_server.create_app()
+        return luna_server.create_app()
 
     async def tearDownAsync(self):
         self.p_task_file.stop()
@@ -318,7 +318,7 @@ class Phase4Stage4ABackendTest(AioHTTPTestCase):
         print("  [Stage 4A Test 17 PASSED] Stale task revision token cleanly rejected with HTTP 409.")
 
     async def test_18_activity_logging_does_not_break_task_persistence(self):
-        with patch("jarvis_server.log_activity", side_effect=Exception("Logging Subsystem Failure")):
+        with patch("luna_server.log_activity", side_effect=Exception("Logging Subsystem Failure")):
             # Task creation should still succeed or fail gracefully without crashing server
             # Since log_activity is called after persistence, we test that tasks are persisted
             resp = await self.client.post("/api/tasks", json={"subject": "Log Test Task", "duration": 40})

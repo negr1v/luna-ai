@@ -1,5 +1,5 @@
 """
-ZERO CORE OS (ACCIO-JARVIS) V15 - PHASE 15A.1 TEST SUITE
+ZERO CORE OS (LUNA-AI) V15 - PHASE 15A.1 TEST SUITE
 Test: Hard Paid API Protection, Authorization Tokens, Single-use & Expiration Guarantees
 """
 
@@ -11,11 +11,11 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 # Proje dizinini ekle
-PROJECT_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+PROJECT_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
 if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)
 
-from jarvis_server import (
+from luna_server import (
     get_model_cost_category,
     create_paid_model_authorization,
     validate_and_consume_paid_authorization,
@@ -135,7 +135,7 @@ class TestPhase15A1PaidProtection(AioHTTPTestCase):
         }
         
         # Mocking groq/openrouter to prevent real network calls
-        with patch("jarvis_server.load_config", return_value={"groq_api_key": ""}):
+        with patch("luna_server.load_config", return_value={"groq_api_key": ""}):
             resp = await self.client.post("/api/chat", json=payload)
             # 402 dönmemeli, onay aşamasını geçmiş olmalı
             self.assertNotEqual(resp.status, 402)

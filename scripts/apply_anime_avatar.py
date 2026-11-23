@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS - Study With Mommy Reactive Anime Girl Avatar & Features Patch
+LUNA-AI - Study With Mommy Reactive Anime Girl Avatar & Features Patch
 Adds:
 1. Interactive Reactive Anime Girl Avatar in center stage (toggleable with Cyber Orb)
 2. Lip-sync mouth movement, blinking, breathing, listening tilt, blush emotions
@@ -14,11 +14,11 @@ import os
 import sys
 import re
 
-ROOT = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+ROOT = r"C:\Users\negr1\Projeler\LUNA-AI"
 HTML_PATH = os.path.join(ROOT, "index.html")
-DIST_HTML_PATH = os.path.join(ROOT, "dist", "ACCIO-JARVIS-PORTABLE", "app", "index.html")
+DIST_HTML_PATH = os.path.join(ROOT, "dist", "LUNA-AI-PORTABLE", "app", "index.html")
 
-print("[*] ACCIO-JARVIS Anime Avatar & Study Mommy Güncellemesi başlatılıyor...")
+print("[*] LUNA-AI Anime Avatar & Study Mommy Güncellemesi başlatılıyor...")
 
 if not os.path.exists(HTML_PATH):
     print(f"[!] HATA: {HTML_PATH} bulunamadı!")
@@ -551,7 +551,7 @@ avatar_js = """
 """
 
 if "REACTIVE ANIME AVATAR CONTROLLER" not in content:
-    content = content.replace("// OPENJARVIS HITL APPROVAL BELL ENGINE", avatar_js + "\n  // OPENJARVIS HITL APPROVAL BELL ENGINE", 1)
+    content = content.replace("// OPENLUNA HITL APPROVAL BELL ENGINE", avatar_js + "\n  // OPENLUNA HITL APPROVAL BELL ENGINE", 1)
     print("[+] Avatar Controller JS kodu eklendi.")
 
 # Save modified index.html

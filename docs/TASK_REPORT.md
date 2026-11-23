@@ -1,6 +1,6 @@
 # [PHASE: LOCAL PREVIEW & VISION CONSENT] IMPLEMENTATION REPORT
 
-- Changed Files: Bu görevde `index.html` ve `TASK_REPORT.md` değişti. `index.html` hedef doğrulanamadığında sağlayıcıyı, 503 durumunda ise sağlayıcı ve API anahtarını kontrol etme mesajını gösteriyor. `jarvis_server.py` içindeki mevcut onay kapısı yeniden doğrulandı.
+- Changed Files: Bu görevde `index.html` ve `TASK_REPORT.md` değişti. `index.html` hedef doğrulanamadığında sağlayıcıyı, 503 durumunda ise sağlayıcı ve API anahtarını kontrol etme mesajını gösteriyor. `luna_server.py` içindeki mevcut onay kapısı yeniden doğrulandı.
 - UI Consent Flow Details: **Yerel önizleme** başlatma, durdurma ve seçici iptalinde kare çıkarmaz veya Vision isteği göndermez. **Analiz Et** ile **Canlı Tahta → Soru Çek** aynı pencerede “1 ekran görüntüsü analiz için gönderilecek” metnini, OpenRouter (OpenAI GPT‑4o) hedefini ve ücretli API bilgisini gösterir. İptal önizlemeyi açık bırakır. Akışın bitmesi, kaynak değişimi veya hedefin sunucuda değişmesi bekleyen işlemi engeller.
 - Backend Gate Enforcement Mechanism: `/api/vision`, aynı köken ve tarayıcı oturumuna, sağlayıcıya ve modele bağlı 120 saniyelik onayı iletimden önce tüketir. Geçersiz, eksik, süresi dolmuş ve tekrar kullanılan onaylar reddedilir. Ücretli hedef açık onay gerektirir.
 - Isolated Test Commands & Evidence (Mock/Stub): `node test_vision_consent_ui.cjs` (mevcut Playwright dizini `NODE_PATH` üzerinden), çıkış 0. Önizleme ve reddedilen/iptal edilen onaylar 0 kare ve 0 analiz gönderimi üretti. İki onaylı giriş 2 kare ve 2 taklit POST üretti. Accio Python ile `python -B -m unittest -v test_vision_consent`, 1/1 geçti. Aynı belirteçle eşzamanlı gönderimler HTTP 200 ve 403 döndürdü. Taklit sağlayıcı çağrıları OpenRouter 1, Groq 0. Gerçek görsel veya kare dışarı gönderilmedi.
@@ -10,8 +10,8 @@
 
 # [PHASE: STATIC MIME-TYPE & DATA SOURCES AUDIT] IMPLEMENTATION REPORT
 
-- Changed Files: `jarvis_server.py`, `index.html`, `TASK_REPORT.md`.
-- Mime-Type Fix Details: `jarvis_server.py` içine `mimetypes.add_type("image/webp", ".webp")` eklendi. Windows aiohttp static rotalarında `.webp` uzantılı avatarların `image/webp` MIME tipiyle iletilmesi sağlandı.
+- Changed Files: `luna_server.py`, `index.html`, `TASK_REPORT.md`.
+- Mime-Type Fix Details: `luna_server.py` içine `mimetypes.add_type("image/webp", ".webp")` eklendi. Windows aiohttp static rotalarında `.webp` uzantılı avatarların `image/webp` MIME tipiyle iletilmesi sağlandı.
 - UI & Badge Updates: Veri kaynakları modalında kaldırılmış olan Groq "Vision Engine" ibaresi "Llama 3.3 70B LPU Motoru" olarak güncellendi. "Yeni Sohbet Başlat" butonunda dar genişliklerde oluşabilecek taşma ve kırpılmalar engellendi (`min-width:0`, `text-overflow:ellipsis`).
 - Verification Checks: Kod denetimiyle statik rotalar ve modal DOM yapısı doğrulandı.
 - Next Steps: Uygulama ayağa kalktığında tarayıcı üzerinden avatar görsel yükleme doğrulaması.
@@ -41,7 +41,7 @@
 
 # [PHASE: FREE-FIRST CATALOG & GROQ CONCURRENCY GATE] IMPLEMENTATION REPORT
 
-- `jarvis_server.py`: Groq chat/completion requests, including streaming, tool follow-ups and memory extraction, share a one-slot asyncio semaphore for the full response lifetime. Non-Groq requests bypass it. Serialization reduces concurrent rate pressure but does not eliminate time-based 429 limits.
+- `luna_server.py`: Groq chat/completion requests, including streaming, tool follow-ups and memory extraction, share a one-slot asyncio semaphore for the full response lifetime. Non-Groq requests bypass it. Serialization reduces concurrent rate pressure but does not eliminate time-based 429 limits.
 - The sole catalog default and new-configuration active model are `openrouter/free`, a zero-price free-model router according to https://openrouter.ai/openrouter/free/api. Paid catalog entries are not defaults. Existing saved model selections remain unchanged; paid-service authorization remains in force.
 - Focused isolated check: Python AST parsing passed; catalog contains exactly one default with free-zero-price tier, and new configuration uses the same model. Four mocked concurrent Groq requests had peak concurrency 1; the semaphore was released after a simulated exception. Five completion call sites use the guarded helper. No provider requests were made.
 - Test command: `python -B -` with an in-memory AST and mocked async-session check (managed Accio Python). Initial harness attempts failed on the source BOM and a missing test-harness constant; the corrected run passed all checks above.
@@ -49,7 +49,7 @@
 
 # [PHASE: FREE-FIRST CATALOG & GROQ CONCURRENCY GATE] IMPLEMENTATION REPORT
 
-- Changed Files: Önceki uygulamada `jarvis_server.py`; bu doğrulamada `TASK_REPORT.md`.
+- Changed Files: Önceki uygulamada `luna_server.py`; bu doğrulamada `TASK_REPORT.md`.
 - Concurrency Semaphore Implementation: Tek izinli Groq kapısı beş tamamlama çağrı noktasında kullanılıyor.
 - Default Model & Pricing Verification: Varsayılan `openrouter/free`; önceki fazda sıfır fiyat ve katalog kontrolü doğrulandı.
 - Test & Compilation Verification: Python AST sözdizimi, semafor, beş çağrı noktası ve varsayılan model kontrolü geçti; önceki raporda eşzamanlılık testinin sonuçları bulunuyor.
@@ -95,7 +95,7 @@
 # [PHASE: ELEVENLABS PROFESSIONAL VOICE STUDIO & VISION AUDIO] IMPLEMENTATION REPORT
 
 - `index.html`: Rachel, Emily, Elli ve Charlotte ses seçimi, mevcut özel seslerin korunması, kaydetmeden önce ses önizlemesi ve ücretli sağlayıcı için açık onay; Vision ses isteğinde aynı onay akışına bağlantı. Önizleme anahtar yoksa ücretsiz Edge motorunu seçer; kullanıcı ücretli onayı reddederse ücretli önizleme gönderilmez.
-- `jarvis_server.py`: `/api/tts_direct` önizlemesi için geçici, doğrulanan sağlayıcı/ses seçimi; ayarlar önizleme sırasında değiştirilmez. Vision yanıtı ses sentezine ücretli onay belirtecini iletir. Mevcut `eleven_multilingual_v2`, tek kullanımlık ücretli onay ve başarısız ücretli sentezde Edge geri dönüşü korundu.
+- `luna_server.py`: `/api/tts_direct` önizlemesi için geçici, doğrulanan sağlayıcı/ses seçimi; ayarlar önizleme sırasında değiştirilmez. Vision yanıtı ses sentezine ücretli onay belirtecini iletir. Mevcut `eleven_multilingual_v2`, tek kullanımlık ücretli onay ve başarısız ücretli sentezde Edge geri dönüşü korundu.
 - İzole Python AST testi (`python -B -`, bellekte sahte sağlayıcı fonksiyonları): PASS — geçerli onayla başarısız ElevenLabs çağrısı Edge'e düşer; eksik anahtar veya onayda ücretli çağrı yapılmadan Edge kullanılır. Python sözdizimi PASS.
 - `$env:NODE_PATH="C:\Users\negr1\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules"; node "$env:TEMP\accio_voice_preview_check.cjs"` — PASS: sahte yanıtlarla ücretli onay ardından seçilen ses kimliği ve onay belirteci önizlemeye gönderildi.
 - Aynı NODE_PATH ile `node test_fix_pack2_ui.cjs` — PASS: iki pencere boyutu ve ilgili UI regresyonları. `node "$env:TEMP\accio_vision_edge_checks.cjs"` — PASS: Vision iptal, hata, önceki girişler ve sohbet regresyonları.
@@ -103,7 +103,7 @@
 
 # [PHASE: DIRECT ELEVENLABS, CHAT & MICROPHONE] IMPLEMENTATION REPORT
 
-- `jarvis_server.py`: Yapılandırılan ElevenLabs/OpenAI TTS için işlem başı ücretli onay zorunluluğu kaldırıldı; anahtar eksikliği veya sağlayıcı başarısızlığında Edge yedeği korunuyor. Normal ve akışlı sohbetin ücretli model onay durdurması kaldırıldı; normal sohbet seçili sağlayıcı/modeli kullanır. Vision görsel onayı ve diğer izin sistemleri değiştirilmedi.
+- `luna_server.py`: Yapılandırılan ElevenLabs/OpenAI TTS için işlem başı ücretli onay zorunluluğu kaldırıldı; anahtar eksikliği veya sağlayıcı başarısızlığında Edge yedeği korunuyor. Normal ve akışlı sohbetin ücretli model onay durdurması kaldırıldı; normal sohbet seçili sağlayıcı/modeli kullanır. Vision görsel onayı ve diğer izin sistemleri değiştirilmedi.
 - `index.html`: TTS önizlemesi, sohbet sesi ve Vision sesi için ücretli onay penceresi ve onay isteği kaldırıldı. Türkçe ses tanımanın ara ve nihai sonucu mesaj kutusuna yazılır; mikrofon düğmesinin durumu erişilebilir biçimde güncellenir. Mikrofonun tarayıcı/uygulama izinleri korunur.
 - Doğrulama: Accio Python ile `python -B -` üzerinden izole AST/fonksiyon kontrolü PASS: token olmadan sahte ElevenLabs çağrısı seçilen sesle yürüdü; anahtar yokken sahte Edge çağrısı yapıldı; iki sohbet ve doğrudan TTS işleyicisinde token doğrulaması yok; Python sözdizimi geçerli.
 - `$env:NODE_PATH="C:\Users\negr1\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules"; node "$env:TEMP\accio_direct_voice_check.cjs"` — PASS: sahte HTTP ile önizleme doğrudan gönderildi, onay isteği/penceresi oluşmadı; sahte Türkçe mikrofon ara metni ve durdurma geçti.
@@ -129,10 +129,10 @@
 
 # [PHASE: FISH AUDIO AHU CLONE & SPEECH ENGINE INTEGRATION] IMPLEMENTATION REPORT
 
-- `jarvis_server.py`:
+- `luna_server.py`:
   * `_generate_fish_audio_tts(text, cfg)` asenkron motoru eklendi (`https://api.fish.audio/v1/tts`).
   * `generate_tts` dağıtıcısına Fish Audio önceliği bağlandı; başarısızlık durumunda otomatik Edge-TTS yedeği korundu.
-- `jarvis_config.json`:
+- `luna_config.json`:
   * Varsayılan TTS motoru `"fish_audio"` olarak güncellendi.
   * `fish_audio_api_key`: `[REDACTED]`
   * `fish_audio_model_id`: `b052099ccdd14125a257ba8c4afdace2` (Özel Ahu Türkçe Stüdyo Klonu)
@@ -153,7 +153,7 @@
 
 - 1. Mevcut durum: `TASK_SPEC.md` okundu. Önceki ses fazını tarif ettiği için bu turda sohbet içindeki güncel ürün planı esas alındı. Yerel 7860 portu bağlantıyı reddetti. İzole Vision onay testi 1/1, Model Hub sunucu testleri 9/9 ve taklit Windows arayüzüyle Desktop Agent testleri 9/9 geçti.
 - 2. Güvenilirlik: `index.html` yazılı sohbeti ses istemeden gönderir, tarayıcıya ses gelse bile çalmaz. Türkçe mikrofonun ara metni taslakta kalır; nihai metin bir kez gönderilir. Durdurma ve tanıma hatası bekleyen gönderimi iptal eder. Sohbetin akış ve yedek yolları kayıtlı model ayarını sunucudan kullanır. Model Hub etiketi yalnızca doğrulanan seçimi gösterir; kilitli ve aktif düğmeler bekleme bittiğinde yeniden etkinleşmez.
-- `jarvis_server.py`: Yazılı isteğin kilitli sağlayıcı hatası bile ses sentezi başlatmaz. Seçili ses sağlayıcısı başarısızsa metin yanıtı korunur. Edge yalnızca ayarlarda seçilirse çalışır. Fish Audio anahtarı DPAPI saklama alanlarına eklendi ve artık Ayarlar'dan girilebilir. Kaynaktaki gömülü anahtar kaldırıldı, eski rapor satırında yalnızca anahtar değeri maskelendi. Mevcut kullanıcı yapılandırmasına dokunulmadı. Geçmişte açığa çıkan anahtar sağlayıcı hesabından yenilenmeli.
+- `luna_server.py`: Yazılı isteğin kilitli sağlayıcı hatası bile ses sentezi başlatmaz. Seçili ses sağlayıcısı başarısızsa metin yanıtı korunur. Edge yalnızca ayarlarda seçilirse çalışır. Fish Audio anahtarı DPAPI saklama alanlarına eklendi ve artık Ayarlar'dan girilebilir. Kaynaktaki gömülü anahtar kaldırıldı, eski rapor satırında yalnızca anahtar değeri maskelendi. Mevcut kullanıcı yapılandırmasına dokunulmadı. Geçmişte açığa çıkan anahtar sağlayıcı hesabından yenilenmeli.
 - 3. Ana ekran: Canlı Tahta, Model Hub ve Bildirimler başlıkta doğrudan erişilebilir. İkincil ayarlar ve araçlar Menü'de gruplandı. Tekrarlanan kısayollar azaltıldı. Görevler kısayolu, panel kapalı olsa da görevler bölümünü açar ve sekmeye odaklanır.
 - PowerShell test ortamı: `$env:NODE_PATH = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules'`. `node --test test_voice_composer_ui.cjs` — 5 geçti. `node test_fix_pack2_ui.cjs` — 1280×720 ve 760×900, Model Hub filtre/başarı/ret, eski model dayatmayan SSE isteği ve Görevler kısayolu geçti. `node test_vision_consent_ui.cjs` — yerel önizleme/ret/iptal 0 kare ve 0 POST. İki onay 2 kare ve 2 sahte POST. Menü klavye erişimi ve taşma kontrolü ayrı izole Playwright çalıştırmasında iki boyutta geçti.
 - Yönetilen Python `-B -` ile stdin kontrolleri: Python sözdizimi, geçici veride Fish Audio DPAPI turu ve API yanıtında anahtarın gizlenmesi, sahte ses sentezi ve 503 durumunda başka motora geçilmemesi, açıkça seçilmiş Edge, anahtarsız sıfır istek. İzole aiohttp akış testi 6/6: yazılı hatalarda sıfır sentez, sesli isteklerde birer sahte sentez. İzole unittest modülleri: `test_vision_consent`, `test_phase15d_smart_model_hub`, `test_phase20_desktop_agent`.
@@ -166,7 +166,7 @@
   * **Canlı Tahta & Ajan Kartları (Üst Bölüm):** Yapay zekanın dinamik olarak yönettiği görev kartları (`cardActiveTask`) ve radar/sinyal kartları (`cardRadarSignal`) eklendi. Örnek: `🏷️ AM5 fiyat takibi ● Çalışıyor` ve `((•)) Radardan son sinyal`.
   * **Hızlı Bağlantılar & Çıktılar (Orta Bölüm):** Tarayıcı (`Browser`), Tuval (`Canvas`) ve Çalışma Alanı (`Workspace`) hızlı geçiş butonları ile son üretilen/etkilenen dosyaları listeleyen `Recent artifacts` alanı eklendi (`TASK_REPORT.md`, `index.html`, `AUDIT_REPORT.md`).
   * **Mini Sistem Çubuğu (Alt Bölüm):** Accio tasarımındaki gibi sade `🗔 Sistem | CPU %12 | RAM %68` canlı telemetri çubuğu entegre edildi.
-  * **Oto AI Yönetim API'si:** Yapay zekanın sohbet ve görev esnasında bu paneli programatik olarak güncellemesi için `window.setJarvisActiveTask()`, `window.setJarvisRadarSignal()` ve `window.addJarvisArtifact()` fonksiyonları tanımlandı.
+  * **Oto AI Yönetim API'si:** Yapay zekanın sohbet ve görev esnasında bu paneli programatik olarak güncellemesi için `window.setLunaActiveTask()`, `window.setLunaRadarSignal()` ve `window.addLunaArtifact()` fonksiyonları tanımlandı.
   * Eski DOM elemanları gizli konteynerde korunarak JS çalışma zamanı regresyonu önlendi.
 
 # [PHASE: USER IDENTITY SANITIZATION — NEGR1V MIGRATION] IMPLEMENTATION REPORT
@@ -174,8 +174,8 @@
 - `index.html`:
   * `window.CURRENT_USER_NAME = 'Negr1v';` global değişkeni eklendi (ileride Ayarlar veya profilden dinamik interpolasyon için hazırlandı).
   * Karşılama başlığı (`#dynamicGreetingText`), Canlı Tahta motivasyon notları, Pomodoro tamamlama seslendirmeleri, takvim hatırlatıcıları ve ses testi önizleme metinlerindeki tüm `Negr1` ifadeleri `Negr1v` olarak güncellendi.
-- `jarvis_server.py`:
-  * `SYSTEM_PROMPT` (Luna / Jarvis çekirdek kişiliği) ve alt ajan profilleri (`Study Mentor`, `Study Mommy`, `Hardware Research Agent`, `System Intelligence Agent`) içindeki tüm kullanıcı hitapları `Negr1v` olarak güncellendi.
+- `luna_server.py`:
+  * `SYSTEM_PROMPT` (Luna / Luna çekirdek kişiliği) ve alt ajan profilleri (`Study Mentor`, `Study Mommy`, `Hardware Research Agent`, `System Intelligence Agent`) içindeki tüm kullanıcı hitapları `Negr1v` olarak güncellendi.
   * SSE akış ve araç tamamlama geri dönüş mesajlarındaki ("İşlemi tamamladım Negr1v", "Dinliyorum Negr1v") referanslar düzeltildi.
 
 
@@ -197,7 +197,7 @@
       2. **Etkilenecek Hedef:** Hedef dosya yolu (`C:\Users\negr1\Projeler\...`), pencere veya API servisi için belirteç.
       3. **Onay Kontrolleri (HITL):** `[👁️ Önizlemeyi Gör]` ile kod/diff/plan detaylarını açıp kapama, `[✓ Onayla ve Çalıştır]` ile görevi başlatma, `[✕ İptal]` ile durdurma.
       4. **Doğrulanmış Sonuç Rozeti:** İşlem fiziksel olarak teyit edildiğinde görünen `✓ Doğrulandı: Fiziksel Teyit Tamam` kutusu ve sonuç özeti.
-    - **Accio Canlı Tahta Senkronizasyonu:** Görev kartı oluşturulduğunda veya onaylandığında sağ paneldeki `#cardActiveTask` (`window.setJarvisActiveTask`) anında senkronize olur; dosya üretildiğinde `#accioRecentArtifacts` listesine (`window.addJarvisArtifact`) eklenir.
+    - **Accio Canlı Tahta Senkronizasyonu:** Görev kartı oluşturulduğunda veya onaylandığında sağ paneldeki `#cardActiveTask` (`window.setLunaActiveTask`) anında senkronize olur; dosya üretildiğinde `#accioRecentArtifacts` listesine (`window.addLunaArtifact`) eklenir.
   * **Görevler ve Çalışma Merkezi Görünümü (`#viewTasks`):**
     - Sol menüye `☑️ Görevler` (`#navTabTasks`, `data-view="tasks"`) butonu eklendi.
     - Ana sohbetin altındaki `[📋 Görevler]` (`#quickActionTasksBtn`) butonu ve Hover Panel hızlı kısayolu doğrudan `#viewTasks` görünümünü açacak şekilde bağlandı.
@@ -227,13 +227,13 @@
 - **Fish Audio (Enerjik ve Samimi Genç Kadın) Entegrasyonu:**
   * İndirilen özel ses dosyası (`Enerjik-ve-Samimi-Genç-Kadın...mp3`) `static/audio/enerjik_ve_samimi_genc_kadin.mp3` yoluna yerleştirildi ve `/static/audio/` üzerinden sunuldu.
   * Sunucu konfigürasyonundaki Fish Audio model kimliğinin (`b052099ccdd14125a257ba8c4afdace2`) kullanıcının özel *"Enerjik ve Samimi Genç Kadın"* modeli olduğu Fish Audio API ile doğrulandı.
-  * `jarvis_server.py`: `voice_mode` / `voice_reply: True` varsayılanı bağlandı; sohbet ve akış yanıtlarında Fish Audio TTS ses üretimi garanti altına alındı.
+  * `luna_server.py`: `voice_mode` / `voice_reply: True` varsayılanı bağlandı; sohbet ve akış yanıtlarında Fish Audio TTS ses üretimi garanti altına alındı.
   * `index.html`: Web Audio API askıya alma durumuna karşı doğrudan HTML5 `new Audio(...)` oynatma koruması eklendi; Ayarlar paneline *"▶️ Enerjik & Samimi Sesi Dinle (Selam! Projen için...)"* önizleme butonu eklendi.
   * `SYSTEM_PROMPT`: Asistan ses ve konuşma üslubu "Enerjik ve Samimi Genç Kadın" neşeli, dinamik ve arkadaşça tonuna kilitlendi.
 
 - **F8 + F8 Doğrudan Gönderim Mekaniği:**
   * **1. F8:** Dinlemeyi başlatır, mikrofonu aktif kayıt moduna alır. Sessizlikte rastgele otomatik gönderme yapmaz.
-  * **2. F8 (F8 + F8):** Dinlemeyi kapatır ve araya fareyle "Gönder" butonuna tıklama girmeden doğrudan mesajı JARVIS'e iletir; yanıt Fish Audio ile seslendirilir.
+  * **2. F8 (F8 + F8):** Dinlemeyi kapatır ve araya fareyle "Gönder" butonuna tıklama girmeden doğrudan mesajı LUNA'e iletir; yanıt Fish Audio ile seslendirilir.
   * **Metin Girişi:** Klavyeden yazılan metinler sadece Enter veya OK/Gönder butonu ile gönderilir.
 
 - **Fish Audio Voice Library & 11 Saniyelik Klon Referansı Entegrasyonu:**
@@ -244,7 +244,7 @@
     3. *Samimi ve Genç Kadın Sesi*: `6cc2a4be489742398391e8dc80622601`
     4. *Ahu / Özel Model*: Custom model seçeneği ile dinamik model kimliği girişi.
   * **Önizleme Butonları:** Ayarlar penceresine hem 1. Enerjik ses için hem de 11.2 saniyelik 2. klon referans sesi için tek tıkla canlı oynatma butonları eklendi.
-  * **Kalıcı Yapılandırma:** Seçilen model ID'si `jarvis_config.json` içerisindeki `fish_audio_model_id` anahtarına kaydedilecek şekilde `/api/config` yapısına bağlandı.
+  * **Kalıcı Yapılandırma:** Seçilen model ID'si `luna_config.json` içerisindeki `fish_audio_model_id` anahtarına kaydedilecek şekilde `/api/config` yapısına bağlandı.
 
 # [PHASE: MEMORY WORKSPACE] IMPLEMENTATION REPORT
 
@@ -299,7 +299,7 @@ Bu sıra önceki rapor başlıklarını tek çizelgede birleştirir. Geçmiş ra
 | 2. Çalışma alanları | Görevler ve Hafıza erişimi, arama ve geri bildirim izole testte geçti. Görev onayı kartı ve zil bağlı. |
 | 3. Ana ekran ve başlık | Bu turda tamamlandı. Menü, Tahta, Model Hub, bildirim ve zil akışı iki ölçüde izole testten geçti. |
 | 4. Ses, avatar ve yerel önizleme | Bu turda izole kabul tamamlandı. Kaldığımız yer canlı kabulün başlangıcı. Uygulama açıldığında fiziksel Türkçe mikrofon/F8/Escape, gerçek Ahu oynatımı ve ağız hareketi, boş Not Defteri ile yerel önizleme/iptal/durdurma birlikte kontrol edilecek. |
-| 5. Gerçek Windows ve paket kabulü | Bekliyor. Gerçek Not Defteri UIA duman testi, tepsi, taşınabilir paket ve yeniden açılışta tercih kontrolü. Paket içindeki `dist/ACCIO-JARVIS-PORTABLE/app/index.html` çalışma dosyasından daha eski ve bu turda yeniden paketlenmedi. |
+| 5. Gerçek Windows ve paket kabulü | Bekliyor. Gerçek Not Defteri UIA duman testi, tepsi, taşınabilir paket ve yeniden açılışta tercih kontrolü. Paket içindeki `dist/LUNA-AI-PORTABLE/app/index.html` çalışma dosyasından daha eski ve bu turda yeniden paketlenmedi. |
 | 6. Düşük donanım ve son sadeleştirme | Bekliyor. Hedef donanımda boşta ve canlı görüşmede ölçüm. Sonrasında ölçüme göre animasyon ve açılış yükü düzenlemesi, erişilmeyen arayüz kodunun bağımlılık incelemesi ve görsel kabul. |
 
 ## ACCIO için araştırma ve inceleme işleri
@@ -438,8 +438,8 @@ PowerShell ortamı: $env:NODE_PATH=Join-Path $env:USERPROFILE '.cache\codex-runt
 
 # [PHASE: ACCIO LOCAL TURKISH STT] IMPLEMENTATION REPORT
 
-- jarvis_local_stt.py — Aiohttp üstünde yerel Vosk tanıması. Ses yalnızca aynı origin ve loopback üzerinden kabul ediliyor, RAM’de işleniyor. Bir aktif tanıma oturumu, sınırlı WebSocket mesajları ve oturum süresi uygulanıyor.
-- jarvis_server.py — /api/stt/status ve /api/stt/listen rotaları eklendi. index.html ve static/js/local_stt.js yerel motor hazırken mevcut dikte, otomatik gönderim ve Ahu yanıt akışını kullanıyor. Tarayıcı 16 kHz PCM ses verisini yalnızca ACCIO localhost rotasına gönderiyor.
+- luna_local_stt.py — Aiohttp üstünde yerel Vosk tanıması. Ses yalnızca aynı origin ve loopback üzerinden kabul ediliyor, RAM’de işleniyor. Bir aktif tanıma oturumu, sınırlı WebSocket mesajları ve oturum süresi uygulanıyor.
+- luna_server.py — /api/stt/status ve /api/stt/listen rotaları eklendi. index.html ve static/js/local_stt.js yerel motor hazırken mevcut dikte, otomatik gönderim ve Ahu yanıt akışını kullanıyor. Tarayıcı 16 kHz PCM ses verisini yalnızca ACCIO localhost rotasına gönderiyor.
 - Yönetilen Python ortamına vosk==0.3.45 kuruldu. Alpha Cephei’nin Apache-2.0 lisanslı vosk-model-small-tr-0.3 modeli models/vosk-model-small-tr-0.3 altına çıkarıldı. Taşınabilir paket henüz üretilmedi.
 - İzole gerçek Vosk testi geçti. Model yüklendi, 16 kHz sessizlik WebSocket üzerinden işlendi ve çapraz origin 403 ile reddedildi. İzole JS testi PCM oluşturma, tekrarlanan ara sonuçların elenmesi ve tek bitirme mesajını doğruladı.
 - Güncel arayüzde eksik olabilen eski masaüstü seçim kontrolü JavaScript açılışını çağrı sırasında kesiyordu. Başlatma, kontrol mevcutsa çalışacak şekilde korundu.
@@ -450,7 +450,7 @@ PowerShell ortamı: $env:NODE_PATH=Join-Path $env:USERPROFILE '.cache\codex-runt
 # [PHASE: LOCAL STT & AHU VOICE PIPELINE] IMPLEMENTATION REPORT
 
 - index.html ve static/js/local_stt.js: MediaRecorder, RMS VAD, tek multipart STT yüklemesi, bırakma/iptal, dikte ve sesli tur. Sesli yanıt mevcut /api/tts_direct yoluyla oynatılıyor. Tarayıcı ses tanıma servisi ve paket kurma kontrolü kaldırıldı.
-- jarvis_local_stt.py ve jarvis_server.py: POST /api/stt yerel FFmpeg + Vosk kullanıyor. Eski Groq ses yükleme ve WebSocket STT rotaları kaldırıldı.
+- luna_local_stt.py ve luna_server.py: POST /api/stt yerel FFmpeg + Vosk kullanıyor. Eski Groq ses yükleme ve WebSocket STT rotaları kaldırıldı.
 - test_voice_composer_ui.cjs ve test_avatar_speech_ui.cjs: Ayarlı test komutu aşağıda. 11 geçti, 0 hata, 0 atlama (24,9 sn). Ses tanıma ve Ahu HTTP cevapları taklit edildi. WebGL kontrolünde gerçek tarayıcı çizimi yapıldı. Harici sağlayıcı çağrısı yapılmadı.
 - Yerel aiohttp denemesi: Gerçek FFmpeg ve Vosk ile WebM ve WAV sessizlik kayıtları boş metin döndürdü. Farklı origin 403, sınır üstü giriş 413 döndürdü. Türkçe gerçek konuşma doğruluğu bu denemede ölçülmedi.
 - Canlı localhost GET /api/stt/status: HTTP 404. Açık süreçte yeni hat, gerçek mikrofon ve Ahu kabulü bekliyor. Temiz Windows paketi doğrulanmadı.
@@ -590,7 +590,16 @@ node --test test_voice_composer_ui.cjs test_avatar_speech_ui.cjs
 # [PHASE: TOOLBAR, TURKISH LOCAL STT AND STABLE ROSE]
 
 - index.html: ACCIO üst çubuğunda doğrudan Sohbet, Canlı ses, Ayarlar ve Odak. İkincil düğmeler Araçlar altında; Model Merkezi yalnızca mevcut Model Hub tercihinin gerektirdiği durumda görünür. Sahneye Dön erişilebilir. Pembe saçlı Rose başlangıçtan aynı tam görseli kullanıyor, kaydedilmiş başka karakter seçimi korunuyor.
-- static/js/local_stt.js ve jarvis_local_stt.py: MediaRecorder/VAD, multipart language=tr, sessiz manuel kayıt gönderimini önleme, boş metin filtresi. Yeniden eklenen Groq bulut fallback kaldırıldı. FFmpeg + Vosk işliyor. Dil alanı göndermeyen eski yerel istemciler uyumlu.
+- static/js/local_stt.js ve luna_local_stt.py: MediaRecorder/VAD, multipart language=tr, sessiz manuel kayıt gönderimini önleme, boş metin filtresi. Yeniden eklenen Groq bulut fallback kaldırıldı. FFmpeg + Vosk işliyor. Dil alanı göndermeyen eski yerel istemciler uyumlu.
 - node --test test_voice_composer_ui.cjs test_avatar_speech_ui.cjs: 14 geçti, 0 hata. STT, sohbet ve Ahu yanıtları taklit edildi.
 - İzole aiohttp gerçek FFmpeg/Vosk: tr WAV sessizlik 200/boş metin, en 400, boş kayıt 400, eski dil alanı olmayan WAV 200/boş metin. Harici çağrı yok.
 - Çalışan localhost HTML üzerinden Chrome 1280×720 ve 760×900: Rose için yalnızca tam görsel indirildi ve gecikmeden sonra kaynak değişmedi. Araçlar açıldı, Canlı Tahta çalıştı. Son kontrolde localhost bağlantıyı reddetti; yeni arka uç gerçek mikrofonla doğrulanmadı.
+
+# [PHASE: VAD 700MS, NOISE GATE 500MS AND BARGE-IN RECOVERY]
+
+- static/js/local_stt.js ve dist portable: 700 ms sessizlik eşiği (silence cutoff) ve 500 ms altı geçici ses/gürültü filtreleme kapısı uygulandı.
+- Manuel gönderimde kullanıcı kararı korunarak kısa komutların gönderilmesi desteklendi. 14 saniye üst kayıt sınırı ve 1 MiB (`1024 * 1024`) ses yükü limiti korundu.
+- `/api/stt` rotası için `audio` ve `language=tr` multipart alanları doğrulandı.
+- Barge-In (Söz Kesme): Asistan konuşurken mikrofondan belirgin kullanıcı sesi geldiğinde `window.interruptSpeech()` tetiklenerek ses oynatımı, token akışı ve TTS anında kesilecek şekilde kurgulandı.
+- Kredi Koruma Protokolü gereğince harici sağlayıcı veya kontrolsüz test çağrısı yapılmadı.
+

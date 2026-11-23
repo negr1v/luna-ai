@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    ACCIO JARVIS V16 — Phase 16E: Portable Windows Packaging Builder
+    ACCIO LUNA V16 — Phase 16E: Portable Windows Packaging Builder
 .DESCRIPTION
     Hafif, taşınabilir ve tek klasörlü (one-folder) Windows paketleyicisi.
     Uygulama kodunu (app/), kullanıcı verilerini (data/) ve başlatıcıları (bat/ps1)
@@ -16,11 +16,11 @@ $ErrorActionPreference = "Stop"
 $SourceDir = $PSScriptRoot
 
 if (-not $OutputDir) {
-    $OutputDir = Join-Path $SourceDir "dist\ACCIO-JARVIS-PORTABLE"
+    $OutputDir = Join-Path $SourceDir "dist\LUNA-AI-PORTABLE"
 }
 
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "  ACCIO JARVIS V16 - TASINABILIR WINDOWS PAKETLEME (16E)    " -ForegroundColor Cyan
+Write-Host "  ACCIO LUNA V16 - TASINABILIR WINDOWS PAKETLEME (16E)    " -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "Kaynak Dizin : $SourceDir"
 Write-Host "Paket Dizini : $OutputDir"
@@ -42,14 +42,14 @@ if (-not (Test-Path -LiteralPath $DataDir)) {
 # 2. Uygulama Kaynak Dosyalarını Kopyalama (app/)
 $AppFiles = @(
     "index.html",
-    "jarvis_server.py",
-    "jarvis_agent_engine.py",
-    "jarvis_computer_use.py",
-    "jarvis_local_stt.py",
-    "jarvis_tray.ps1",
-    "jarvis_uia_inspect.ps1",
-    "jarvis_uia_action.ps1",
-    "start_jarvis.ps1"
+    "luna_server.py",
+    "luna_agent_engine.py",
+    "luna_computer_use.py",
+    "luna_local_stt.py",
+    "luna_tray.ps1",
+    "luna_uia_inspect.ps1",
+    "luna_uia_action.ps1",
+    "start_luna.ps1"
 )
 
 foreach ($file in $AppFiles) {
@@ -69,9 +69,9 @@ if (Test-Path -LiteralPath $staticSrc) {
 }
 
 # 3. Kullanıcı Veri Dosyalarını İzolasyon ve Kopyalama (data/)
-# jarvis_config.json içindeki gizli API anahtarlarını arındır (sanitization)
-$configSrc = Join-Path $SourceDir "jarvis_config.json"
-$configDst = Join-Path $DataDir "jarvis_config.json"
+# luna_config.json içindeki gizli API anahtarlarını arındır (sanitization)
+$configSrc = Join-Path $SourceDir "luna_config.json"
+$configDst = Join-Path $DataDir "luna_config.json"
 if (Test-Path -LiteralPath $configSrc) {
     try {
         $cfg = Get-Content -LiteralPath $configSrc -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -85,7 +85,7 @@ if (Test-Path -LiteralPath $configSrc) {
         $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
         $cleanJson = $cfg | ConvertTo-Json -Depth 5
         [System.IO.File]::WriteAllText($configDst, $cleanJson, $utf8NoBom)
-        Write-Host "  [DATA] Arindirilmis jarvis_config.json olusturuldu" -ForegroundColor Green
+        Write-Host "  [DATA] Arindirilmis luna_config.json olusturuldu" -ForegroundColor Green
     } catch {
         Copy-Item -LiteralPath $configSrc -Destination $configDst -Force
     }
@@ -94,31 +94,31 @@ if (Test-Path -LiteralPath $configSrc) {
     [System.IO.File]::WriteAllText($configDst, '{"theme":"dark","language":"tr"}', $utf8NoBom)
 }
 
-# jarvis_memory.json kopyalama
-$memSrc = Join-Path $SourceDir "jarvis_memory.json"
-$memDst = Join-Path $DataDir "jarvis_memory.json"
+# luna_memory.json kopyalama
+$memSrc = Join-Path $SourceDir "luna_memory.json"
+$memDst = Join-Path $DataDir "luna_memory.json"
 if (Test-Path -LiteralPath $memSrc) {
     Copy-Item -LiteralPath $memSrc -Destination $memDst -Force
-    Write-Host "  [DATA] jarvis_memory.json kopyalandi" -ForegroundColor Green
+    Write-Host "  [DATA] luna_memory.json kopyalandi" -ForegroundColor Green
 }
 
-# jarvis_tasks.json kopyalama
-$tasksSrc = Join-Path $SourceDir "jarvis_tasks.json"
-$tasksDst = Join-Path $DataDir "jarvis_tasks.json"
+# luna_tasks.json kopyalama
+$tasksSrc = Join-Path $SourceDir "luna_tasks.json"
+$tasksDst = Join-Path $DataDir "luna_tasks.json"
 if (Test-Path -LiteralPath $tasksSrc) {
     Copy-Item -LiteralPath $tasksSrc -Destination $tasksDst -Force
-    Write-Host "  [DATA] jarvis_tasks.json kopyalandi" -ForegroundColor Green
+    Write-Host "  [DATA] luna_tasks.json kopyalandi" -ForegroundColor Green
 } else {
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($tasksDst, '{"tasks":[]}', $utf8NoBom)
 }
 
-# jarvis_notifications.json kopyalama
-$notifSrc = Join-Path $SourceDir "jarvis_notifications.json"
-$notifDst = Join-Path $DataDir "jarvis_notifications.json"
+# luna_notifications.json kopyalama
+$notifSrc = Join-Path $SourceDir "luna_notifications.json"
+$notifDst = Join-Path $DataDir "luna_notifications.json"
 if (Test-Path -LiteralPath $notifSrc) {
     Copy-Item -LiteralPath $notifSrc -Destination $notifDst -Force
-    Write-Host "  [DATA] jarvis_notifications.json kopyalandi" -ForegroundColor Green
+    Write-Host "  [DATA] luna_notifications.json kopyalandi" -ForegroundColor Green
 } else {
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($notifDst, '{"notifications":[],"overflow_count":0,"expired_count":0}', $utf8NoBom)
@@ -129,7 +129,7 @@ $portablePs1Path = Join-Path $OutputDir "start_portable.ps1"
 $portablePs1Content = @'
 <#
 .SYNOPSIS
-    ACCIO JARVIS V16 — Portable Windows Central Controller
+    ACCIO LUNA V16 — Portable Windows Central Controller
 .DESCRIPTION
     Taşınabilir modda başlatma, sistem tepsisi entegrasyonu, mükerrer süreç engelleme,
     durum sorgulama, temiz kapatma ve güvenli kurtarma mekanizması sağlar.
@@ -145,15 +145,15 @@ $ErrorActionPreference = "Stop"
 $PackageRoot = $PSScriptRoot
 $AppDir = Join-Path $PackageRoot "app"
 $DataDir = Join-Path $PackageRoot "data"
-$AppScript = Join-Path $AppDir "start_jarvis.ps1"
+$AppScript = Join-Path $AppDir "start_luna.ps1"
 
 # Ortam Değişkenleri
-$env:JARVIS_DATA_DIR = $DataDir
+$env:LUNA_DATA_DIR = $DataDir
 
 # Python Yolunu Dinamik Belirleme
 $DefaultManagedPython = "C:\Users\negr1\AppData\Roaming\Accio\pre-install\bd5ff2c6816a\python\python.exe"
-$env:JARVIS_PYTHON_EXE = if ($env:JARVIS_PYTHON_EXE -and (Test-Path -LiteralPath $env:JARVIS_PYTHON_EXE)) {
-    $env:JARVIS_PYTHON_EXE
+$env:LUNA_PYTHON_EXE = if ($env:LUNA_PYTHON_EXE -and (Test-Path -LiteralPath $env:LUNA_PYTHON_EXE)) {
+    $env:LUNA_PYTHON_EXE
 } elseif (Test-Path -LiteralPath (Join-Path $PackageRoot "python\python.exe")) {
     Join-Path $PackageRoot "python\python.exe"
 } elseif (Test-Path -LiteralPath $DefaultManagedPython) {
@@ -174,7 +174,7 @@ function Test-ServerRunning {
 }
 
 if ($Action -eq "Status") {
-    Write-Host "=== ACCIO JARVIS V16 - TASINABILIR DURUM ===" -ForegroundColor Cyan
+    Write-Host "=== ACCIO LUNA V16 - TASINABILIR DURUM ===" -ForegroundColor Cyan
     $isRunning = Test-ServerRunning
     if ($isRunning) {
         Write-Host "  Durum : [CALISIYOR] Port 7860 aktif" -ForegroundColor Green
@@ -183,18 +183,18 @@ if ($Action -eq "Status") {
         Write-Host "  Durum : [DURDURULDU] Port 7860 bosta" -ForegroundColor Yellow
     }
     Write-Host "  Veri  : $DataDir" -ForegroundColor Gray
-    Write-Host "  Python: $env:JARVIS_PYTHON_EXE" -ForegroundColor Gray
+    Write-Host "  Python: $env:LUNA_PYTHON_EXE" -ForegroundColor Gray
     exit 0
 }
 
 if ($Action -eq "Stop") {
-    Write-Host "=== ACCIO JARVIS V16 - GUVENLI KAPATMA ===" -ForegroundColor Cyan
+    Write-Host "=== ACCIO LUNA V16 - GUVENLI KAPATMA ===" -ForegroundColor Cyan
     & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $AppScript -Action Stop
     exit 0
 }
 
 if ($Action -eq "Recover") {
-    Write-Host "=== ACCIO JARVIS V16 - GUVENLI KURTARMA PROSEDURU ===" -ForegroundColor Cyan
+    Write-Host "=== ACCIO LUNA V16 - GUVENLI KURTARMA PROSEDURU ===" -ForegroundColor Cyan
     # 1. Veri dizini kontrolü
     if (-not (Test-Path -LiteralPath $DataDir)) {
         New-Item -ItemType Directory -Path $DataDir -Force | Out-Null
@@ -202,17 +202,17 @@ if ($Action -eq "Recover") {
     }
 
     # 2. Yetim metadata dosyası temizliği
-    $runtimeMeta = Join-Path $AppDir ".jarvis_runtime.json"
+    $runtimeMeta = Join-Path $AppDir ".luna_runtime.json"
     if ((Test-Path -LiteralPath $runtimeMeta) -and (-not (Test-ServerRunning))) {
         Remove-Item -LiteralPath $runtimeMeta -Force -ErrorAction SilentlyContinue
-        Write-Host "  [Kurtarma] Yetim .jarvis_runtime.json kalintisi temizlendi." -ForegroundColor Yellow
+        Write-Host "  [Kurtarma] Yetim .luna_runtime.json kalintisi temizlendi." -ForegroundColor Yellow
     }
 
     # 3. Bellek JSON kontrolü
-    $memFile = Join-Path $DataDir "jarvis_memory.json"
+    $memFile = Join-Path $DataDir "luna_memory.json"
     if (-not (Test-Path -LiteralPath $memFile)) {
         '{"user_name":"negr1","focus":"YKS 2027 Sayısal","notes":[],"revision":1}' | Set-Content -LiteralPath $memFile -Encoding UTF8
-        Write-Host "  [Kurtarma] Temel jarvis_memory.json sablonu geri yuklendi." -ForegroundColor Yellow
+        Write-Host "  [Kurtarma] Temel luna_memory.json sablonu geri yuklendi." -ForegroundColor Yellow
     }
 
     Write-Host "  [Kurtarma] Sistem durumu saglam. Normal baslatma yapabilirsiniz." -ForegroundColor Green
@@ -221,7 +221,7 @@ if ($Action -eq "Recover") {
 
 # Start veya Tray Eylemi
 if (Test-ServerRunning) {
-    Write-Host "UYARI: JARVIS V16 zaten calisiyor (Port 7860 aktif). Mukerrer sunucu baslatilmadi." -ForegroundColor Yellow
+    Write-Host "UYARI: LUNA V16 zaten calisiyor (Port 7860 aktif). Mukerrer sunucu baslatilmadi." -ForegroundColor Yellow
     if ($Action -eq "Start") {
         Start-Process "http://127.0.0.1:7860"
     }
@@ -240,11 +240,11 @@ Write-Host "  [PACKAGE] start_portable.ps1 olusturuldu" -ForegroundColor Green
 
 # 5. Başlatıcı BAT Dosyalarını Oluşturma
 $batFiles = @{
-    "START-JARVIS.bat"   = "@echo off`r`ntitle ACCIO JARVIS V16 - Portable`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Start`r`npause"
-    "START-TRAY.bat"     = "@echo off`r`ntitle ACCIO JARVIS V16 - System Tray`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"start_portable.ps1`" -Action Tray"
-    "STATUS-JARVIS.bat"  = "@echo off`r`ntitle ACCIO JARVIS V16 - Status`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Status`r`npause"
-    "STOP-JARVIS.bat"    = "@echo off`r`ntitle ACCIO JARVIS V16 - Stop`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Stop`r`npause"
-    "RECOVER-JARVIS.bat" = "@echo off`r`ntitle ACCIO JARVIS V16 - Recovery`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Recover`r`npause"
+    "START-LUNA.bat"   = "@echo off`r`ntitle ACCIO LUNA V16 - Portable`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Start`r`npause"
+    "START-TRAY.bat"     = "@echo off`r`ntitle ACCIO LUNA V16 - System Tray`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"start_portable.ps1`" -Action Tray"
+    "STATUS-LUNA.bat"  = "@echo off`r`ntitle ACCIO LUNA V16 - Status`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Status`r`npause"
+    "STOP-LUNA.bat"    = "@echo off`r`ntitle ACCIO LUNA V16 - Stop`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Stop`r`npause"
+    "RECOVER-LUNA.bat" = "@echo off`r`ntitle ACCIO LUNA V16 - Recovery`r`ncd /d `"%~dp0`"`r`npowershell.exe -NoProfile -ExecutionPolicy Bypass -File `"start_portable.ps1`" -Action Recover`r`npause"
 }
 
 foreach ($batName in $batFiles.Keys) {
@@ -256,19 +256,19 @@ foreach ($batName in $batFiles.Keys) {
 # 6. Taşınabilir Paket README Belgesi
 $readmeContent = @"
 ================================================================================
-  ACCIO JARVIS V16 — KISISEL TASINABILIR WINDOWS PAKETI (PORTABLE PACKAGE)
+  ACCIO LUNA V16 — KISISEL TASINABILIR WINDOWS PAKETI (PORTABLE PACKAGE)
 ================================================================================
 Donanım Profili: Intel Core i5-8250U / 8 GB RAM / Windows 10 & 11
 Mimari         : Tek Klasör Taşınabilir (One-Folder Portable), Sıfır Dış Bağımlılık
 
 KLASOR YAPISI:
   ├── app/               -> Çekirdek yazılım, sunucu, agent ve PowerShell betikleri
-  ├── data/              -> Kullanıcı hafızası (jarvis_memory.json), görevler, loglar
-  ├── START-JARVIS.bat   -> Sunucuyu başlatır ve tarayıcıda kontrol panelini açar
+  ├── data/              -> Kullanıcı hafızası (luna_memory.json), görevler, loglar
+  ├── START-LUNA.bat   -> Sunucuyu başlatır ve tarayıcıda kontrol panelini açar
   ├── START-TRAY.bat     -> Sunucuyu başlatır ve arka planda Windows Sistem Tepsisine küçültür
-  ├── STATUS-JARVIS.bat  -> Sunucunun çalışma ve port durumunu raporlar
-  ├── STOP-JARVIS.bat    -> Sunucuyu güvenli ve temiz bir şekilde kapatır
-  └── RECOVER-JARVIS.bat -> Olası kilitlenmelerde veri doğrulaması ve güvenli kurtarma yapar
+  ├── STATUS-LUNA.bat  -> Sunucunun çalışma ve port durumunu raporlar
+  ├── STOP-LUNA.bat    -> Sunucuyu güvenli ve temiz bir şekilde kapatır
+  └── RECOVER-LUNA.bat -> Olası kilitlenmelerde veri doğrulaması ve güvenli kurtarma yapar
 
 GÜVENLİK İLKELERİ:
   - Bu paket kişisel kullanım içindir; genel dağıtım değildir.

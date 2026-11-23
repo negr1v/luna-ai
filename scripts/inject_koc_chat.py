@@ -1,7 +1,7 @@
 import re
 
 p_desktop = r"C:\Users\negr1\Desktop\yks-test-takip.html"
-p_projeler = r"C:\Users\negr1\Projeler\ACCIO-JARVIS\yks-test-takip.html"
+p_projeler = r"C:\Users\negr1\Projeler\LUNA-AI\yks-test-takip.html"
 
 koc_module_code = '''
 // ==================== YKS KOÇU AI CHAT ENGINE (STUDYTRACKER CLONE) ====================

@@ -11,7 +11,7 @@ from unittest.mock import patch, AsyncMock
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
-import jarvis_server
+import luna_server
 
 class Phase3Stage5BBackendTest(AioHTTPTestCase):
     async def get_application(self):
@@ -20,14 +20,14 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         self.test_candidates_file = os.path.join(self.test_dir, "test_candidates.json")
         self.test_journal_file = os.path.join(self.test_dir, "test_journal.json")
 
-        shutil.copy2("jarvis_memory.json.v3.bak", self.test_memory_file)
+        shutil.copy2("luna_memory.json.v3.bak", self.test_memory_file)
 
-        jarvis_server.MEMORY_FILE = self.test_memory_file
-        jarvis_server.CANDIDATES_FILE = self.test_candidates_file
-        jarvis_server.JOURNAL_FILE = self.test_journal_file
-        jarvis_server.RECOVERY_REQUIRED_STATE = False
+        luna_server.MEMORY_FILE = self.test_memory_file
+        luna_server.CANDIDATES_FILE = self.test_candidates_file
+        luna_server.JOURNAL_FILE = self.test_journal_file
+        luna_server.RECOVERY_REQUIRED_STATE = False
 
-        return jarvis_server.create_app()
+        return luna_server.create_app()
 
     def tearDown(self):
         super().tearDown()
@@ -36,14 +36,14 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
 
     def test_01_config_default_disabled(self):
         """Verify memory_learning_enabled defaults to False in DEFAULT_CONFIG."""
-        self.assertIn("memory_learning_enabled", jarvis_server.DEFAULT_CONFIG)
-        self.assertIs(jarvis_server.DEFAULT_CONFIG["memory_learning_enabled"], False)
+        self.assertIn("memory_learning_enabled", luna_server.DEFAULT_CONFIG)
+        self.assertIs(luna_server.DEFAULT_CONFIG["memory_learning_enabled"], False)
         print("  [Stage 5B Test 1 PASSED] memory_learning_enabled defaults to False.")
 
     @unittest_run_loop
     async def test_02_explicit_command_zero_groq_calls(self):
         """Explicit remember command creates candidate with ZERO Groq API calls for memory extraction."""
-        with patch("jarvis_server.run_groq_structured_extraction") as mock_groq_extract:
+        with patch("luna_server.run_groq_structured_extraction") as mock_groq_extract:
             resp = await self.client.post("/api/chat", json={
                 "message": "Bunu unutma: Gelecekte AMD AM5 platformunu tercih edeceğim"
             })
@@ -80,12 +80,12 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
     @unittest_run_loop
     async def test_04_automatic_learning_disabled_zero_extraction(self):
         """When memory_learning_enabled is False, normal chat triggers zero extraction requests."""
-        self.assertEqual(jarvis_server.MEMORY_EXTRACTION_QUEUE.qsize(), 0)
+        self.assertEqual(luna_server.MEMORY_EXTRACTION_QUEUE.qsize(), 0)
         resp = await self.client.post("/api/chat", json={
             "message": "Normal bir sohbet mesajı gönderiyorum."
         })
         self.assertEqual(resp.status, 200)
-        self.assertEqual(jarvis_server.MEMORY_EXTRACTION_QUEUE.qsize(), 0)
+        self.assertEqual(luna_server.MEMORY_EXTRACTION_QUEUE.qsize(), 0)
         print("  [Stage 5B Test 4 PASSED] Learning disabled produces zero background extraction.")
 
     @unittest_run_loop
@@ -108,7 +108,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 for i in range(20)
             ]
         }
-        jarvis_server.save_candidates_file(cdata, self.test_candidates_file)
+        luna_server.save_candidates_file(cdata, self.test_candidates_file)
 
         resp = await self.client.post("/api/memory/candidates", json={
             "text": "21. Açık kullanıcı isteği",
@@ -132,7 +132,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
             "TC numaram 12345678901 dir"
         ]
         for bad in bad_samples:
-            ok, err = jarvis_server.validate_privacy_and_security(bad)
+            ok, err = luna_server.validate_privacy_and_security(bad)
             self.assertFalse(ok, f"Expected rejection for: {bad}")
             resp = await self.client.post("/api/memory/candidates", json={"text": bad})
             self.assertEqual(resp.status, 400)
@@ -152,12 +152,12 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         rev_token = (await mem_resp.json())["revision_token"]
 
         # Simulate candidate already in_flight
-        cdata = jarvis_server.load_candidates_file(self.test_candidates_file)
+        cdata = luna_server.load_candidates_file(self.test_candidates_file)
         for c in cdata["candidates"]:
             if c["candidate_id"] == cand_id:
                 c["status"] = "in_flight"
                 c["reservation_id"] = "res_simulated"
-        jarvis_server.save_candidates_file(cdata, self.test_candidates_file)
+        luna_server.save_candidates_file(cdata, self.test_candidates_file)
 
         resp2 = await self.client.post(
             f"/api/memory/candidates/{cand_id}/approve",
@@ -241,7 +241,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 }
             ]
         }
-        jarvis_server.save_candidates_file(cdata, self.test_candidates_file)
+        luna_server.save_candidates_file(cdata, self.test_candidates_file)
 
         jdata = {
             "schema_version": "1.0",
@@ -252,16 +252,16 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 "postimage_sha256": "fake_postimage_hash_12345"
             }
         }
-        jarvis_server.save_journal_file(jdata, self.test_journal_file)
+        luna_server.save_journal_file(jdata, self.test_journal_file)
 
-        outcome = jarvis_server.startup_journal_recovery(
+        outcome = luna_server.startup_journal_recovery(
             self.test_memory_file, self.test_candidates_file, self.test_journal_file
         )
         self.assertEqual(outcome, "ROLLED_BACK_TO_PENDING")
 
-        c_reloaded = jarvis_server.load_candidates_file(self.test_candidates_file)
+        c_reloaded = luna_server.load_candidates_file(self.test_candidates_file)
         self.assertEqual(c_reloaded["candidates"][0]["status"], "pending")
-        j_reloaded = jarvis_server.load_journal_file(self.test_journal_file)
+        j_reloaded = luna_server.load_journal_file(self.test_journal_file)
         self.assertIsNone(j_reloaded.get("active_transaction"))
         print("  [Stage 5B Test 10 PASSED] Recovery rolled back unfinished candidate to pending.")
 
@@ -282,7 +282,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 }
             ]
         }
-        jarvis_server.save_candidates_file(cdata, self.test_candidates_file)
+        luna_server.save_candidates_file(cdata, self.test_candidates_file)
 
         jdata = {
             "schema_version": "1.0",
@@ -293,16 +293,16 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 "postimage_sha256": postimage_hash
             }
         }
-        jarvis_server.save_journal_file(jdata, self.test_journal_file)
+        luna_server.save_journal_file(jdata, self.test_journal_file)
 
-        outcome = jarvis_server.startup_journal_recovery(
+        outcome = luna_server.startup_journal_recovery(
             self.test_memory_file, self.test_candidates_file, self.test_journal_file
         )
         self.assertEqual(outcome, "COMMITTED_TO_APPROVED")
 
-        c_reloaded = jarvis_server.load_candidates_file(self.test_candidates_file)
+        c_reloaded = luna_server.load_candidates_file(self.test_candidates_file)
         self.assertEqual(c_reloaded["candidates"][0]["status"], "approved")
-        j_reloaded = jarvis_server.load_journal_file(self.test_journal_file)
+        j_reloaded = luna_server.load_journal_file(self.test_journal_file)
         self.assertIsNone(j_reloaded.get("active_transaction"))
         print("  [Stage 5B Test 11 PASSED] Recovery committed completed canonical write to approved.")
 
@@ -317,13 +317,13 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 "postimage_sha256": "post_mismatch_222"
             }
         }
-        jarvis_server.save_journal_file(jdata, self.test_journal_file)
+        luna_server.save_journal_file(jdata, self.test_journal_file)
 
-        outcome = jarvis_server.startup_journal_recovery(
+        outcome = luna_server.startup_journal_recovery(
             self.test_memory_file, self.test_candidates_file, self.test_journal_file
         )
         self.assertEqual(outcome, "RECOVERY_REQUIRED")
-        self.assertTrue(jarvis_server.RECOVERY_REQUIRED_STATE)
+        self.assertTrue(luna_server.RECOVERY_REQUIRED_STATE)
         print("  [Stage 5B Test 12 PASSED] Inconsistent state triggered RECOVERY_REQUIRED fail-closed mode.")
 
     @unittest_run_loop
@@ -367,7 +367,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
     @unittest_run_loop
     async def test_15_recovery_required_blocks_all_mutation_endpoints(self):
         """When RECOVERY_REQUIRED_STATE is True, every canonical mutation route returns 503 and memory bytes remain unchanged."""
-        jarvis_server.RECOVERY_REQUIRED_STATE = True
+        luna_server.RECOVERY_REQUIRED_STATE = True
         orig_bytes = open(self.test_memory_file, "rb").read()
         orig_hash = hashlib.sha256(orig_bytes).hexdigest()
 
@@ -395,7 +395,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         cur_bytes = open(self.test_memory_file, "rb").read()
         cur_hash = hashlib.sha256(cur_bytes).hexdigest()
         self.assertEqual(orig_hash, cur_hash)
-        jarvis_server.RECOVERY_REQUIRED_STATE = False
+        luna_server.RECOVERY_REQUIRED_STATE = False
         print("  [Stage 5B Test 15 PASSED] RECOVERY_REQUIRED blocks all 4 canonical mutation routes with 503.")
 
     @unittest_run_loop
@@ -413,13 +413,13 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 }
             ]
         }
-        jarvis_server.save_candidates_file(cdata_orig, self.test_candidates_file)
+        luna_server.save_candidates_file(cdata_orig, self.test_candidates_file)
 
-        with patch("jarvis_server.atomic_write_json", side_effect=OSError("Disk write error")):
+        with patch("luna_server.atomic_write_json", side_effect=OSError("Disk write error")):
             with self.assertRaises(OSError):
-                jarvis_server.save_candidates_file({"schema_version": "1.0", "candidates": []}, self.test_candidates_file)
+                luna_server.save_candidates_file({"schema_version": "1.0", "candidates": []}, self.test_candidates_file)
 
-        reloaded = jarvis_server.load_candidates_file(self.test_candidates_file)
+        reloaded = luna_server.load_candidates_file(self.test_candidates_file)
         self.assertEqual(len(reloaded.get("candidates", [])), 1)
         self.assertEqual(reloaded["candidates"][0]["candidate_id"], "cand_safe_01")
         print("  [Stage 5B Test 16 PASSED] Candidate atomic write failure preserved existing file.")
@@ -433,7 +433,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         mem_resp = await self.client.get("/api/memory")
         rev_token = (await mem_resp.json())["revision_token"]
 
-        with patch("jarvis_server.save_journal_file", side_effect=OSError("Simulated journal write failure")):
+        with patch("luna_server.save_journal_file", side_effect=OSError("Simulated journal write failure")):
             app_resp = await self.client.post(
                 f"/api/memory/candidates/{cand_id}/approve",
                 headers={"X-Memory-Revision-Token": rev_token}
@@ -441,7 +441,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
             self.assertEqual(app_resp.status, 500)
 
         # Candidate must not remain stuck in in_flight
-        cdata = jarvis_server.load_candidates_file(self.test_candidates_file)
+        cdata = luna_server.load_candidates_file(self.test_candidates_file)
         target = [c for c in cdata["candidates"] if c["candidate_id"] == cand_id][0]
         self.assertEqual(target["status"], "pending")
         self.assertNotIn("reservation_id", target)
@@ -471,7 +471,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         self.assertEqual(orig_hash, cur_hash)
 
         # Candidate restored to pending
-        cdata = jarvis_server.load_candidates_file(self.test_candidates_file)
+        cdata = luna_server.load_candidates_file(self.test_candidates_file)
         target = [c for c in cdata["candidates"] if c["candidate_id"] == cand_id][0]
         self.assertEqual(target["status"], "pending")
         print("  [Stage 5B Test 18 PASSED] Canonical write failure before replace kept memory at preimage.")
@@ -500,9 +500,9 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
             )
             self.assertEqual(app_resp.status, 503)
             self.assertEqual((await app_resp.json()).get("error"), "RECOVERY_REQUIRED")
-            self.assertTrue(jarvis_server.RECOVERY_REQUIRED_STATE)
+            self.assertTrue(luna_server.RECOVERY_REQUIRED_STATE)
 
-        jarvis_server.RECOVERY_REQUIRED_STATE = False
+        luna_server.RECOVERY_REQUIRED_STATE = False
         print("  [Stage 5B Test 19 PASSED] Post-replace exception triggered actual disk hash check.")
 
     def test_20_malformed_journal_fails_closed(self):
@@ -510,18 +510,18 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         with open(self.test_journal_file, "w", encoding="utf-8") as f:
             f.write("INVALID_JSON{")
 
-        outcome = jarvis_server.startup_journal_recovery(
+        outcome = luna_server.startup_journal_recovery(
             self.test_memory_file, self.test_candidates_file, self.test_journal_file
         )
         self.assertEqual(outcome, "RECOVERY_REQUIRED")
-        self.assertTrue(jarvis_server.RECOVERY_REQUIRED_STATE)
-        jarvis_server.RECOVERY_REQUIRED_STATE = False
+        self.assertTrue(luna_server.RECOVERY_REQUIRED_STATE)
+        luna_server.RECOVERY_REQUIRED_STATE = False
         print("  [Stage 5B Test 20 PASSED] Malformed journal failed closed cleanly.")
 
     @unittest_run_loop
     async def test_21_worker_clean_shutdown_and_cancellation(self):
         """Background extraction worker cancels cleanly without unhandled exceptions."""
-        worker = asyncio.create_task(jarvis_server.background_extraction_worker())
+        worker = asyncio.create_task(luna_server.background_extraction_worker())
         await asyncio.sleep(0.01)
         worker.cancel()
         try:
@@ -535,7 +535,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
     async def test_22_automatic_extraction_valid_structured_response(self):
         """When enabled, valid structured output from allowlisted model creates candidate."""
         from unittest.mock import MagicMock
-        cfg = jarvis_server.load_config()
+        cfg = luna_server.load_config()
         cfg["memory_learning_enabled"] = True
         cfg["groq_api_key"] = "gsk_test_key_dummy"
         cfg["groq_model"] = "qwen/qwen3.8-27b"
@@ -562,9 +562,9 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         mock_ctx.__aenter__ = AsyncMock(return_value=mock_resp)
         mock_ctx.__aexit__ = AsyncMock(return_value=None)
 
-        with patch.object(jarvis_server.aiohttp.ClientSession, "post", return_value=mock_ctx):
-            with patch("jarvis_server.add_memory_candidate_internal", new_callable=AsyncMock) as mock_add_cand:
-                await jarvis_server.run_groq_structured_extraction("AM5 platformunu tercih ediyorum.", cfg)
+        with patch.object(luna_server.aiohttp.ClientSession, "post", return_value=mock_ctx):
+            with patch("luna_server.add_memory_candidate_internal", new_callable=AsyncMock) as mock_add_cand:
+                await luna_server.run_groq_structured_extraction("AM5 platformunu tercih ediyorum.", cfg)
 
                 mock_add_cand.assert_called_once()
                 call_kwargs = mock_add_cand.call_args[1]
@@ -576,13 +576,13 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
     @unittest_run_loop
     async def test_23_unsupported_model_abandons_extraction(self):
         """Unsupported model abandons extraction safely without any network calls."""
-        cfg = jarvis_server.load_config()
+        cfg = luna_server.load_config()
         cfg["memory_learning_enabled"] = True
         cfg["groq_api_key"] = "gsk_test_key_dummy"
         cfg["groq_model"] = "unsupported-custom-model"
 
         with patch("aiohttp.ClientSession.post") as mock_post:
-            await jarvis_server.run_groq_structured_extraction("Bir mesaj içeriği", cfg)
+            await luna_server.run_groq_structured_extraction("Bir mesaj içeriği", cfg)
             mock_post.assert_not_called()
         print("  [Stage 5B Test 23 PASSED] Unsupported model safely abandoned extraction.")
 
@@ -604,7 +604,7 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 }
             ]
         }
-        jarvis_server.save_candidates_file(cdata, self.test_candidates_file)
+        luna_server.save_candidates_file(cdata, self.test_candidates_file)
 
         # Journal remained lingering with postimage match
         jdata = {
@@ -616,15 +616,15 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
                 "postimage_sha256": postimage_hash
             }
         }
-        jarvis_server.save_journal_file(jdata, self.test_journal_file)
+        luna_server.save_journal_file(jdata, self.test_journal_file)
 
-        outcome = jarvis_server.startup_journal_recovery(
+        outcome = luna_server.startup_journal_recovery(
             self.test_memory_file, self.test_candidates_file, self.test_journal_file
         )
         self.assertEqual(outcome, "COMMITTED_TO_APPROVED")
 
         # Journal is now cleaned up
-        j_clean = jarvis_server.load_journal_file(self.test_journal_file)
+        j_clean = luna_server.load_journal_file(self.test_journal_file)
         self.assertIsNone(j_clean.get("active_transaction"))
         print("  [Stage 5B Test 24 PASSED] Lingering journal cleaned up idempotently on recovery.")
 

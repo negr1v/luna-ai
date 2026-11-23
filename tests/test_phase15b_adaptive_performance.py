@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS V15 - PHASE 15B ADAPTIVE PERFORMANCE TESTS
+LUNA-AI V15 - PHASE 15B ADAPTIVE PERFORMANCE TESTS
 Verifies:
 1. Default performance profile (BALANCED).
 2. Auto-scaling to LITE under sustained high CPU/RAM load.
@@ -20,7 +20,7 @@ from aiohttp import web
 # Add project root
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from jarvis_server import (
+from luna_server import (
     ADAPTIVE_PERFORMANCE_CONTROLLER,
     PerformanceProfile,
     AdaptivePerformanceController,

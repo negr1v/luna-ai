@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 4 / Stage 4B
+ACCIO LUNA V4.0 — Phase 4 / Stage 4B
 Comprehensive Isolated Tests for Agent Engine Task Management Tool Integration,
 Mixed-Concurrency Synchronization, and Idempotency Correction.
 
@@ -9,7 +9,7 @@ Covers:
 3. Explicit task creation with omitted duration uses 40 minutes.
 4. Invalid duration is rejected.
 5. Invalid category is rejected.
-6. Main JARVIS is authorized.
+6. Main LUNA is authorized.
 7. Luna is authorized and normalized to canonical profile.
 8. Unauthorized agents cannot execute the tool.
 9. List returns the correct task data and revision token.
@@ -47,7 +47,7 @@ from unittest.mock import patch, MagicMock, AsyncMock
 from aiohttp.test_utils import AioHTTPTestCase
 from aiohttp import web
 
-import jarvis_server
+import luna_server
 
 
 class Phase4Stage4BAgentTest(AioHTTPTestCase):
@@ -67,15 +67,15 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         with open(self.test_cfg_file, "w", encoding="utf-8") as f:
             json.dump({"groq_api_key": "mock_key"}, f)
 
-        self.p_task_file = patch("jarvis_server.TASKS_FILE", self.test_tasks_file)
-        self.p_cfg_file = patch("jarvis_server.CONFIG_FILE", self.test_cfg_file)
-        self.p_tts = patch("jarvis_server.generate_tts", AsyncMock(return_value=""))
+        self.p_task_file = patch("luna_server.TASKS_FILE", self.test_tasks_file)
+        self.p_cfg_file = patch("luna_server.CONFIG_FILE", self.test_cfg_file)
+        self.p_tts = patch("luna_server.generate_tts", AsyncMock(return_value=""))
 
         self.p_task_file.start()
         self.p_cfg_file.start()
         self.p_tts.start()
 
-        return jarvis_server.create_app()
+        return luna_server.create_app()
 
     async def tearDownAsync(self):
         self.p_task_file.stop()
@@ -86,8 +86,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
     # --- Core Functional Tests (1 - 15) ---
 
     async def test_01_explicit_add_request_creates_one_task(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "AYT Biyoloji: Solunum", "duration": 50, "category": "biyoloji"},
             user_context="Bunu görevlerime ekle: AYT Biyoloji Solunum",
@@ -100,13 +100,13 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(created["category"], "biyoloji")
         self.assertEqual(created["tool_call_id"], "call_add_1")
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         self.assertEqual(len(tasks), 4)
         print("  [Stage 4B Test 1 PASSED] Explicit add request created exactly one task.")
 
     async def test_02_ordinary_task_related_conversation_does_not_create_task(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "AYT Biyoloji çalışmam lazım", "duration": 40},
             user_context="Bugün AYT Biyoloji çalışmam lazım."
@@ -114,13 +114,13 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(res.get("status"), "error")
         self.assertIn("açık kullanıcı talebi", res.get("message", ""))
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         self.assertEqual(len(tasks), 3, "Ordinary conversation must never create a task")
         print("  [Stage 4B Test 2 PASSED] Ordinary conversation without explicit intent rejected.")
 
     async def test_03_explicit_task_creation_with_omitted_duration_uses_40_minutes(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Kimya: Gazlar"},
             user_context="Ders programıma ekle Kimya Gazlar",
@@ -131,16 +131,16 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 3 PASSED] Omitted duration safely defaulted to 40 minutes.")
 
     async def test_04_invalid_duration_is_rejected(self):
-        r1 = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r1 = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Ders", "duration": 0},
             user_context="Görev oluştur Ders"
         )
         self.assertEqual(r1.get("status"), "error")
 
-        r2 = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r2 = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Ders", "duration": 400},
             user_context="Görev oluştur Ders"
@@ -149,8 +149,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 4 PASSED] Out of range duration cleanly rejected.")
 
     async def test_05_invalid_category_is_rejected(self):
-        r = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Ders", "category": "astronomi"},
             user_context="Görev listeme ekle Ders"
@@ -158,24 +158,24 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(r.get("status"), "error")
         print("  [Stage 4B Test 5 PASSED] Invalid category cleanly rejected.")
 
-    async def test_06_main_jarvis_is_authorized(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+    async def test_06_main_luna_is_authorized(self):
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "list"}
         )
         self.assertEqual(res.get("status"), "ok")
-        print("  [Stage 4B Test 6 PASSED] Main JARVIS is authorized to execute manage_tasks.")
+        print("  [Stage 4B Test 6 PASSED] Main LUNA is authorized to execute manage_tasks.")
 
     async def test_07_luna_is_authorized_and_normalized_to_canonical(self):
-        res1 = jarvis_server.execute_desktop_tool_with_allowlist(
+        res1 = luna_server.execute_desktop_tool_with_allowlist(
             agent_name="Luna",
             tool_name="manage_tasks",
             args={"action": "list"}
         )
         self.assertEqual(res1.get("status"), "ok")
 
-        res2 = jarvis_server.execute_desktop_tool_with_allowlist(
+        res2 = luna_server.execute_desktop_tool_with_allowlist(
             agent_name="Luna (Sert Koç)",
             tool_name="manage_tasks",
             args={"action": "list"}
@@ -186,7 +186,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
     async def test_08_unauthorized_agents_cannot_execute_tool(self):
         unauth_agents = ["Study Mentor", "Hardware Research Agent", "System Intelligence Agent"]
         for agent in unauth_agents:
-            res = jarvis_server.execute_desktop_tool_with_allowlist(
+            res = luna_server.execute_desktop_tool_with_allowlist(
                 agent_name=agent,
                 tool_name="manage_tasks",
                 args={"action": "list"}
@@ -195,27 +195,27 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 8 PASSED] Unauthorized agents strictly denied server-side.")
 
     async def test_09_list_returns_correct_task_data_and_revision_token(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "list"}
         )
         self.assertEqual(res.get("status"), "ok")
         self.assertEqual(res.get("count"), 3)
         self.assertEqual(len(res.get("tasks")), 3)
-        self.assertIn(f"{jarvis_server.SERVER_EPOCH}:task_", res.get("revision_token"))
+        self.assertIn(f"{luna_server.SERVER_EPOCH}:task_", res.get("revision_token"))
         print("  [Stage 4B Test 9 PASSED] List action returns accurate task inventory and revision token.")
 
     async def test_10_complete_marks_only_intended_task_done(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "complete", "task_id": "t2"}
         )
         self.assertEqual(res.get("status"), "ok")
         self.assertTrue(res.get("task")["done"])
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         t2 = next(t for t in tasks if t["id"] == "t2")
         t3 = next(t for t in tasks if t["id"] == "t3")
         self.assertTrue(t2["done"])
@@ -223,14 +223,14 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 10 PASSED] Complete marks only the targeted task.")
 
     async def test_11_ambiguous_completion_does_not_mutate_any_task(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "complete", "subject": "Paragraf"}
         )
         self.assertEqual(res.get("status"), "ambiguous")
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         t2 = next(t for t in tasks if t["id"] == "t2")
         t3 = next(t for t in tasks if t["id"] == "t3")
         self.assertFalse(t2["done"])
@@ -238,8 +238,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 11 PASSED] Ambiguous task completion safely halted without mutations.")
 
     async def test_12_missing_task_id_or_unknown_task_returns_controlled_error(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "complete", "task_id": "t_nonexistent"}
         )
@@ -312,14 +312,14 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 14 PASSED] SSE chat survived tool execution failure.")
 
     async def test_15_existing_task_ids_and_custom_fields_are_preserved(self):
-        res = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "complete", "task_id": "t1"}
         )
         self.assertEqual(res.get("status"), "ok")
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         t1 = next(t for t in tasks if t["id"] == "t1")
         self.assertEqual(t1.get("custom_prop"), "keep_me")
         self.assertEqual(t1.get("id"), "t1")
@@ -329,7 +329,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
 
     async def test_16_http_add_racing_with_agent_add_prevents_lost_update(self):
         """Simulate preemption delay in HTTP handler to prove that unified lock prevents lost update."""
-        orig_load = jarvis_server.load_tasks_result
+        orig_load = luna_server.load_tasks_result
 
         def slow_load():
             res = orig_load()
@@ -338,8 +338,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
 
         def agent_worker():
             time.sleep(0.01)
-            return jarvis_server.execute_desktop_tool_with_allowlist(
-                agent_name="Main JARVIS",
+            return luna_server.execute_desktop_tool_with_allowlist(
+                agent_name="Main LUNA",
                 tool_name="manage_tasks",
                 args={"action": "add", "subject": "Agent Race Task"},
                 user_context="Görevlerime ekle Agent Race Task",
@@ -347,7 +347,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
             )
 
         loop = asyncio.get_running_loop()
-        with patch("jarvis_server.load_tasks_result", slow_load):
+        with patch("luna_server.load_tasks_result", slow_load):
             http_task = self.client.post("/api/tasks", json={"subject": "HTTP Race Task", "duration": 40})
             agent_task = loop.run_in_executor(None, agent_worker)
             res_http, res_agent = await asyncio.gather(http_task, agent_task)
@@ -355,7 +355,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(res_http.status, 201)
         self.assertEqual(res_agent.get("status"), "ok")
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         subjects = [t["subject"] for t in tasks]
         self.assertIn("Agent Race Task", subjects, "Agent task must NOT be lost!")
         self.assertIn("HTTP Race Task", subjects, "HTTP task must NOT be lost!")
@@ -365,8 +365,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
     async def test_17_http_complete_racing_with_agent_complete(self):
         """HTTP toggle on t2 racing with agent complete on t3."""
         def agent_complete_worker():
-            return jarvis_server.execute_desktop_tool_with_allowlist(
-                agent_name="Main JARVIS",
+            return luna_server.execute_desktop_tool_with_allowlist(
+                agent_name="Main LUNA",
                 tool_name="manage_tasks",
                 args={"action": "complete", "task_id": "t3"}
             )
@@ -379,7 +379,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(res_http.status, 200)
         self.assertEqual(res_agent.get("status"), "ok")
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         t2 = next(t for t in tasks if t["id"] == "t2")
         t3 = next(t for t in tasks if t["id"] == "t3")
         self.assertTrue(t2["done"], "t2 must be completed by HTTP toggle")
@@ -395,8 +395,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         bulk_payload = curr_tasks + [{"id": "t_bulk", "subject": "Bulk Appended Task", "duration": 35}]
 
         def agent_add_worker():
-            return jarvis_server.execute_desktop_tool_with_allowlist(
-                agent_name="Main JARVIS",
+            return luna_server.execute_desktop_tool_with_allowlist(
+                agent_name="Main LUNA",
                 tool_name="manage_tasks",
                 args={"action": "add", "subject": "Agent Concurrent To Bulk"},
                 user_context="Bunu görevlerime ekle Agent Concurrent To Bulk",
@@ -411,7 +411,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(res_agent.get("status"), "ok")
         self.assertIn(res_http.status, (200, 409))
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         subjects = [t["subject"] for t in tasks]
         self.assertIn("Agent Concurrent To Bulk", subjects, "Agent task must never be lost")
         if res_http.status == 200:
@@ -422,8 +422,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
 
     async def test_19_multiple_simultaneous_agent_task_creations(self):
         def sync_worker(idx):
-            return jarvis_server.execute_desktop_tool_with_allowlist(
-                agent_name="Main JARVIS",
+            return luna_server.execute_desktop_tool_with_allowlist(
+                agent_name="Main LUNA",
                 tool_name="manage_tasks",
                 args={"action": "add", "subject": f"Paralel Ders {idx}"},
                 user_context=f"Görevlerime ekle Paralel Ders {idx}",
@@ -437,7 +437,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         for r in results:
             self.assertEqual(r.get("status"), "ok")
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         self.assertEqual(len(tasks), 3 + 5)
         print("  [Stage 4B Test 19 PASSED] 5 simultaneous agent task creations safely serialized.")
 
@@ -446,8 +446,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         call_id = "tc_shared_unique_123"
 
         def sync_caller(idx):
-            return jarvis_server.execute_desktop_tool_with_allowlist(
-                agent_name="Main JARVIS",
+            return luna_server.execute_desktop_tool_with_allowlist(
+                agent_name="Main LUNA",
                 tool_name="manage_tasks",
                 args={"action": "add", "subject": "Tekil Ders Görevi"},
                 user_context="Görevlerime ekle Tekil Ders Görevi",
@@ -466,15 +466,15 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(created_count, 1, "Exactly one task must be created")
         self.assertEqual(idempotent_count, 4, "Four callers must receive idempotent duplicate notification")
 
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         matching = [t for t in tasks if t.get("tool_call_id") == call_id]
         self.assertEqual(len(matching), 1)
         print("  [Stage 4B Test 20 PASSED] Concurrent calls with identical tool_call_id created exactly one task.")
 
     async def test_21_same_tool_call_id_retried_returns_original_task(self):
         call_id = "tc_retry_test_999"
-        r1 = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r1 = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Geometri Tekrarı"},
             user_context="Bunu görevlerime ekle Geometri Tekrarı",
@@ -485,8 +485,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         t1_id = r1["task"]["id"]
 
         # Retry with identical tool_call_id
-        r2 = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r2 = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Geometri Tekrarı"},
             user_context="Bunu görevlerime ekle Geometri Tekrarı",
@@ -499,8 +499,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
 
     async def test_22_different_tool_call_ids_with_identical_subjects_create_separate_tasks(self):
         """User asking to add identical tasks in separate turns with different tool-call IDs."""
-        r1 = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r1 = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Paragraf 25 Soru"},
             user_context="Görevlerime ekle Paragraf 25 Soru",
@@ -509,8 +509,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertEqual(r1.get("status"), "ok")
         self.assertFalse(r1.get("idempotent", False))
 
-        r2 = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r2 = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Paragraf 25 Soru"},
             user_context="Görevlerime ekle Paragraf 25 Soru",
@@ -520,16 +520,16 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertFalse(r2.get("idempotent", False))
 
         self.assertNotEqual(r1["task"]["id"], r2["task"]["id"])
-        tasks = jarvis_server.load_tasks()
+        tasks = luna_server.load_tasks()
         paragraf_tasks = [t for t in tasks if t["subject"] == "Paragraf 25 Soru"]
         self.assertEqual(len(paragraf_tasks), 2, "Both distinct intentional tasks must be created")
         print("  [Stage 4B Test 22 PASSED] Different tool_call_ids with identical subjects preserved as separate tasks.")
 
     async def test_23_persistence_failure_does_not_commit_idempotency_key(self):
         call_id = "tc_fail_and_retry"
-        with patch("jarvis_server.save_tasks", side_effect=OSError("Disk Out of Space")):
-            r1 = jarvis_server.execute_desktop_tool_with_allowlist(
-                agent_name="Main JARVIS",
+        with patch("luna_server.save_tasks", side_effect=OSError("Disk Out of Space")):
+            r1 = luna_server.execute_desktop_tool_with_allowlist(
+                agent_name="Main LUNA",
                 tool_name="manage_tasks",
                 args={"action": "add", "subject": "Fail Task"},
                 user_context="Görevlerime ekle Fail Task",
@@ -538,8 +538,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
             self.assertEqual(r1.get("status"), "error")
 
         # Now disk is healthy; retry with same call_id must succeed and create the task
-        r2 = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r2 = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Fail Task"},
             user_context="Görevlerime ekle Fail Task",
@@ -550,25 +550,25 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 23 PASSED] Persistence failure did not commit idempotency key.")
 
     async def test_24_agent_mutation_increments_task_revision_counter(self):
-        rev_before = jarvis_server.TASK_REVISION_COUNTER
-        r_add = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        rev_before = luna_server.TASK_REVISION_COUNTER
+        r_add = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Counter Test Task"},
             user_context="Görevlerime ekle Counter Test Task",
             tool_call_id="call_counter_1"
         )
         self.assertEqual(r_add.get("status"), "ok")
-        self.assertEqual(jarvis_server.TASK_REVISION_COUNTER, rev_before + 1)
+        self.assertEqual(luna_server.TASK_REVISION_COUNTER, rev_before + 1)
 
         t_id = r_add["task"]["id"]
-        r_comp = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        r_comp = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "complete", "task_id": t_id}
         )
         self.assertEqual(r_comp.get("status"), "ok")
-        self.assertEqual(jarvis_server.TASK_REVISION_COUNTER, rev_before + 2)
+        self.assertEqual(luna_server.TASK_REVISION_COUNTER, rev_before + 2)
         print("  [Stage 4B Test 24 PASSED] Agent task creation and completion both increment revision counter.")
 
     async def test_25_previous_revision_token_stale_after_agent_mutation(self):
@@ -579,8 +579,8 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         self.assertTrue(token_t1)
 
         # 2. Agent mutates task list
-        res_agent = jarvis_server.execute_desktop_tool_with_allowlist(
-            agent_name="Main JARVIS",
+        res_agent = luna_server.execute_desktop_tool_with_allowlist(
+            agent_name="Main LUNA",
             tool_name="manage_tasks",
             args={"action": "add", "subject": "Invalidate HTTP Token Task"},
             user_context="Görevlerime ekle Invalidate HTTP Token Task",
@@ -600,15 +600,15 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
         print("  [Stage 4B Test 25 PASSED] Prior HTTP revision token invalidated by agent mutation (HTTP 409).")
 
     async def test_26_luna_alias_cannot_gain_permissions_beyond_canonical_profile(self):
-        self.assertEqual(jarvis_server.normalize_agent_name("Luna"), "Luna (Sert Koç)")
-        self.assertEqual(jarvis_server.normalize_agent_name("Luna (Sert Koç)"), "Luna (Sert Koç)")
+        self.assertEqual(luna_server.normalize_agent_name("Luna"), "Luna (Sert Koç)")
+        self.assertEqual(luna_server.normalize_agent_name("Luna (Sert Koç)"), "Luna (Sert Koç)")
 
-        canonical_tools = jarvis_server.AGENT_PROFILES["Luna (Sert Koç)"]["allowed_tools"]
-        alias_tools = jarvis_server.AGENT_PROFILES["Luna"]["allowed_tools"]
+        canonical_tools = luna_server.AGENT_PROFILES["Luna (Sert Koç)"]["allowed_tools"]
+        alias_tools = luna_server.AGENT_PROFILES["Luna"]["allowed_tools"]
         self.assertEqual(canonical_tools, alias_tools)
 
         # Verify an unallowed tool for Luna is strictly denied
-        res_denied = jarvis_server.execute_desktop_tool_with_allowlist(
+        res_denied = luna_server.execute_desktop_tool_with_allowlist(
             agent_name="Luna",
             tool_name="get_hardware_price",
             args={"item": "7500F"}
@@ -619,7 +619,7 @@ class Phase4Stage4BAgentTest(AioHTTPTestCase):
     async def test_27_unauthorized_agent_attempts_strictly_denied(self):
         unauth = ["Study Mentor", "Hardware Research Agent", "System Intelligence Agent", "Unknown Bot"]
         for agent in unauth:
-            res = jarvis_server.execute_desktop_tool_with_allowlist(
+            res = luna_server.execute_desktop_tool_with_allowlist(
                 agent_name=agent,
                 tool_name="manage_tasks",
                 args={"action": "add", "subject": "Sneaky Task"},

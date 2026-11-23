@@ -10,25 +10,25 @@ import unittest
 import asyncio
 from unittest.mock import patch, MagicMock
 
-BASE_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+BASE_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
 
 class TestPhase16DAdvancedComputerUse(unittest.TestCase):
 
     def setUp(self):
-        self.backup_cu = os.path.join(BASE_DIR, "jarvis_computer_use.py.bak_phase16d_20261114")
-        self.backup_agent = os.path.join(BASE_DIR, "jarvis_agent_engine.py.bak_phase16d_20261114")
-        self.action_ps1 = os.path.join(BASE_DIR, "jarvis_uia_action.ps1")
+        self.backup_cu = os.path.join(BASE_DIR, "luna_computer_use.py.bak_phase16d_20261114")
+        self.backup_agent = os.path.join(BASE_DIR, "luna_agent_engine.py.bak_phase16d_20261114")
+        self.action_ps1 = os.path.join(BASE_DIR, "luna_uia_action.ps1")
 
     def test_01_backup_verification(self):
-        """Doğrulama 1: jarvis_computer_use.py ve jarvis_agent_engine.py yedekleri mevcut."""
-        self.assertTrue(os.path.exists(self.backup_cu), "Backup for jarvis_computer_use.py missing")
-        self.assertTrue(os.path.exists(self.backup_agent), "Backup for jarvis_agent_engine.py missing")
+        """Doğrulama 1: luna_computer_use.py ve luna_agent_engine.py yedekleri mevcut."""
+        self.assertTrue(os.path.exists(self.backup_cu), "Backup for luna_computer_use.py missing")
+        self.assertTrue(os.path.exists(self.backup_agent), "Backup for luna_agent_engine.py missing")
         self.assertGreater(os.path.getsize(self.backup_cu), 8000)
         self.assertGreater(os.path.getsize(self.backup_agent), 20000)
 
     def test_02_tool_definitions_and_permissions(self):
         """Doğrulama 2: Araç izin seviyeleri (READ_ONLY vs USER_APPROVAL) titizlikle korunuyor."""
-        from jarvis_agent_engine import AgentController, PermissionLevel
+        from luna_agent_engine import AgentController, PermissionLevel
 
         controller = AgentController(BASE_DIR)
         registry = controller.registry
@@ -57,9 +57,9 @@ class TestPhase16DAdvancedComputerUse(unittest.TestCase):
 
     def test_03_allowlist_and_blocked_apps(self):
         """Doğrulama 3: Güvenlik kısıtlamalı uygulamalar (powershell, cmd, regedit) engelleniyor."""
-        from jarvis_computer_use import UIAutomationActionController
+        from luna_computer_use import UIAutomationActionController
 
-        with patch("jarvis_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
+        with patch("luna_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
             # PowerShell engellenmeli
             mock_fg.return_value = {
                 "status": "ok",
@@ -84,9 +84,9 @@ class TestPhase16DAdvancedComputerUse(unittest.TestCase):
 
     def test_04_password_and_sensitive_field_protection(self):
         """Doğrulama 4: Parola, PIN ve kimlik kontrol alanlarına müdahale kesinlikle engelleniyor."""
-        from jarvis_computer_use import UIAutomationActionController
+        from luna_computer_use import UIAutomationActionController
 
-        with patch("jarvis_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
+        with patch("luna_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
             mock_fg.return_value = {
                 "status": "ok",
                 "process_name": "notepad.exe",
@@ -111,9 +111,9 @@ class TestPhase16DAdvancedComputerUse(unittest.TestCase):
 
     def test_05_destructive_command_blocking(self):
         """Doğrulama 5: Yıkıcı silme veya sistem kapatma komutları ValuePattern ile engelleniyor."""
-        from jarvis_computer_use import UIAutomationActionController
+        from luna_computer_use import UIAutomationActionController
 
-        with patch("jarvis_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
+        with patch("luna_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
             mock_fg.return_value = {
                 "status": "ok",
                 "process_name": "notepad.exe",
@@ -137,7 +137,7 @@ class TestPhase16DAdvancedComputerUse(unittest.TestCase):
 
     def test_06_duplicate_action_prevention(self):
         """Doğrulama 6: Aynı eylemin peş peşe mükerrer yürütülmesi engelleniyor."""
-        from jarvis_computer_use import UIAutomationActionController
+        from luna_computer_use import UIAutomationActionController
 
         # Önbelleğe simüle edilmiş yürütülmüş token ekle
         test_token = "unique_action_token_123"
@@ -145,7 +145,7 @@ class TestPhase16DAdvancedComputerUse(unittest.TestCase):
 
         self.assertTrue(UIAutomationActionController._is_duplicate(test_token))
 
-        with patch("jarvis_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
+        with patch("luna_computer_use.DesktopAwareness.get_foreground_window_info") as mock_fg:
             mock_fg.return_value = {
                 "status": "ok",
                 "process_name": "notepad.exe",
@@ -164,7 +164,7 @@ class TestPhase16DAdvancedComputerUse(unittest.TestCase):
 
     def test_07_agent_engine_user_approval_workflow(self):
         """Doğrulama 7: Ajan planlayıcı USER_APPROVAL gerektirir; onay verilmeden çalışmaz."""
-        from jarvis_agent_engine import AgentController, TaskState, PermissionLevel
+        from luna_agent_engine import AgentController, TaskState, PermissionLevel
 
         controller = AgentController(BASE_DIR)
         task = controller.create_task("hesap makinesinde butona tıkla")
@@ -200,7 +200,7 @@ class TestPhase16DAdvancedComputerUse(unittest.TestCase):
             loop.close()
 
     def test_08_ps1_script_exists_and_contains_patterns(self):
-        """Doğrulama 8: jarvis_uia_action.ps1 betiği mevcut ve gerekli güvenlik kalıplarını içeriyor."""
+        """Doğrulama 8: luna_uia_action.ps1 betiği mevcut ve gerekli güvenlik kalıplarını içeriyor."""
         self.assertTrue(os.path.exists(self.action_ps1))
         with open(self.action_ps1, "r", encoding="utf-8") as f:
             content = f.read()

@@ -1,8 +1,8 @@
 """
-openjarvis_digest.py
-ACCIO-JARVIS için OpenJarvis tabanlı Sabah Brifingi ve Günlük Özet Ajanı.
+openluna_digest.py
+LUNA-AI için OpenLuna tabanlı Sabah Brifingi ve Günlük Özet Ajanı.
 
-OpenJarvis'in `MorningDigestAgent` stratejisinden uyarlanmıştır:
+OpenLuna'in `MorningDigestAgent` stratejisinden uyarlanmıştır:
 - Sistem saati, aktif görevler, sistem telemetrisi ve bildirimleri toplar.
 - Hem metin raporu hem de TTS (seslendirme) için optimize edilmiş konuşma metni üretir.
 - Sıfır halüsinasyon: Yalnızca gerçek JSON ve sistem verilerini temel alır.
@@ -17,12 +17,12 @@ from typing import Dict, Any, List
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-class OpenJarvisDigest:
+class OpenLunaDigest:
     def __init__(self, project_dir: str = PROJECT_DIR, honorific: str = "Efendim"):
         self.project_dir = project_dir
         self.honorific = honorific
-        self.tasks_file = os.path.join(project_dir, "jarvis_tasks.json")
-        self.notifications_file = os.path.join(project_dir, "jarvis_notifications.json")
+        self.tasks_file = os.path.join(project_dir, "luna_tasks.json")
+        self.notifications_file = os.path.join(project_dir, "luna_notifications.json")
 
     def _read_json_safe(self, filepath: str) -> Any:
         if not os.path.exists(filepath):
@@ -61,7 +61,7 @@ class OpenJarvisDigest:
 
     def generate_spoken_briefing(self) -> str:
         """
-        OpenJarvis TTS formatı:
+        OpenLuna TTS formatı:
         Maksimum 150-200 kelime, doğrudan konuşma dili, emojisiz, temiz metin.
         """
         data = self.collect_digest_data()
@@ -87,7 +87,7 @@ class OpenJarvisDigest:
         """Kullanıcının HUD veya arayüzde okuyabileceği yapılandırılmış rapor."""
         data = self.collect_digest_data()
         md = []
-        md.append(f"# 🌅 [OPENJARVIS MORNING DIGEST]")
+        md.append(f"# 🌅 [OPENLUNA MORNING DIGEST]")
         md.append(f"**Tarih:** {data['date_str']} | **Saat:** {data['time_str']}")
         md.append(f"**Hitap:** {self.honorific}\n")
 
@@ -106,12 +106,12 @@ class OpenJarvisDigest:
         else:
             md.append("*Yeni bildirim yok.*")
 
-        md.append("\n---\n*OpenJarvis Morning Digest Ajanı tarafından derlenmiştir.*")
+        md.append("\n---\n*OpenLuna Morning Digest Ajanı tarafından derlenmiştir.*")
         return "\n".join(md)
 
 
 if __name__ == "__main__":
-    digest = OpenJarvisDigest()
+    digest = OpenLunaDigest()
     print("--- SESLİ BRİFİNG METNİ (TTS) ---")
     print(digest.generate_spoken_briefing())
     print("\n--- GÖRSEL PANEL METNİ ---")

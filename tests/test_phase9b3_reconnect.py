@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 9B.3D Automated Test Suite
+ACCIO LUNA V4.0 — Phase 9B.3D Automated Test Suite
 Focus: Frontend Reconnect Acceptance Tests (Offline Banner, State Manager, Network Classification,
        Visibility Lifecycle, Draft Preservation, Mutation Replay Protection & Metrics Endpoint).
 """
@@ -24,7 +24,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)
 
-import jarvis_server
+import luna_server
 
 INDEX_PATH = os.path.join(PROJECT_DIR, "index.html")
 
@@ -74,10 +74,10 @@ class TestPhase9B3StaticHTMLAndDOM(unittest.TestCase):
         self.assertTrue('display:none' in tag or 'display: none' in tag, "Banner must be initially hidden")
 
     def test_04_reconnect_banner_exact_turkish_copy(self):
-        """4. Exact Turkish text 'JARVIS Çevrimdışı — Yeniden Bağlanıyor...' is present."""
+        """4. Exact Turkish text 'LUNA Çevrimdışı — Yeniden Bağlanıyor...' is present."""
         banner_snippet = re.search(r'<div[^>]*id=["\']reconnectBanner["\'].*?</div>', self.html, re.DOTALL)
         self.assertIsNotNone(banner_snippet, "Banner snippet could not be extracted")
-        self.assertIn("JARVIS Çevrimdışı — Yeniden Bağlanıyor...", banner_snippet.group(0))
+        self.assertIn("LUNA Çevrimdışı — Yeniden Bağlanıyor...", banner_snippet.group(0))
 
     def test_05_reconnect_banner_amber_warning_style(self):
         """5. Styling uses amber warning colors (#f59e0b / #fef08a)."""
@@ -588,7 +588,7 @@ class TestPhase9B3SystemMetricsEndpoint(AioHTTPTestCase):
 
     async def get_application(self):
         app = web.Application()
-        app.router.add_get("/api/system_metrics", jarvis_server.handle_system_metrics)
+        app.router.add_get("/api/system_metrics", luna_server.handle_system_metrics)
         return app
 
     async def test_17_system_metrics_route_isolated(self):

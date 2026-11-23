@@ -1,5 +1,5 @@
 """
-Focused Validation Test Suite for ACCIO-JARVIS Phase 15G (Wallpaper Studio)
+Focused Validation Test Suite for LUNA-AI Phase 15G (Wallpaper Studio)
 Verifies DOM structure, CSS tokens, Wallpaper Studio Modal, JS Controller,
 Security/Safe Local Image handling, and regression integrity of Cyber Orb & Hover Panels.
 """
@@ -8,8 +8,8 @@ import os
 import re
 import sys
 
-INDEX_PATH = r"C:\Users\negr1\Projeler\ACCIO-JARVIS\index.html"
-BACKUP_PATH = r"C:\Users\negr1\Projeler\ACCIO-JARVIS\index.html.bak_phase15g_20261114"
+INDEX_PATH = r"C:\Users\negr1\Projeler\LUNA-AI\index.html"
+BACKUP_PATH = r"C:\Users\negr1\Projeler\LUNA-AI\index.html.bak_phase15g_20261114"
 
 def test_wallpaper_studio():
     print("======================================================================")

@@ -2,20 +2,20 @@
 Focused Test Suite for Phase 16C: Memory Graph Explorer
 Validates Memory Graph DOM structure, SVG/Canvas rendering logic,
 category grouping, stored vs suggested edge separation, 40-node cap,
-accessible text-list fallback, and jarvis_memory.json integrity.
+accessible text-list fallback, and luna_memory.json integrity.
 """
 
 import os
 import json
 import unittest
 
-BASE_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+BASE_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
 
 class TestPhase16CMemoryGraph(unittest.TestCase):
 
     def setUp(self):
         self.index_html_path = os.path.join(BASE_DIR, "index.html")
-        self.memory_json_path = os.path.join(BASE_DIR, "jarvis_memory.json")
+        self.memory_json_path = os.path.join(BASE_DIR, "luna_memory.json")
         self.backup_path = os.path.join(BASE_DIR, "index.html.bak_phase16c_20261114")
 
     def test_01_backup_file_exists(self):
@@ -24,7 +24,7 @@ class TestPhase16CMemoryGraph(unittest.TestCase):
         self.assertGreater(os.path.getsize(self.backup_path), 500000)
 
     def test_02_memory_json_integrity(self):
-        """Doğrulama 2: jarvis_memory.json tek yetkili kaynak olarak sağlam ve geçerli."""
+        """Doğrulama 2: luna_memory.json tek yetkili kaynak olarak sağlam ve geçerli."""
         self.assertTrue(os.path.exists(self.memory_json_path))
         with open(self.memory_json_path, "r", encoding="utf-8") as f:
             data = json.load(f)

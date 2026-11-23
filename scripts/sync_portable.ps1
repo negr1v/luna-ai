@@ -1,9 +1,9 @@
-# ACCIO JARVIS - Otomatik Dizin Senkronizasyonu
+# ACCIO LUNA - Otomatik Dizin Senkronizasyonu
 # Bu betik ana proje dizinindeki degisiklikleri tasinabilir pakete aninda aktarir.
 
 $ErrorActionPreference = "SilentlyContinue"
 $src = $PSScriptRoot
-$dst = Join-Path $src "dist\ACCIO-JARVIS-PORTABLE\app"
+$dst = Join-Path $src "dist\LUNA-AI-PORTABLE\app"
 
 if (-not (Test-Path $dst)) {
     New-Item -ItemType Directory -Path $dst -Force | Out-Null
@@ -11,14 +11,14 @@ if (-not (Test-Path $dst)) {
 
 $coreFiles = @(
     "index.html",
-    "jarvis_server.py",
-    "jarvis_agent_engine.py",
-    "jarvis_computer_use.py",
-    "jarvis_local_stt.py",
-    "jarvis_tray.ps1",
-    "jarvis_uia_inspect.ps1",
-    "jarvis_uia_action.ps1",
-    "start_jarvis.ps1"
+    "luna_server.py",
+    "luna_agent_engine.py",
+    "luna_computer_use.py",
+    "luna_local_stt.py",
+    "luna_tray.ps1",
+    "luna_uia_inspect.ps1",
+    "luna_uia_action.ps1",
+    "start_luna.ps1"
 )
 
 $syncedCount = 0

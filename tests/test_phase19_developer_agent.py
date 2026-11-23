@@ -1,4 +1,4 @@
-"""Focused tests for ACCIO JARVIS ULTRA Developer Agent V1."""
+"""Focused tests for ACCIO LUNA ULTRA Developer Agent V1."""
 
 import asyncio
 import os
@@ -7,12 +7,12 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from jarvis_developer_agent import DeveloperAgent, DeveloperAgentError
+from luna_developer_agent import DeveloperAgent, DeveloperAgentError
 
 
 class DeveloperAgentV1Tests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.temp_dir = tempfile.mkdtemp(prefix="jarvis_phase19_")
+        self.temp_dir = tempfile.mkdtemp(prefix="luna_phase19_")
         self.workspace = os.path.join(self.temp_dir, "workspace")
         self.other_workspace = os.path.join(self.temp_dir, "other_workspace")
         os.makedirs(self.workspace)
@@ -70,7 +70,7 @@ class DeveloperAgentV1Tests(unittest.IsolatedAsyncioTestCase):
             # The test host does not grant symlink creation.  Simulate the
             # canonical result a junction/symlink would produce instead.
             original_realpath = os.path.realpath
-            with patch("jarvis_developer_agent.os.path.realpath", side_effect=lambda value: outside if str(value).endswith("outside_link.txt") else original_realpath(value)):
+            with patch("luna_developer_agent.os.path.realpath", side_effect=lambda value: outside if str(value).endswith("outside_link.txt") else original_realpath(value)):
                 with self.assertRaises(DeveloperAgentError):
                     await self.agent.read_workspace_file({"path": "outside_link.txt"})
 

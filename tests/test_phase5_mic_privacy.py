@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 5 / Priority Microphone Privacy & Transparency Patch
+ACCIO LUNA V4.0 — Phase 5 / Priority Microphone Privacy & Transparency Patch
 Automated Acceptance Tests for Explicit User-Controlled Microphone Lifecycle,
 Zero Background Listening, SpeechRecognition Error Handling, and Privacy Transparency Disclosure.
 
@@ -186,8 +186,8 @@ class TestPhase5MicPrivacy(unittest.TestCase):
 
         # 1. Web Speech API
         self.assertIn("Web Speech API", modal_text, "Disclosure must mention Web Speech API")
-        # 2. Browser provider processing outside local JARVIS
-        self.assertTrue("yerel JARVIS uygulaması dışındaki" in modal_text or "tarayıcı ses tanıma servisleri" in modal_text)
+        # 2. Browser provider processing outside local LUNA
+        self.assertTrue("yerel LUNA uygulaması dışındaki" in modal_text or "tarayıcı ses tanıma servisleri" in modal_text)
         # 3. No raw microphone recordings stored on server
         self.assertTrue("kesinlikle depolanmaz" in modal_text and "ham mikrofon" in modal_text)
         # 4. Only recognized text submitted to chat endpoint

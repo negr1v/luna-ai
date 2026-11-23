@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ACCIO-JARVIS: Akakçe Gerçek İndirim ve Fiyat Hatası Doğrulama Motoru
+LUNA-AI: Akakçe Gerçek İndirim ve Fiyat Hatası Doğrulama Motoru
 Harici botların şişirilmiş liste fiyatı üzerinden ürettiği sahte indirimleri (%22 vb.)
 Akakçe piyasa dip fiyatı ve tarihsel taban verisiyle teyit eder/ayıklar.
 """

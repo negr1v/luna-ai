@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import os, sys, re, subprocess
 
-ROOT = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+ROOT = r"C:\Users\negr1\Projeler\LUNA-AI"
 HTML_PATH = os.path.join(ROOT, "index.html")
-DIST_HTML_PATH = os.path.join(ROOT, "dist", "ACCIO-JARVIS-PORTABLE", "app", "index.html")
+DIST_HTML_PATH = os.path.join(ROOT, "dist", "LUNA-AI-PORTABLE", "app", "index.html")
 
 with open(HTML_PATH, "r", encoding="utf-8") as f:
     html = f.read()

@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 8B.2 Automated Test Suite
+ACCIO LUNA V4.0 — Phase 8B.2 Automated Test Suite
 Focus: Runtime Config Sanitization, Custom Config Whitelisting,
        API Key Verification Endpoint (/api/config/test),
        TTS Graceful Edge Fallback, Frontend Test & Parameter Controls.
@@ -17,17 +17,17 @@ from unittest.mock import patch, AsyncMock, MagicMock
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
-import jarvis_server
+import luna_server
 
 
 class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
 
     async def get_application(self):
         app = web.Application()
-        app.router.add_get("/api/config", jarvis_server.handle_get_config)
-        app.router.add_post("/api/config", jarvis_server.handle_save_config)
-        app.router.add_post("/api/config/test", jarvis_server.handle_test_config)
-        app.router.add_post("/api/chat", jarvis_server.handle_chat)
+        app.router.add_get("/api/config", luna_server.handle_get_config)
+        app.router.add_post("/api/config", luna_server.handle_save_config)
+        app.router.add_post("/api/config/test", luna_server.handle_test_config)
+        app.router.add_post("/api/chat", luna_server.handle_chat)
         return app
 
     def setUp(self):
@@ -50,14 +50,14 @@ class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
         with open(self.test_config_file, "w", encoding="utf-8") as f:
             json.dump(self.initial_config, f, indent=2)
 
-        self.orig_config_file = jarvis_server.CONFIG_FILE
-        jarvis_server.CONFIG_FILE = self.test_config_file
+        self.orig_config_file = luna_server.CONFIG_FILE
+        luna_server.CONFIG_FILE = self.test_config_file
 
         super().setUp()
 
     def tearDown(self):
         super().tearDown()
-        jarvis_server.CONFIG_FILE = self.orig_config_file
+        luna_server.CONFIG_FILE = self.orig_config_file
         if hasattr(self, "test_dir") and os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
 
@@ -73,7 +73,7 @@ class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
             "edge_pitch": "+5Hz",
             "memory_learning_enabled": True
         }
-        sanitized = jarvis_server.sanitize_runtime_custom_config(malicious_input)
+        sanitized = luna_server.sanitize_runtime_custom_config(malicious_input)
 
         # Secrets and unknown fields must be completely absent
         self.assertNotIn("groq_api_key", sanitized)
@@ -95,7 +95,7 @@ class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
             "edge_rate": 12345,  # wrong type
             "memory_learning_enabled": "not_a_bool"  # wrong type
         }
-        sanitized = jarvis_server.sanitize_runtime_custom_config(invalid_input)
+        sanitized = luna_server.sanitize_runtime_custom_config(invalid_input)
         self.assertEqual(sanitized, {})
 
         # Valid input
@@ -103,7 +103,7 @@ class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
             "tts_engine": "elevenlabs",
             "edge_rate": "+10%"
         }
-        sanitized_valid = jarvis_server.sanitize_runtime_custom_config(valid_input)
+        sanitized_valid = luna_server.sanitize_runtime_custom_config(valid_input)
         self.assertEqual(sanitized_valid, {"tts_engine": "elevenlabs", "edge_rate": "+10%"})
         print("  [Phase 8B.2 Test 2 PASSED] Runtime enum and type constraints strictly enforced.")
 
@@ -206,8 +206,8 @@ class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
             "elevenlabs_api_key": "",
             "edge_voice": "tr-TR-EmelNeural"
         }
-        with patch("jarvis_server._generate_edge_tts", new=AsyncMock(return_value="edge_mock_audio_b64")):
-            audio = await jarvis_server.generate_tts("Selam Negr1", test_cfg)
+        with patch("luna_server._generate_edge_tts", new=AsyncMock(return_value="edge_mock_audio_b64")):
+            audio = await luna_server.generate_tts("Selam Negr1", test_cfg)
             self.assertEqual(audio, "edge_mock_audio_b64")
         print("  [Phase 8B.2 Test 8 PASSED] Missing ElevenLabs key automatically triggers Edge-TTS fallback.")
 
@@ -218,15 +218,15 @@ class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
             "elevenlabs_api_key": "xi_mock_key",
             "edge_voice": "tr-TR-EmelNeural"
         }
-        with patch("jarvis_server._generate_elevenlabs_tts", new=AsyncMock(return_value=None)), \
-             patch("jarvis_server._generate_edge_tts", new=AsyncMock(return_value="edge_mock_audio_fallback")):
-            audio = await jarvis_server.generate_tts("Selam Negr1", test_cfg)
+        with patch("luna_server._generate_elevenlabs_tts", new=AsyncMock(return_value=None)), \
+             patch("luna_server._generate_edge_tts", new=AsyncMock(return_value="edge_mock_audio_fallback")):
+            audio = await luna_server.generate_tts("Selam Negr1", test_cfg)
             self.assertEqual(audio, "edge_mock_audio_fallback")
         print("  [Phase 8B.2 Test 9 PASSED] ElevenLabs failure automatically triggers Edge-TTS fallback.")
 
     def test_10_frontend_settings_and_test_controls_verified(self):
         """Test 10: Verify index.html contains Rate, Pitch, and Provider Test buttons & handlers."""
-        index_path = os.path.join(jarvis_server.BASE_DIR, "index.html")
+        index_path = os.path.join(luna_server.BASE_DIR, "index.html")
         with open(index_path, "r", encoding="utf-8") as f:
             html = f.read()
 

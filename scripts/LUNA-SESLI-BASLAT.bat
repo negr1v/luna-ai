@@ -1,18 +1,16 @@
 @echo off
-title Accio Jarvis - Sesli Komuta Merkezi
+title Accio Luna - Sesli Asistan
 cd /d "%~dp0"
 echo ========================================================
-echo       Accio Jarvis Sesli Arayuz Baslatiliyor...
+echo       Accio Luna Sesli Asistan Baslatiliyor...
 echo ========================================================
 
 set "ACCIO_PY=C:\Users\negr1\AppData\Roaming\Accio\pre-install\bd5ff2c6816a\python\python.exe"
 
-start "" "http://127.0.0.1:7860"
-
 if exist "%ACCIO_PY%" (
-    "%ACCIO_PY%" jarvis_server.py
+    "%ACCIO_PY%" luna_voice.py
 ) else (
-    python jarvis_server.py
+    python luna_voice.py
 )
 
 pause

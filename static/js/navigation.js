@@ -1,5 +1,5 @@
 /**
- * ZERO OS / ACCIO-JARVIS Navigation & View Management Module
+ * ZERO OS / LUNA-AI Navigation & View Management Module
  * Handles multi-view switcher (Cockpit, Tasks, Radar, System, Desktop, Logs),
  * Fail-safe global event delegation for all menu buttons, Hover Panel Toolbars,
  * and Command Palette modal toggles.

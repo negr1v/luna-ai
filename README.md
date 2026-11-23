@@ -23,7 +23,7 @@ graph TD
     A[Microphone / Web Audio API] -->|MediaRecorder / 16kHz PCM| B[POST /api/stt]
     B -->|Fast Cloud STT| C[Groq Whisper Large v3 Turbo]
     B -->|Offline Fallback| D[Local Vosk TR Engine]
-    C & D -->|Recognized Prompt| E[Orchestration Engine / jarvis_server.py]
+    C & D -->|Recognized Prompt| E[Orchestration Engine / luna_server.py]
     E -->|OpenRouter API| F[Claude 3.5 Sonnet / DeepSeek V3 / Qwen 2.5]
     F -->|Streaming SSE Tokens| G[index.html OLED Cybernetic HUD]
     E -->|Audio Synthesis| H[Fish Audio / Edge TTS]
@@ -55,8 +55,8 @@ luna-ai/
 │   ├── LUNA_AI_YONETICI_BRİFİNG_VE_PROMPT.md
 │   └── ACCIO_SISTEM_VE_DEVIR_RAPORU.md
 ├── scripts/                    # Automation utilities, Windows launchers & patch scripts
-│   ├── start_jarvis.bat
-│   └── start_jarvis.ps1
+│   ├── start_luna.bat
+│   └── start_luna.ps1
 ├── static/                     # Web assets (avatars, soundscapes, audio files)
 │   ├── avatars/                # Seated portraits and dynamic avatar sprites
 │   └── audio/                  # Ambient sound reference audio
@@ -64,9 +64,9 @@ luna-ai/
 ├── .clinerules                 # Local coding constitution for VS Code Cline agent
 ├── AGENTS.md                   # Multi-agent collaboration protocol (Accio, Claude, Manus, Cline)
 ├── CLAUDE.md                   # Strict surgical coding & token-conservation guidelines
-├── jarvis_server.py            # Primary FastAPI / WebSocket async backend (Port 7860)
-├── jarvis_local_stt.py         # Offline Vosk Turkish STT loopback worker
-├── jarvis_voice.py             # Voice bridge and streaming audio controller
+├── luna_server.py            # Primary FastAPI / WebSocket async backend (Port 7860)
+├── luna_local_stt.py         # Offline Vosk Turkish STT loopback worker
+├── luna_voice.py             # Voice bridge and streaming audio controller
 ├── index.html                  # Cybernetic HUD frontend interface
 └── README.md                   # Project documentation
 ```
@@ -87,13 +87,13 @@ Set-Location "luna-ai"
 ```
 
 ### 2. Configure Environment
-Set your API keys inside `jarvis_config.json` or through the interactive in-app settings modal:
+Set your API keys inside `luna_config.json` or through the interactive in-app settings modal:
 - `openrouter_api_key`: OpenRouter API key for Claude 3.5 Sonnet & DeepSeek.
 - `groq_api_key`: Groq Cloud API key for ultra-fast Whisper STT.
 
 ### 3. Launch System
 ```powershell
-.\start_jarvis.bat
+.\start_luna.bat
 ```
 Navigate to `http://127.0.0.1:7860` in any modern web browser.
 

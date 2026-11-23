@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 5 / Stage 5C
+ACCIO LUNA V4.0 — Phase 5 / Stage 5C
 Automated Acceptance Tests for Audio Playback, Stale Prevention, Monotonic Generation Tracking,
 and Unified Barge-In Interruption (Button, Escape, Spoken Phrases, SSE Cancellation, Visibility).
 

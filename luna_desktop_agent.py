@@ -1,4 +1,4 @@
-"""ACCIO JARVIS ULTRA Desktop Agent V1.
+"""ACCIO LUNA ULTRA Desktop Agent V1.
 
 This is intentionally a small semantic Windows UI Automation workflow.  It is
 not a general desktop controller: no coordinates, process launch, shell,
@@ -18,7 +18,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from jarvis_agent_engine import AgentController, AgentTask, PermissionLevel, TaskState, TaskStep, ToolDefinition
+from luna_agent_engine import AgentController, AgentTask, PermissionLevel, TaskState, TaskStep, ToolDefinition
 
 
 class DesktopAgentError(Exception):
@@ -120,7 +120,7 @@ class DesktopSemanticBackend:
 
     @staticmethod
     def list_windows() -> List[Dict[str, Any]]:
-        from jarvis_computer_use import DesktopAwareness
+        from luna_computer_use import DesktopAwareness
         windows: List[Dict[str, Any]] = []
         for item in DesktopAwareness.list_visible_windows(max_windows=60):
             info = DesktopAwareness.get_window_info(item.get("hwnd"))
@@ -130,26 +130,26 @@ class DesktopSemanticBackend:
 
     @staticmethod
     def get_window_info(hwnd: int) -> Dict[str, Any]:
-        from jarvis_computer_use import DesktopAwareness
+        from luna_computer_use import DesktopAwareness
         return DesktopAwareness.get_window_info(hwnd)
 
     @staticmethod
     def get_foreground_window_info() -> Dict[str, Any]:
-        from jarvis_computer_use import DesktopAwareness
+        from luna_computer_use import DesktopAwareness
         return DesktopAwareness.get_foreground_window_info()
 
     def inspect_window(self, hwnd: int) -> List[Dict[str, Any]]:
-        from jarvis_computer_use import UIAutomationInspector
+        from luna_computer_use import UIAutomationInspector
         # Desktop V1 has no Win32 / coordinate fallback.
         return UIAutomationInspector.inspect_window_uia(hwnd, max_elements=MAX_ELEMENTS, max_depth=3, timeout_sec=UIA_TIMEOUT_SECONDS)
 
     @staticmethod
     def focus_window(hwnd: int) -> bool:
-        from jarvis_computer_use import SafeComputerController
+        from luna_computer_use import SafeComputerController
         return bool(SafeComputerController.focus_window(hwnd))
 
     def execute_element(self, target: WindowTarget, element: Dict[str, Any], action: str, text: str) -> Dict[str, Any]:
-        script_path = os.path.join(self.base_dir, "jarvis_desktop_uia_action.ps1")
+        script_path = os.path.join(self.base_dir, "luna_desktop_uia_action.ps1")
         if not os.path.isfile(script_path):
             raise DesktopAgentError("Desktop Agent UI Automation yürütücüsü bulunamadı.")
         command = [

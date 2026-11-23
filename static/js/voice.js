@@ -1,5 +1,5 @@
 /**
- * ZERO OS / ACCIO-JARVIS Voice Module
+ * ZERO OS / LUNA-AI Voice Module
  * Handles Web Speech API (SpeechRecognition / STT), AudioContext,
  * Real-Time Audio-Reactive Visualizer (Halo Glow), Silence Timer (VAD),
  * Push-to-Talk / Push-to-Send (F8 / Space / Mic Button).
@@ -21,7 +21,7 @@
   let activeMicAnimFrame = null;
 
   let micConsentGranted = false;
-  if (localStorage.getItem('jarvis_mic_consent') !== 'false') {
+  if (localStorage.getItem('luna_mic_consent') !== 'false') {
     micConsentGranted = true;
   }
 

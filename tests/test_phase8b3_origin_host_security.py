@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 8B.3 Automated Test Suite
+ACCIO LUNA V4.0 — Phase 8B.3 Automated Test Suite
 Focus: Origin & Host Validation, CSRF Defense, CORS Preflight, Loopback/LAN Parsing & Secret Isolation.
 """
 
@@ -15,27 +15,27 @@ from unittest.mock import patch
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
-import jarvis_server
+import luna_server
 
 
 class Phase8B3OriginHostSecurityTest(AioHTTPTestCase):
 
     async def get_application(self):
         # Build app using the official create_app() to test full middleware stack
-        return jarvis_server.create_app()
+        return luna_server.create_app()
 
     def setUp(self):
         super().setUp()
         self.test_dir = tempfile.mkdtemp(prefix="phase8b3_test_")
-        self.test_config_file = os.path.join(self.test_dir, "jarvis_config.json")
-        self.test_memory_file = os.path.join(self.test_dir, "jarvis_memory.json")
-        self.test_tasks_file = os.path.join(self.test_dir, "jarvis_tasks.json")
-        self.test_tg_file = os.path.join(self.test_dir, "jarvis_telegram.json")
+        self.test_config_file = os.path.join(self.test_dir, "luna_config.json")
+        self.test_memory_file = os.path.join(self.test_dir, "luna_memory.json")
+        self.test_tasks_file = os.path.join(self.test_dir, "luna_tasks.json")
+        self.test_tg_file = os.path.join(self.test_dir, "luna_telegram.json")
 
         self.initial_config = {
             "groq_api_key": "gsk_secret_production_key_xyz",
             "telegram_bot_token": "123456789:ABCdefGHIjklMNOpqrSTUvwxYZ_12345678",
-            "allowed_hosts": ["custom-jarvis.internal"],
+            "allowed_hosts": ["custom-luna.internal"],
             "trusted_proxy_enabled": False
         }
 
@@ -48,28 +48,28 @@ class Phase8B3OriginHostSecurityTest(AioHTTPTestCase):
         with open(self.test_tg_file, "w", encoding="utf-8") as f:
             json.dump([], f)
 
-        self.orig_cfg_file = jarvis_server.CONFIG_FILE
-        self.orig_mem_file = jarvis_server.MEMORY_FILE
-        self.orig_tasks_file = jarvis_server.TASKS_FILE
-        self.orig_tg_file = jarvis_server.TELEGRAM_FILE
+        self.orig_cfg_file = luna_server.CONFIG_FILE
+        self.orig_mem_file = luna_server.MEMORY_FILE
+        self.orig_tasks_file = luna_server.TASKS_FILE
+        self.orig_tg_file = luna_server.TELEGRAM_FILE
 
-        jarvis_server.CONFIG_FILE = self.test_config_file
-        jarvis_server.MEMORY_FILE = self.test_memory_file
-        jarvis_server.TASKS_FILE = self.test_tasks_file
-        jarvis_server.TELEGRAM_FILE = self.test_tg_file
+        luna_server.CONFIG_FILE = self.test_config_file
+        luna_server.MEMORY_FILE = self.test_memory_file
+        luna_server.TASKS_FILE = self.test_tasks_file
+        luna_server.TELEGRAM_FILE = self.test_tg_file
 
     def tearDown(self):
-        jarvis_server.CONFIG_FILE = self.orig_cfg_file
-        jarvis_server.MEMORY_FILE = self.orig_mem_file
-        jarvis_server.TASKS_FILE = self.orig_tasks_file
-        jarvis_server.TELEGRAM_FILE = self.orig_tg_file
+        luna_server.CONFIG_FILE = self.orig_cfg_file
+        luna_server.MEMORY_FILE = self.orig_mem_file
+        luna_server.TASKS_FILE = self.orig_tasks_file
+        luna_server.TELEGRAM_FILE = self.orig_tg_file
 
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
         super().tearDown()
 
     async def tearDownAsync(self):
-        await jarvis_server.stop_telegram_worker()
+        await luna_server.stop_telegram_worker()
         await super().tearDownAsync()
 
     # =========================================================================
@@ -127,27 +127,27 @@ class Phase8B3OriginHostSecurityTest(AioHTTPTestCase):
     async def test_05_host_header_manipulation_injection_rejected(self):
         """Test 05: Host header containing CRLF, null bytes or whitespace is safely rejected with 400."""
         # Test CRLF
-        h1, _ = jarvis_server.parse_host_header("localhost:7860\r\nX-Injected: 1")
+        h1, _ = luna_server.parse_host_header("localhost:7860\r\nX-Injected: 1")
         self.assertEqual(h1, "")
 
         # Test Null Byte
-        h2, _ = jarvis_server.parse_host_header("localhost:7860\0attacker.com")
+        h2, _ = luna_server.parse_host_header("localhost:7860\0attacker.com")
         self.assertEqual(h2, "")
 
         # Test Space
-        h3, _ = jarvis_server.parse_host_header("localhost :7860")
+        h3, _ = luna_server.parse_host_header("localhost :7860")
         self.assertEqual(h3, "")
 
     async def test_06_malformed_authority_and_invalid_port_rejected(self):
         """Test 06: Malformed ports (negative, non-numeric, >65535) and bad authorities are rejected."""
-        h1, p1 = jarvis_server.parse_host_header("localhost:99999")
+        h1, p1 = luna_server.parse_host_header("localhost:99999")
         self.assertEqual(h1, "")
         self.assertIsNone(p1)
 
-        h2, p2 = jarvis_server.parse_host_header("localhost:abc")
+        h2, p2 = luna_server.parse_host_header("localhost:abc")
         self.assertEqual(h2, "")
 
-        h3, p3 = jarvis_server.parse_host_header("bad::host:7860")
+        h3, p3 = luna_server.parse_host_header("bad::host:7860")
         self.assertEqual(h3, "")
 
         headers = {"Host": "localhost:99999"}
@@ -225,12 +225,12 @@ class Phase8B3OriginHostSecurityTest(AioHTTPTestCase):
 
     async def test_13_private_lan_hosts_accepted(self):
         """Test 13: Private RFC1918 IPv4 ranges (10.x, 172.16-31.x, 192.168.x) are accepted for local LAN."""
-        self.assertTrue(jarvis_server.is_allowed_hostname("192.168.1.105"))
-        self.assertTrue(jarvis_server.is_allowed_hostname("10.0.0.15"))
-        self.assertTrue(jarvis_server.is_allowed_hostname("172.20.10.2"))
+        self.assertTrue(luna_server.is_allowed_hostname("192.168.1.105"))
+        self.assertTrue(luna_server.is_allowed_hostname("10.0.0.15"))
+        self.assertTrue(luna_server.is_allowed_hostname("172.20.10.2"))
         # Public IP should NOT be allowed by default
-        self.assertFalse(jarvis_server.is_allowed_hostname("8.8.8.8"))
-        self.assertFalse(jarvis_server.is_allowed_hostname("1.1.1.1"))
+        self.assertFalse(luna_server.is_allowed_hostname("8.8.8.8"))
+        self.assertFalse(luna_server.is_allowed_hostname("1.1.1.1"))
 
     # =========================================================================
     # 6. PROXY FORWARDING & CONFIG ALLOWLIST
@@ -249,7 +249,7 @@ class Phase8B3OriginHostSecurityTest(AioHTTPTestCase):
     async def test_15_configured_allowed_hosts_accepted(self):
         """Test 15: Custom domain declared in allowed_hosts configuration is accepted."""
         headers = {
-            "Host": "custom-jarvis.internal:7860"
+            "Host": "custom-luna.internal:7860"
         }
         resp = await self.client.get("/api/config", headers=headers)
         self.assertEqual(resp.status, 200)

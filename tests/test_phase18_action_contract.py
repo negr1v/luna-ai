@@ -9,14 +9,14 @@ import time
 import unittest
 from unittest.mock import patch
 
-import jarvis_server
-from jarvis_agent_engine import AgentController, AgentTask, PermissionLevel, TaskState, TaskStep, ToolDefinition
-from jarvis_computer_use import UIAutomationActionController
+import luna_server
+from luna_agent_engine import AgentController, AgentTask, PermissionLevel, TaskState, TaskStep, ToolDefinition
+from luna_computer_use import UIAutomationActionController
 
 
 class ActionContractTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp(prefix="jarvis_phase18_agent_")
+        self.temp_dir = tempfile.mkdtemp(prefix="luna_phase18_agent_")
         self.controller = AgentController(self.temp_dir, data_dir=self.temp_dir)
         self.calls = []
 
@@ -180,47 +180,47 @@ class ActionContractTests(unittest.IsolatedAsyncioTestCase):
 
 class LegacySecretMigrationTests(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp(prefix="jarvis_phase18_secret_")
-        self.old_base = jarvis_server.BASE_DIR
-        self.old_config = jarvis_server.CONFIG_FILE
-        jarvis_server.BASE_DIR = self.temp_dir
-        jarvis_server.CONFIG_FILE = os.path.join(self.temp_dir, "jarvis_config.json")
+        self.temp_dir = tempfile.mkdtemp(prefix="luna_phase18_secret_")
+        self.old_base = luna_server.BASE_DIR
+        self.old_config = luna_server.CONFIG_FILE
+        luna_server.BASE_DIR = self.temp_dir
+        luna_server.CONFIG_FILE = os.path.join(self.temp_dir, "luna_config.json")
         with open(os.path.join(self.temp_dir, "api_key.txt"), "w", encoding="utf-8") as f:
             f.write("gsk_phase18_temporary_value\n")
 
     def tearDown(self):
-        jarvis_server.BASE_DIR = self.old_base
-        jarvis_server.CONFIG_FILE = self.old_config
+        luna_server.BASE_DIR = self.old_base
+        luna_server.CONFIG_FILE = self.old_config
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_legacy_detection_and_successful_confirmed_cleanup(self):
-        status = jarvis_server.get_legacy_api_key_status()
+        status = luna_server.get_legacy_api_key_status()
         self.assertTrue(status["present"])
         self.assertTrue(status["requires_migration"])
         self.assertNotIn("gsk_phase18_temporary_value", json.dumps(status))
 
-        result = jarvis_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=True)
+        result = luna_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=True)
         self.assertEqual(result["status"], "ok")
         self.assertFalse(os.path.exists(os.path.join(self.temp_dir, "api_key.txt")))
-        with open(jarvis_server.CONFIG_FILE, "r", encoding="utf-8") as f:
+        with open(luna_server.CONFIG_FILE, "r", encoding="utf-8") as f:
             stored = json.load(f)
         self.assertTrue(str(stored["groq_api_key"]).startswith("dpapi:v1:"))
         self.assertNotIn("gsk_phase18_temporary_value", json.dumps(stored))
-        self.assertTrue(jarvis_server.load_config()["groq_api_key"])
+        self.assertTrue(luna_server.load_config()["groq_api_key"])
 
     def test_declined_cleanup_and_failed_paths_preserve_legacy_file(self):
-        result = jarvis_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=False)
+        result = luna_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=False)
         self.assertEqual(result["status"], "ok")
         self.assertTrue(result["cleanup_pending"])
         self.assertTrue(os.path.exists(os.path.join(self.temp_dir, "api_key.txt")))
 
-        with patch.object(jarvis_server, "save_config", side_effect=RuntimeError("save failed")):
-            failed = jarvis_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=True)
+        with patch.object(luna_server, "save_config", side_effect=RuntimeError("save failed")):
+            failed = luna_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=True)
         self.assertEqual(failed["error"], "MIGRATION_SAVE_FAILED")
         self.assertTrue(os.path.exists(os.path.join(self.temp_dir, "api_key.txt")))
 
-        with patch.object(jarvis_server.os, "remove", side_effect=OSError("locked")):
-            cleanup_failed = jarvis_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=True)
+        with patch.object(luna_server.os, "remove", side_effect=OSError("locked")):
+            cleanup_failed = luna_server.migrate_legacy_api_key(confirm_migration=True, cleanup_legacy_file=True)
         self.assertEqual(cleanup_failed["error"], "LEGACY_CLEANUP_FAILED")
         self.assertTrue(cleanup_failed["migrated"])
         self.assertTrue(os.path.exists(os.path.join(self.temp_dir, "api_key.txt")))
@@ -229,7 +229,7 @@ class LegacySecretMigrationTests(unittest.TestCase):
 class ComputerUseTargetBindingTests(unittest.TestCase):
     def test_preview_and_execution_reject_unrelated_window(self):
         foreground = {"status": "ok", "hwnd": 101, "process_name": "notepad.exe", "title": "Notes", "is_allowed": True}
-        with patch("jarvis_computer_use.DesktopAwareness.get_foreground_window_info", return_value=foreground):
+        with patch("luna_computer_use.DesktopAwareness.get_foreground_window_info", return_value=foreground):
             preview = UIAutomationActionController.preview_ui_action(202, "Invoke", name="Save")
             execution = UIAutomationActionController.execute_ui_action(202, "Invoke", name="Save")
         self.assertEqual(preview.get("reason"), "target_window_changed")

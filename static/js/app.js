@@ -1,5 +1,5 @@
 /**
- * ZERO OS / ACCIO-JARVIS Core Application Module (app.js)
+ * ZERO OS / LUNA-AI Core Application Module (app.js)
  * Orchestrates application lifecycle, theme persistence, toast notifications,
  * command palette (Ctrl+K), and centralized fail-safe initialization.
  */

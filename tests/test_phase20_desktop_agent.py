@@ -8,7 +8,7 @@ import os
 import tempfile
 import unittest
 
-from jarvis_desktop_agent import DesktopAgent, DesktopAgentError
+from luna_desktop_agent import DesktopAgent, DesktopAgentError
 
 
 class FakeDesktopBackend:
@@ -200,11 +200,11 @@ class DesktopAgentV1Tests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.backend.execute_calls, 1)
 
     async def test_legacy_computer_use_is_not_used_as_a_desktop_v1_fallback(self):
-        with open(os.path.join(os.path.dirname(__file__), "jarvis_desktop_agent.py"), encoding="utf-8") as handle:
+        with open(os.path.join(os.path.dirname(__file__), "luna_desktop_agent.py"), encoding="utf-8") as handle:
             source = handle.read()
         self.assertNotIn("SendMessageW", source)
         self.assertNotIn("send_safe_text", source)
-        self.assertIn("jarvis_desktop_uia_action.ps1", source)
+        self.assertIn("luna_desktop_uia_action.ps1", source)
 
 
 if __name__ == "__main__":

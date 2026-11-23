@@ -26,8 +26,8 @@
       "tech_stack": "C# (.NET 8.0.428) + Win32 P/Invoke + Groq Whisper",
       "status": "Temel tipler, girdi alma ve mimari tamamlandı. Kavax C# temel videosu izleniyor."
     },
-    "accio_jarvis": {
-      "path": "C:\\Users\\negr1\\Projeler\\ACCIO-JARVIS",
+    "luna_ai": {
+      "path": "C:\\Users\\negr1\\Projeler\\LUNA-AI",
       "status": "Faz 8B tamamlandı, Faz 1 Teşhisi yapıldı, Faz 9C.1B Safe Launcher beklemede."
     }
   },

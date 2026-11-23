@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V15 - PHASE 15A FINAL VALIDATION TEST SUITE
+ACCIO LUNA V15 - PHASE 15A FINAL VALIDATION TEST SUITE
 Runs targeted checks across 15A.1 - 15A.4:
 1. Paid API protection (single-use token, 402 block)
 2. Free-first routing (zero-price preference, anti-silent-fallback)
@@ -22,8 +22,8 @@ from aiohttp import web
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import jarvis_server
-from jarvis_server import (
+import luna_server
+from luna_server import (
     handle_chat,
     handle_chat_stream,
     handle_request_paid_auth,
@@ -34,7 +34,7 @@ from jarvis_server import (
     SMART_PROVIDER_LIMITER,
     PAID_MODEL_AUTHORIZATIONS
 )
-from jarvis_agent_engine import (
+from luna_agent_engine import (
     AgentController,
     TaskState,
     PermissionLevel,
@@ -122,7 +122,7 @@ class Phase15AFinalValidation(AioHTTPTestCase):
         """Normal chat handles valid requests cleanly; SSE streams structured events."""
         # Chat without Groq key returns graceful prompt response
         resp = await self.client.post("/api/chat", json={
-            "message": "Naber JARVIS",
+            "message": "Naber LUNA",
             "config": {"model": "llama-3.3-70b-versatile"}
         })
         self.assertEqual(resp.status, 200)
@@ -156,8 +156,8 @@ class Phase15AFinalValidation(AioHTTPTestCase):
     def test_07_data_integrity(self):
         """JSON storage files exist, parse correctly, and have valid schemas."""
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        mem_file = os.path.join(base_dir, "jarvis_memory.json")
-        tasks_file = os.path.join(base_dir, "jarvis_tasks.json")
+        mem_file = os.path.join(base_dir, "luna_memory.json")
+        tasks_file = os.path.join(base_dir, "luna_tasks.json")
 
         self.assertTrue(os.path.exists(mem_file))
         self.assertTrue(os.path.exists(tasks_file))

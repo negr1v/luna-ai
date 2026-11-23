@@ -1,4 +1,4 @@
-"""ACCIO JARVIS ULTRA Developer Agent V1.
+"""ACCIO LUNA ULTRA Developer Agent V1.
 
 This module is deliberately a narrow local-workspace change pipeline.  It does
 not expose a shell, install packages, use the network, operate Git, or infer a
@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from jarvis_agent_engine import AgentController, AgentTask, PermissionLevel, TaskState, TaskStep, ToolDefinition
+from luna_agent_engine import AgentController, AgentTask, PermissionLevel, TaskState, TaskStep, ToolDefinition
 
 
 class DeveloperAgentError(Exception):
@@ -47,7 +47,7 @@ TEST_TIMEOUT_SECONDS = 45
 _SKIPPED_DIRS = {".git", ".hg", ".svn", "node_modules", "__pycache__", ".venv", "venv", "env"}
 _SECRET_EXACT_NAMES = {
     ".env", "api_key.txt", "apikey.txt", "credentials.json", "credential.json",
-    "secrets.json", "secret.json", "token.json", "tokens.json", "jarvis_config.json",
+    "secrets.json", "secret.json", "token.json", "tokens.json", "luna_config.json",
     "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519",
 }
 _SECRET_SUFFIXES = (".pem", ".key", ".pfx", ".p12", ".kdbx")
@@ -67,7 +67,7 @@ def _is_secret_name(path: str) -> bool:
     if name.endswith(_SECRET_SUFFIXES):
         return True
     # Common credential stores are excluded, while source files such as
-    # jarvis_secret_store.py remain inspectable.
+    # luna_secret_store.py remain inspectable.
     stem, ext = os.path.splitext(name)
     return ext in {".json", ".txt", ".ini", ".cfg"} and any(token in stem for token in ("credential", "secret", "token", "api_key", "apikey"))
 

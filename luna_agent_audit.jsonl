@@ -5,11 +5,11 @@
 {"timestamp": 1794639253.947055, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_588e48ba", "payload": {"step_id": 2, "tool": "get_app_status"}}
 {"timestamp": 1794639253.94807, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_588e48ba", "payload": {"step_id": 2, "result_status": "ok"}}
 {"timestamp": 1794639253.94807, "event_type": "TASK_COMPLETED", "task_id": "agent_task_588e48ba", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %4.2, RAM: %75.2"}}
-{"timestamp": 1794639253.94807, "event_type": "TASK_CREATED", "task_id": "agent_task_5ed648be", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794639253.94807, "event_type": "TASK_CREATED", "task_id": "agent_task_5ed648be", "payload": {"request": "ZERO, proje dosyalarında luna_config dosyasını bul.", "steps_count": 1}}
 {"timestamp": 1794639253.94807, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_5ed648be", "payload": {}}
 {"timestamp": 1794639253.9491167, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_5ed648be", "payload": {"step_id": 1, "tool": "get_app_status"}}
 {"timestamp": 1794639253.9491167, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_5ed648be", "payload": {"step_id": 1, "result_status": "ok"}}
-{"timestamp": 1794639253.9491167, "event_type": "TASK_COMPLETED", "task_id": "agent_task_5ed648be", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794639253.9491167, "event_type": "TASK_COMPLETED", "task_id": "agent_task_5ed648be", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında luna_config d' başarıyla tamamlandı."}}
 {"timestamp": 1794639253.9491167, "event_type": "TASK_CREATED", "task_id": "agent_task_4768815e", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 2}}
 {"timestamp": 1794639253.9491167, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_4768815e", "payload": {}}
 {"timestamp": 1794639253.9491167, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_4768815e", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
@@ -38,11 +38,11 @@
 {"timestamp": 1794644689.2528477, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_f3e6169f", "payload": {"step_id": 2, "tool": "get_app_status"}}
 {"timestamp": 1794644689.2528477, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_f3e6169f", "payload": {"step_id": 2, "result_status": "ok"}}
 {"timestamp": 1794644689.2528477, "event_type": "TASK_COMPLETED", "task_id": "agent_task_f3e6169f", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %3.8, RAM: %80.5"}}
-{"timestamp": 1794644689.2528477, "event_type": "TASK_CREATED", "task_id": "agent_task_896584b7", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794644689.2528477, "event_type": "TASK_CREATED", "task_id": "agent_task_896584b7", "payload": {"request": "ZERO, proje dosyalarında luna_config dosyasını bul.", "steps_count": 1}}
 {"timestamp": 1794644689.2538264, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_896584b7", "payload": {}}
 {"timestamp": 1794644689.2538264, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_896584b7", "payload": {"step_id": 1, "tool": "get_app_status"}}
 {"timestamp": 1794644689.2538264, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_896584b7", "payload": {"step_id": 1, "result_status": "ok"}}
-{"timestamp": 1794644689.2538264, "event_type": "TASK_COMPLETED", "task_id": "agent_task_896584b7", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794644689.2538264, "event_type": "TASK_COMPLETED", "task_id": "agent_task_896584b7", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında luna_config d' başarıyla tamamlandı."}}
 {"timestamp": 1794644689.2538264, "event_type": "TASK_CREATED", "task_id": "agent_task_66c8185b", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 1}}
 {"timestamp": 1794644689.254825, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_66c8185b", "payload": {}}
 {"timestamp": 1794644689.254825, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_66c8185b", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
@@ -56,11 +56,11 @@
 {"timestamp": 1794645373.8925905, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_0fb70ce1", "payload": {"step_id": 2, "tool": "get_app_status"}}
 {"timestamp": 1794645373.8925905, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_0fb70ce1", "payload": {"step_id": 2, "result_status": "ok"}}
 {"timestamp": 1794645373.8925905, "event_type": "TASK_COMPLETED", "task_id": "agent_task_0fb70ce1", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %0.0, RAM: %80.6"}}
-{"timestamp": 1794645373.8935895, "event_type": "TASK_CREATED", "task_id": "agent_task_e4ea8898", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794645373.8935895, "event_type": "TASK_CREATED", "task_id": "agent_task_e4ea8898", "payload": {"request": "ZERO, proje dosyalarında luna_config dosyasını bul.", "steps_count": 1}}
 {"timestamp": 1794645373.8935895, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_e4ea8898", "payload": {}}
 {"timestamp": 1794645373.8935895, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_e4ea8898", "payload": {"step_id": 1, "tool": "get_app_status"}}
 {"timestamp": 1794645373.8935895, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_e4ea8898", "payload": {"step_id": 1, "result_status": "ok"}}
-{"timestamp": 1794645373.8935895, "event_type": "TASK_COMPLETED", "task_id": "agent_task_e4ea8898", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794645373.8935895, "event_type": "TASK_COMPLETED", "task_id": "agent_task_e4ea8898", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında luna_config d' başarıyla tamamlandı."}}
 {"timestamp": 1794645373.8945887, "event_type": "TASK_CREATED", "task_id": "agent_task_7037b5dc", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 1}}
 {"timestamp": 1794645373.8945887, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_7037b5dc", "payload": {}}
 {"timestamp": 1794645373.8945887, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_7037b5dc", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
@@ -74,11 +74,11 @@
 {"timestamp": 1794645738.7327344, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_1373e8bf", "payload": {"step_id": 2, "tool": "get_app_status"}}
 {"timestamp": 1794645738.7327344, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_1373e8bf", "payload": {"step_id": 2, "result_status": "ok"}}
 {"timestamp": 1794645738.7327344, "event_type": "TASK_COMPLETED", "task_id": "agent_task_1373e8bf", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %12.2, RAM: %80.5"}}
-{"timestamp": 1794645738.7336707, "event_type": "TASK_CREATED", "task_id": "agent_task_a189e21b", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794645738.7336707, "event_type": "TASK_CREATED", "task_id": "agent_task_a189e21b", "payload": {"request": "ZERO, proje dosyalarında luna_config dosyasını bul.", "steps_count": 1}}
 {"timestamp": 1794645738.7336707, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_a189e21b", "payload": {}}
 {"timestamp": 1794645738.7336707, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_a189e21b", "payload": {"step_id": 1, "tool": "get_app_status"}}
 {"timestamp": 1794645738.7336707, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_a189e21b", "payload": {"step_id": 1, "result_status": "ok"}}
-{"timestamp": 1794645738.7336707, "event_type": "TASK_COMPLETED", "task_id": "agent_task_a189e21b", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794645738.7336707, "event_type": "TASK_COMPLETED", "task_id": "agent_task_a189e21b", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında luna_config d' başarıyla tamamlandı."}}
 {"timestamp": 1794645738.734671, "event_type": "TASK_CREATED", "task_id": "agent_task_8d538043", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 1}}
 {"timestamp": 1794645738.734671, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_8d538043", "payload": {}}
 {"timestamp": 1794645738.734671, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_8d538043", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}

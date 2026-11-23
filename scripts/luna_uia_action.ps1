@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    ACCIO JARVIS V16 — Phase 16D: Safe Controlled Windows UIAutomation Action Executor
+    ACCIO LUNA V16 — Phase 16D: Safe Controlled Windows UIAutomation Action Executor
 .DESCRIPTION
     Hafif .NET System.Windows.Automation tabanlı güvenli etkileşim yürütücüsü.
     Yalnızca açık kullanıcı onayı verilmiş butonları (InvokePattern) veya

@@ -1,5 +1,5 @@
 /**
- * ZERO OS / ACCIO-JARVIS Telemetry & System Metrics Module
+ * ZERO OS / LUNA-AI Telemetry & System Metrics Module
  * Handles live hardware monitoring (CPU, RAM, Disk, Active Window, Gaming Mode),
  * Header Pill Tooltips, Connection State & Monotonic Sequence Reconnects.
  */

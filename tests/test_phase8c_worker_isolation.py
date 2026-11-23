@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V4.0 — Phase 8C Automated Test Suite
+ACCIO LUNA V4.0 — Phase 8C Automated Test Suite
 Focus: Automation & Worker Thread Isolation, Strict Timeout Enforcement,
        Akakçe Price Validator Worker Integration & /api/automations/test_action Endpoint.
 """
@@ -15,29 +15,29 @@ from unittest.mock import patch, MagicMock
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
-import jarvis_server
+import luna_server
 
 
 class Phase8CWorkerIsolationTest(AioHTTPTestCase):
 
     async def get_application(self):
         app = web.Application()
-        app.router.add_get("/api/automations", jarvis_server.handle_get_automations)
-        app.router.add_post("/api/automations", jarvis_server.handle_create_automation)
-        app.router.add_post("/api/automations/test_action", jarvis_server.handle_test_automation_action)
+        app.router.add_get("/api/automations", luna_server.handle_get_automations)
+        app.router.add_post("/api/automations", luna_server.handle_create_automation)
+        app.router.add_post("/api/automations/test_action", luna_server.handle_test_automation_action)
         return app
 
     def setUp(self):
         super().setUp()
-        self.orig_automations_file = jarvis_server.AUTOMATIONS_FILE
-        self.test_automations_file = os.path.join(jarvis_server.BASE_DIR, "test_automations_phase8c.json")
-        jarvis_server.AUTOMATIONS_FILE = self.test_automations_file
+        self.orig_automations_file = luna_server.AUTOMATIONS_FILE
+        self.test_automations_file = os.path.join(luna_server.BASE_DIR, "test_automations_phase8c.json")
+        luna_server.AUTOMATIONS_FILE = self.test_automations_file
         with open(self.test_automations_file, "w", encoding="utf-8") as f:
             json.dump({"schema_version": "4.0", "revision": 1, "automations": []}, f)
 
     def tearDown(self):
         super().tearDown()
-        jarvis_server.AUTOMATIONS_FILE = self.orig_automations_file
+        luna_server.AUTOMATIONS_FILE = self.orig_automations_file
         if os.path.exists(self.test_automations_file):
             try:
                 os.remove(self.test_automations_file)
@@ -50,7 +50,7 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
             time.sleep(0.05)
             return x * y
 
-        res = await jarvis_server.run_in_worker_thread(blocking_io_func, 6, 7, timeout=2.0)
+        res = await luna_server.run_in_worker_thread(blocking_io_func, 6, 7, timeout=2.0)
         self.assertEqual(res, 42)
 
     async def test_02_worker_thread_timeout_enforcement(self):
@@ -60,7 +60,7 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
             return "never"
 
         with self.assertRaises(TimeoutError):
-            await jarvis_server.run_in_worker_thread(hanging_func, timeout=0.1)
+            await luna_server.run_in_worker_thread(hanging_func, timeout=0.1)
 
     async def test_03_execute_automation_action_timeout_handling(self):
         """Test 03: execute_automation_action returns graceful TIMEOUT error when action times out."""
@@ -68,8 +68,8 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
             await asyncio.sleep(0.3)
             return {"status": "ok"}
 
-        with patch("jarvis_server.dispatch_notification", side_effect=slow_action_func):
-            res = await jarvis_server.execute_automation_action({
+        with patch("luna_server.dispatch_notification", side_effect=slow_action_func):
+            res = await luna_server.execute_automation_action({
                 "action_id": "dispatch_study_reminder",
                 "params": {"text": "Ders Çalışma Saati", "timeout": 0.1}
             })
@@ -79,7 +79,7 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
 
     async def test_04_run_isolated_worker_akakce_success(self):
         """Test 04: run_isolated_worker executes allowlisted akakce task cleanly."""
-        res = await jarvis_server.execute_automation_action({
+        res = await luna_server.execute_automation_action({
             "action_id": "run_isolated_worker",
             "params": {
                 "task_name": "akakce_price_validator",
@@ -93,7 +93,7 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
 
     async def test_05_disallowed_worker_task_rejected(self):
         """Test 05: run_isolated_worker rejects unapproved task names."""
-        res = await jarvis_server.execute_automation_action({
+        res = await luna_server.execute_automation_action({
             "action_id": "run_isolated_worker",
             "params": {"task_name": "unauthorized_malicious_script"}
         })
@@ -111,7 +111,7 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
                 "params": {"task_name": "hardware_price_check", "timeout": 10.0}
             }
         }
-        ok, msg, cleaned = jarvis_server.validate_automation_definition(valid_spec)
+        ok, msg, cleaned = luna_server.validate_automation_definition(valid_spec)
         self.assertTrue(ok, msg)
         self.assertEqual(cleaned["action"]["action_id"], "run_isolated_worker")
 
@@ -124,7 +124,7 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
                 "params": {"task_name": "rm_rf_script"}
             }
         }
-        ok2, msg2, _ = jarvis_server.validate_automation_definition(bad_task_spec)
+        ok2, msg2, _ = luna_server.validate_automation_definition(bad_task_spec)
         self.assertFalse(ok2)
         self.assertIn("invalid", msg2.lower())
 
@@ -137,14 +137,14 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
                 "params": {"task_name": "hardware_price_check", "timeout": 999.0}
             }
         }
-        ok3, msg3, _ = jarvis_server.validate_automation_definition(bad_timeout_spec)
+        ok3, msg3, _ = luna_server.validate_automation_definition(bad_timeout_spec)
         self.assertFalse(ok3)
         self.assertIn("between 1.0 and 30.0", msg3)
 
     async def test_07_allowed_action_ids_includes_worker(self):
         """Test 07: ALLOWED_ACTION_IDS contains run_isolated_worker."""
-        self.assertIn("run_isolated_worker", jarvis_server.ALLOWED_ACTION_IDS)
-        self.assertIn("dispatch_study_reminder", jarvis_server.ALLOWED_ACTION_IDS)
+        self.assertIn("run_isolated_worker", luna_server.ALLOWED_ACTION_IDS)
+        self.assertIn("dispatch_study_reminder", luna_server.ALLOWED_ACTION_IDS)
 
     async def test_08_test_action_endpoint_success(self):
         """Test 08: POST /api/automations/test_action triggers allowlisted action directly."""
@@ -197,8 +197,8 @@ class Phase8CWorkerIsolationTest(AioHTTPTestCase):
             time.sleep(0.3)
             return {}
 
-        with patch("jarvis_server.run_in_worker_thread", side_effect=TimeoutError("Worker task timed out after 0.1s")):
-            executed = await jarvis_server.scheduler_tick(now_dt=now)
+        with patch("luna_server.run_in_worker_thread", side_effect=TimeoutError("Worker task timed out after 0.1s")):
+            executed = await luna_server.scheduler_tick(now_dt=now)
             self.assertEqual(len(executed), 1)
             action_res = executed[0].get("action_result", {})
             self.assertEqual(action_res.get("status"), "error")

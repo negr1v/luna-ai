@@ -40,6 +40,7 @@ class LocalVoiceRecorder {
         .find(type => MediaRecorder.isTypeSupported(type));
       recorder = mimeType ? new MediaRecorder(stream, { mimeType, audioBitsPerSecond: 32000 }) : new MediaRecorder(stream);
       let speech = false;
+      let speechStart = 0;
       let loudFrames = 0;
       let lastSound = 0;
       let noiseBaseline = 0.3;
@@ -51,7 +52,10 @@ class LocalVoiceRecorder {
       recorder.onstop = async () => {
         clearInterval(timer);
         if (finished) return;
-        if (chunks.length && speech && !window.isSpeaking) {
+        const speechDuration = speech ? (lastSound - speechStart) : 0;
+        // 500 ms altı sesleri eleme (gürültü/geçici ses filtresi; manuel durdurmada kullanıcı kararına saygı duyulur)
+        const isEligibleSpeech = speech && (manual || speechDuration >= 500);
+        if (chunks.length && isEligibleSpeech && !window.isSpeaking) {
           const currentTurn = ++turnSequence;
           try {
             const audio = new Blob(chunks, { type: recorder.mimeType || chunks[0].type });
@@ -83,13 +87,19 @@ class LocalVoiceRecorder {
       recorder.start();
       let wasSpeaking = false;
       timer = setInterval(() => {
-        // Asistan konuşurken mikrofondan dönen hoparlör sesini kullanıcı sesi sanıp kesme yapma
+        // Barge-In & Hoparlör Yankı İzolasyonu
         if (window.isSpeaking) {
-          wasSpeaking = true;
-          loudFrames = 0;
-          speech = false;
-          chunks.length = 0;
-          return;
+          if (rms >= speechThreshold + 4.5 && ++loudFrames >= 3) {
+            if (typeof window.interruptSpeech === 'function') {
+              window.interruptSpeech();
+            }
+          } else {
+            wasSpeaking = true;
+            loudFrames = 0;
+            speech = false;
+            chunks.length = 0;
+            return;
+          }
         }
         if (wasSpeaking) {
           wasSpeaking = false;
@@ -109,6 +119,7 @@ class LocalVoiceRecorder {
         if (rms >= speechThreshold) {
           if (++loudFrames >= 2 && !speech) {
             speech = true;
+            speechStart = now;
             this.onspeechstart?.();
           }
           if (speech) lastSound = now;
@@ -117,7 +128,7 @@ class LocalVoiceRecorder {
           noiseBaseline = noiseBaseline * 0.96 + rms * 0.04;
         }
 
-        if ((speech && now - lastSound >= 650) || now - started >= 14000) recorder.stop();
+        if ((speech && now - lastSound >= 700) || now - started >= 14000) recorder.stop();
       }, 60);
     };
     try {

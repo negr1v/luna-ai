@@ -225,7 +225,7 @@ const { chromium } = require('playwright');
             visible: r.width > 0 && r.height > 0 && r.left >= 0 && r.right <= innerWidth
               && r.top >= 0 && r.bottom <= innerHeight && element.contains(hit) };
         });
-        const group = ['.orb-box', '.openjarvis-prompt-container'].map(selector => {
+        const group = ['.orb-box', '.openluna-prompt-container'].map(selector => {
           const r = rect(document.querySelector(selector));
           return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
         });

@@ -1,5 +1,5 @@
 """
-ACCIO JARVIS V15 — FINAL INTEGRATION TEST SUITE
+ACCIO LUNA V15 — FINAL INTEGRATION TEST SUITE
 Validates:
 1. Paid API protection and free-first Model Hub
 2. Terminal permission denial
@@ -18,22 +18,22 @@ import os
 import re
 import sys
 
-PROJECT_DIR = r"C:\Users\negr1\Projeler\ACCIO-JARVIS"
+PROJECT_DIR = r"C:\Users\negr1\Projeler\LUNA-AI"
 INDEX_PATH = os.path.join(PROJECT_DIR, "index.html")
-SERVER_PATH = os.path.join(PROJECT_DIR, "jarvis_server.py")
+SERVER_PATH = os.path.join(PROJECT_DIR, "luna_server.py")
 
 DATA_FILES = [
-    "jarvis_tasks.json",
-    "jarvis_memory.json",
-    "jarvis_config.json",
-    "jarvis_automations.json",
-    "jarvis_notifications.json",
-    "jarvis_telegram.json"
+    "luna_tasks.json",
+    "luna_memory.json",
+    "luna_config.json",
+    "luna_automations.json",
+    "luna_notifications.json",
+    "luna_telegram.json"
 ]
 
 def run_integration_tests():
     print("======================================================================")
-    print("ACCIO JARVIS V15 — FINAL INTEGRATION CHECK")
+    print("ACCIO LUNA V15 — FINAL INTEGRATION CHECK")
     print("======================================================================\n")
 
     passed = 0

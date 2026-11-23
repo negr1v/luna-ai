@@ -4,7 +4,7 @@ Ekran paylaşımı artık **Yerel önizleme** olarak etiketleniyor. Önizlemeyi 
 
 **Analiz Et** ve **Canlı Tahta → Soru Çek** aynı onay penceresini açıyor. Pencere, bir ekran görüntüsünün **OpenRouter’a (OpenAI GPT‑4o)** gönderileceğini ve çağrının ücretli olduğunu kare alınmadan önce gösteriyor. Vazgeçmek önizlemeyi açık bırakıyor. Akış biterse, kaynak değişirse veya sunucu hedefin değiştiğini bildirirse bekleyen onayla devam edilmiyor.
 
-`jarvis_server.py:5031` ile başlayan sunucu doğrulaması, onayı tarayıcı oturumuna, sağlayıcıya ve modele bağlıyor. Onay 120 saniye geçerli ve iletimden önce tek kullanımlık olarak tüketiliyor. Groq’taki mevcut Vision modeli hizmetten kaldırıldığı için o hedef kullanılamaz olarak bildiriliyor. [Groq model kaldırma kaydı](https://console.groq.com/docs/deprecations)
+`luna_server.py:5031` ile başlayan sunucu doğrulaması, onayı tarayıcı oturumuna, sağlayıcıya ve modele bağlıyor. Onay 120 saniye geçerli ve iletimden önce tek kullanımlık olarak tüketiliyor. Groq’taki mevcut Vision modeli hizmetten kaldırıldığı için o hedef kullanılamaz olarak bildiriliyor. [Groq model kaldırma kaydı](https://console.groq.com/docs/deprecations)
 
 ## Test sonuçları
 

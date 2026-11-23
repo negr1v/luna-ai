@@ -1,11 +1,11 @@
 """
-openjarvis_executor.py
-ACCIO-JARVIS için OpenJarvis tabanlı Python CodeAct ve Tool Çalıştırma Motoru.
+openluna_executor.py
+LUNA-AI için OpenLuna tabanlı Python CodeAct ve Tool Çalıştırma Motoru.
 
-OpenJarvis'in `NativeOpenHandsAgent` mantığından uyarlanmıştır:
+OpenLuna'in `NativeOpenHandsAgent` mantığından uyarlanmıştır:
 - LLM yanıtlarındaki ```python ... ``` kod bloklarını tespit eder.
 - Güvenli bir alt süreçte (timeout ve bellek limitli) çalıştırır.
-- Çıktıyı (stdout / stderr) yakalayıp JARVIS sistemine geri döndürür.
+- Çıktıyı (stdout / stderr) yakalayıp LUNA sistemine geri döndürür.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from typing import Dict, Any, Optional
 
 PYTHON_EXE = sys.executable
 
-class OpenJarvisExecutor:
+class OpenLunaExecutor:
     def __init__(self, timeout_sec: int = 15, max_output_chars: int = 4000):
         self.timeout_sec = timeout_sec
         self.max_output_chars = max_output_chars
@@ -98,7 +98,7 @@ class OpenJarvisExecutor:
 
 if __name__ == "__main__":
     # Test çalıştırması
-    executor = OpenJarvisExecutor()
+    executor = OpenLunaExecutor()
     sample_llm_text = """
     Tabii, senin için hesaplıyorum:
     ```python

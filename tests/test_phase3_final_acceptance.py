@@ -11,12 +11,12 @@ from unittest.mock import patch
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
-import jarvis_server
+import luna_server
 
 PROTECTED_HASHES = {
-    "jarvis_memory.json": "01d5f8469eef9e31b59874ba907dda9b512cc8ac28c6773580af8bb753537f81",
-    "jarvis_memory.json.v3.bak": "01d5f8469eef9e31b59874ba907dda9b512cc8ac28c6773580af8bb753537f81",
-    "jarvis_server.py.v4_pre_memory.bak": "c2dce5389fcdf43fa735df0659107650a327ed36060e7c3edc830eab7b5c3df3",
+    "luna_memory.json": "01d5f8469eef9e31b59874ba907dda9b512cc8ac28c6773580af8bb753537f81",
+    "luna_memory.json.v3.bak": "01d5f8469eef9e31b59874ba907dda9b512cc8ac28c6773580af8bb753537f81",
+    "luna_server.py.v4_pre_memory.bak": "c2dce5389fcdf43fa735df0659107650a327ed36060e7c3edc830eab7b5c3df3",
     "index.html.v4_pre_memory.bak": "0ffd6df831ece31befa464e3f5364ab13f51ade1aa35fa1886728d69c2f90840"
 }
 
@@ -31,10 +31,10 @@ class Phase3FinalAcceptanceTest(AioHTTPTestCase):
     async def get_application(self):
         self.test_dir = tempfile.mkdtemp(prefix="phase3_acceptance_")
         self.test_memory_file = os.path.join(self.test_dir, "test_memory.json")
-        shutil.copy2("jarvis_memory.json.v3.bak", self.test_memory_file)
+        shutil.copy2("luna_memory.json.v3.bak", self.test_memory_file)
         
-        jarvis_server.MEMORY_FILE = self.test_memory_file
-        return jarvis_server.create_app()
+        luna_server.MEMORY_FILE = self.test_memory_file
+        return luna_server.create_app()
 
     def tearDown(self):
         super().tearDown()
@@ -50,7 +50,7 @@ class Phase3FinalAcceptanceTest(AioHTTPTestCase):
 
     def test_02_server_epoch_uuid(self):
         """Verify SERVER_EPOCH is a full 128-bit UUID hex string (32 characters)."""
-        epoch = jarvis_server.SERVER_EPOCH
+        epoch = luna_server.SERVER_EPOCH
         self.assertIsInstance(epoch, str)
         self.assertEqual(len(epoch), 32, f"SERVER_EPOCH should be 32 hex chars, got {len(epoch)}: {epoch}")
         int(epoch, 16) # Must be valid hex
@@ -64,7 +64,7 @@ class Phase3FinalAcceptanceTest(AioHTTPTestCase):
         self.assertEqual(resp.status, 200)
         data = await resp.json()
         init_token = data["revision_token"]
-        self.assertTrue(init_token.startswith(jarvis_server.SERVER_EPOCH + ":"))
+        self.assertTrue(init_token.startswith(luna_server.SERVER_EPOCH + ":"))
 
         # Step B: POST /api/memory/notes - Missing token -> 409
         resp = await self.client.post("/api/memory/notes", json={"text": "Fail Note"})
@@ -138,7 +138,7 @@ class Phase3FinalAcceptanceTest(AioHTTPTestCase):
         orig_disk_hash = get_file_sha256(self.test_memory_file)
 
         # Inject error into atomic_write_json
-        with patch("jarvis_server.atomic_write_json", side_effect=IOError("Simulated disk write failure")):
+        with patch("luna_server.atomic_write_json", side_effect=IOError("Simulated disk write failure")):
             resp = await self.client.post("/api/memory/notes", json={"text": "Doomed Note"}, headers={
                 "X-Memory-Revision-Token": valid_token
             })
@@ -166,7 +166,7 @@ class Phase3FinalAcceptanceTest(AioHTTPTestCase):
         if sys.platform == "win32":
             with open(target_file, "r+", encoding="utf-8") as lock_handle:
                 try:
-                    jarvis_server.atomic_write_json(target_file, {"test": "replaced"})
+                    luna_server.atomic_write_json(target_file, {"test": "replaced"})
                     replaced = True
                 except PermissionError as pe:
                     replaced = False

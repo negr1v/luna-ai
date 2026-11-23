@@ -12,7 +12,7 @@ proj_dir = os.path.dirname(os.path.abspath(__file__))
 if proj_dir not in sys.path:
     sys.path.insert(0, proj_dir)
 
-from jarvis_agent_engine import AgentController, TaskState, PermissionLevel
+from luna_agent_engine import AgentController, TaskState, PermissionLevel
 
 async def run_agent_tests():
     print("=== ZERO CORE OS V11 - AGENT ENGINE TESTLERİ BAŞLIYOR ===")
@@ -34,7 +34,7 @@ async def run_agent_tests():
 
     # 2. Test: Dosya Arama Görevi
     print("\n[Test 2] 'ZERO, bu projedeki belirli bir dosyayı bul' Görevi...")
-    t2 = controller.create_task("ZERO, proje dosyalarında jarvis_config dosyasını bul.")
+    t2 = controller.create_task("ZERO, proje dosyalarında luna_config dosyasını bul.")
     t2_res = await controller.execute_task(t2.task_id)
     assert t2_res.state == TaskState.COMPLETED
     files = t2_res.steps[0].result.get("matched_files", [])
