@@ -20,3 +20,7 @@ deneme_sorulari/
 deneme_sorulari_ek/
 .env
 api_key.txt
+
+# Backups and execution hooks
+*.bak
+.buyer-execution-hooks/

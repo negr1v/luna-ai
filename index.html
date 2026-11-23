@@ -7039,7 +7039,12 @@
     voiceNotice.textContent = message;
   }
 
-  function startDictation() {
+  let dictationStream = null;
+  let dictationMediaRecorder = null;
+  let dictationAudioChunks = [];
+  let isDictationRecording = false;
+
+  async function startDictation() {
     if (!micConsentGranted) {
       micConsentAction = startDictation;
       showMicConsentModal();
@@ -7047,13 +7052,39 @@
     }
     dictationDraft = textInput.value;
     dictationText = '';
+    dictationAudioChunks = [];
     dictationBar.hidden = false;
     composerRow.hidden = true;
     dictationBar.dataset.state = 'starting';
-    dictationStatus.textContent = recognition ? 'Dikte hazırlanıyor…' : 'Bu tarayıcıda dikte kullanılamıyor.';
+    dictationStatus.textContent = 'Mikrofon hazırlanıyor…';
     document.getElementById('dictationCancelBtn').focus();
-    if (isRecognitionStopping) restartVoiceOnEnd = true;
-    else if (recognition) startListening();
+
+    try {
+      dictationStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true } });
+      const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+      dictationMediaRecorder = mime ? new MediaRecorder(dictationStream, { mimeType: mime }) : new MediaRecorder(dictationStream);
+      dictationAudioChunks = [];
+
+      dictationMediaRecorder.ondataavailable = e => {
+        if (e.data && e.data.size > 0) dictationAudioChunks.push(e.data);
+      };
+
+      dictationMediaRecorder.onstart = () => {
+        isDictationRecording = true;
+        dictationBar.dataset.state = 'listening';
+        dictationStatus.textContent = 'Dinliyor…';
+      };
+
+      dictationMediaRecorder.onerror = err => {
+        console.warn('Dikte kaydı hatası:', err);
+        dictationStatus.textContent = 'Mikrofon hatası oluştu.';
+      };
+
+      dictationMediaRecorder.start(250);
+    } catch (err) {
+      console.warn('Mikrofona erişilemedi:', err);
+      dictationStatus.textContent = 'Mikrofon izni alınamadı.';
+    }
   }
 
   function closeDictation(keepDraft) {
@@ -7064,35 +7095,75 @@
     dictationSendBtn.disabled = false;
     dictationBar.hidden = true;
     composerRow.hidden = false;
-    stopListening();
+    isDictationRecording = false;
+    if (dictationMediaRecorder && dictationMediaRecorder.state !== 'inactive') {
+      try { dictationMediaRecorder.stop(); } catch {}
+    }
+    if (dictationStream) {
+      dictationStream.getTracks().forEach(t => t.stop());
+      dictationStream = null;
+    }
     if (!keepDraft) textInput.value = dictationDraft;
     textInput.dispatchEvent(new Event('input', { bubbles: true }));
     textInput.focus();
   }
 
   document.getElementById('dictationCancelBtn').onclick = () => closeDictation(false);
+
   function finishDictationSend() {
     if (dictationBar.hidden) return;
-    const recognized = Boolean(dictationText);
+    const recognized = Boolean(textInput.value.trim());
     closeDictation(true);
     if (recognized) submitComposerMessage();
     else showZeroToast('Dikte', 'Gönderilecek konuşma metni algılanmadı.', 'info');
   }
 
-  dictationSendBtn.onclick = () => {
+  dictationSendBtn.onclick = async () => {
     if (dictationSendTimer !== null) return;
-    if (!recognitionStartIssued) {
-      if (dictationText) finishDictationSend();
-      else dictationStatus.textContent = 'Gönderilecek konuşma metni algılanmadı.';
-      return;
-    }
     dictationSendBtn.disabled = true;
-    dictationStatus.textContent = 'Dikte tamamlanıyor…';
-    dictationSendTimer = setTimeout(finishDictationSend, 16000);
-    try {
-      recognition.stop();
-    } catch {
-      finishDictationSend();
+    dictationStatus.textContent = 'Metne dönüştürülüyor…';
+
+    if (dictationMediaRecorder && dictationMediaRecorder.state !== 'inactive') {
+      dictationMediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(dictationAudioChunks, { type: dictationMediaRecorder.mimeType || 'audio/webm' });
+        if (dictationStream) {
+          dictationStream.getTracks().forEach(t => t.stop());
+          dictationStream = null;
+        }
+        if (audioBlob.size < 500) {
+          showZeroToast('Dikte', 'Ses algılanamadı (çok kısa).', 'info');
+          closeDictation(false);
+          return;
+        }
+        try {
+          const fd = new FormData();
+          fd.append('audio', audioBlob, 'dictation.webm');
+          fd.append('language', 'tr');
+          const resp = await fetch('/api/stt', { method: 'POST', body: fd });
+          if (!resp.ok) throw new Error('STT yanıtı başarısız: ' + resp.status);
+          const data = await resp.json();
+          const recognizedText = (data.text || '').trim();
+          if (recognizedText) {
+            textInput.value = dictationDraft ? (dictationDraft.trim() + ' ' + recognizedText) : recognizedText;
+            textInput.dispatchEvent(new Event('input', { bubbles: true }));
+            finishDictationSend();
+          } else {
+            showZeroToast('Dikte', 'Konuşma metne dönüştürülemedi.', 'info');
+            closeDictation(false);
+          }
+        } catch (err) {
+          console.warn('STT isteği hatası:', err);
+          showZeroToast('Dikte Hatası', 'Yerel ses tanıma servisine ulaşılamadı.', 'error');
+          closeDictation(false);
+        }
+      };
+      try {
+        dictationMediaRecorder.stop();
+      } catch {
+        closeDictation(false);
+      }
+    } else {
+      closeDictation(false);
     }
   };
 
