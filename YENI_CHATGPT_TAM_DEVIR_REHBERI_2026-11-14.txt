@@ -1,0 +1,304 @@
+# ==============================================================================
+# ZERO CORE OS (ACCIO-JARVIS) V4 -> V15 TAM DEVIR REHBERI (HANDOFF GUIDE)
+# TARIH: 2026-11-14
+# PROJE KONUMU: C:\Users\negr1\Projeler\ACCIO-JARVIS
+# HEDEF DONANIM: Intel Core i5-8250U / 8 GB RAM / Windows 10/11
+# ==============================================================================
+
+[KRITIK KURAL: DUSUK KREDI / PARCA PARCA YURUTME (LOW-CREDIT SEQUENTIAL MODE)]
+- Kullanici buyuk promptlar atsa bile ASLA tek seferde hepsini calistirma.
+- Islemleri kucuk mantiksal parcalara bol (Part 1, Part 2, ...).
+- Her adimda kullanicidan "gec" / "uygula" onayi bekle.
+- Buyuk dosyalari (jarvis_server.py 6500+ satir, index.html 15000+ satir) gereksiz yere bastan sona grep/read ile tarayip token/zaman harcama.
+- Ciktilari sohbette kisa, net ve rapor seklinde tut; gereksiz dosya olusturma.
+
+------------------------------------------------------------------------------
+1. MIMARI TEMEL VE KORUNACAK SISTEMLER (NON-NEGOTIABLES)
+------------------------------------------------------------------------------
+* aiohttp Backend (http://127.0.0.1:7860): Tek process, asenkron REST + SSE. Kesinlikle Electron veya harici agir sunucularla DEGISTIRILMEYECEK.
+* Atomik JSON Depolama: jarvis_memory.json ve jarvis_tasks.json revizyon tokenlari (ETag), atomik yaz-degistir (write-replace) ve .bak mekanizmasiyla korunur. Kesinlikle ChromaDB, Pinecone vb. agirlastirici vektor veritabanlari EKLENMEYECEK (8 GB RAM'i bogar).
+* Canvas 2D Cyber Orb: index.html icindeki 60 FPS ses-duyarli gorsellestirici korunacak. Three.js veya WebGL'e tasinmayacak.
+* Sifir-RAM Ses Mimari: Web Speech API (tr-TR) tarayici uzerinden ses tanima + Microsoft Edge-TTS (tr-TR-EmelNeural) sunucu uzerinden ses sentezi + Canli Barge-in (soz kesme). PyTorch/Kokoro/Whisper gibi agir yerel ses modelleri KESINLIKLE YUKLENMEYECEK.
+* Ajan ve Masaustu Farkindaligi: jarvis_agent_engine.py (V11/V12) ve jarvis_computer_use.py (V13 Windows User32 ctypes) cekirdek omurgadir.
+
+------------------------------------------------------------------------------
+2. V14 ACIK KAYNAK ISTIHBARAT DENETIMI OZETI VE ALINAN KARARLAR
+------------------------------------------------------------------------------
+* Incelenen Referans: iggyghub/OpenMind (Felix)
+* Lisans: UNLICENSED (All Rights Reserved). Kod kopyalamak yasaktir; yalnizca temiz oda (clean-room) mimari prensipleri benimsenecektir.
+* Kabul Edilen Prensipler:
+  1. Terminal Permission Gate Denial: Guvenlik kapisi/kullanici bir eylemi reddettiginde, bu durum LLM'e bir hata mesaji olarak donulmez; gorev dogrudan TERMINAL_DENIED olarak kapatilir. Boylece prompt-injection ve guvenlik duvarini atlatma donguleri engellenir.
+  2. Admission Cap (Semaphore): Ucretsiz saglayicilara (Groq vb.) yapilan cagrilar asyncio.Semaphore(1) ile sarilir; boylece 429 (rate limit) hatalari en aza indirilir.
+  3. Free-Provider-First: Sistem varsayilan olarak ucretsiz Groq modellerini (llama-3.3-70b-versatile, qwen-2.5-32b) kullanir. Ucretli OpenRouter modellerine kullanici acik onay vermeden gecilmez.
+* Reddedilen Fikirler:
+  - ChromaDB/Vektor Veritabani: 800MB-1.5GB RAM yer, 8GB RAM'li bilgisayari dondurur.
+  - Yerel PyTorch/Kokoro/Whisper: CPU'yu %100 yapar, asiri isinmaya sebep olur.
+  - Electron Desktop Shell: 300-500MB bosa RAM harcar, HTML5 browser kokpiti daha hafif ve hizlidir.
+
+------------------------------------------------------------------------------
+3. MEVCUT DURUM VE EN SON YAPILAN ISLEMLER (PHASE 15A.1)
+------------------------------------------------------------------------------
+* Dosya Yedekleri:
+  - C:\Users\negr1\Projeler\ACCIO-JARVIS\jarvis_server.py.bak_phase15a1_20261114_105408
+* jarvis_server.py Yapilan Degisiklikler:
+  - PAID_MODEL_AUTHORIZATIONS sozlugu ve PAID_AUTH_TTL_SECONDS = 120 eklendi.
+  - get_model_cost_category(model_id): Modelin 'free', 'paid' veya 'unknown' durumunu tespit eder.
+  - create_paid_model_authorization(model_id, provider): Tek kullanimlik pauth_ tokeni uretir.
+  - validate_and_consume_paid_authorization(token, model_id, provider): Token'in suresini, model/provider eslesmesini kontrol eder ve tek kullanimlik olarak tuketir.
+  - POST /api/models/paid_auth/request: Ucretli model icin onay karti bilgisi ve token donen endpoint eklendi ve router'a baglandi.
+  - /api/chat ve /api/chat/stream icinde ucretli veya bilinmeyen model secildiginde eger gecerli tek kullanimlik onay tokeni yoksa HTTP 402 / confirmation_required dondurerek saglayiciya hic istek atmadan durdurma kilidi eklendi.
+  - Python soz dizimi dogrulandi (py_compile hatasiz gecti).
+
+------------------------------------------------------------------------------
+4. YENI CHATTE YAPILACAK SIRADAKI ISLER (PHASE 15A KALAN ADIMLAR)
+------------------------------------------------------------------------------
+1. Phase 15A.1 Testini Calistir:
+   - Mock test senaryosu olusturarak:
+     a) Ucretli model onaysiz cagrildiginda HTTP 402/confirmation_required dondugunu,
+     b) Dogru token ile onaylandiginda gectigini,
+     c) Token ikinci kez kullanildiginda (reused) reddedildigini,
+     d) Token baska model icin kullanildiginda reddedildigini,
+     e) Ucretsiz modellerin hicbir onay istemeden calistigini dogrula.
+2. Phase 15A.2: Terminal Permission Gate (jarvis_agent_engine.py):
+   - TaskState.TERMINAL_DENIED durumunu ekle.
+   - Reddedilen izinlerde gorevi kalici olarak kapat, LLM alternatif aramasin.
+3. Phase 15A.3: Free-First Catalog & Concurrency Gate:
+   - AI_MODEL_CATALOG icinde varsayilan modeli ucretsiz Groq modeline ayarla.
+   - GROQ_SEMAPHORE = asyncio.Semaphore(1) ile Groq cagrilarini sirala.
+
+Yeni sohbette devam etmek icin bu dosyayi referans gostererek kaldigin yerden devam edebilirsin.
+
+ ------------------------------------------------------------------------------
+ 5. TAM SOHBET TARAMASI — EKSIKSIZ DURUM (11-08 -> 11-14, 32 SOHBET)
+    Bu bolum 11.14'te tum sohbetler teker teker okunarak eklenmistir.
+    ONEMLI: Yukaridaki Bolum 4'teki "siraadaki isler" listesi GECERSIZDIR;
+    15A/15B/15C/15D tamamlandi. Gercek sonraki adim Bolum 6'dadir.
+ ------------------------------------------------------------------------------
+
+ A. JARVIS / ZERO CORE OS (EN ONCELIKLI)
+ 1. V3->V9 7 adimlik sinematik donusum TAMAMLANDI (11.14 gece):
+    - Holografik HUD, cam efektleri, neon sidebar, 500px 10 durumlu Orb
+      (IDLE/LISTENING/THINKING/PROCESSING/SPEAKING/EXECUTING/ANALYZING/
+       SUCCESS/WARNING/ERROR), 5 eksenli gyro halkalar
+    - Ultra-Fast Barge-In: AudioBufferSourceNode 5ms disconnect + AbortController
+      (sadece "dur" kelimesi degil, her soz kesme aninda keser)
+    - /api/vision: openai/gpt-4o multimodal ekran/webcam analizi + prompt destegi
+      + sonucu TTS'ye aktarma (canli dogrulandi)
+    - Varsayilan aktif model: z-ai/glm-5.3 (OpenRouter uzerinden)
+    - Server: http://127.0.0.1:7860 calisir durumda
+ 2. V14 acik kaynak denetimi (5 faz) TAMAM: Felix/OpenMind = UNLICENSED;
+    clean-room prensipleri kabul edildi (Terminal Gate, Admission Semaphore,
+    Free-Provider-First). Reddedilenler: ChromaDB, PyTorch/Kokoro/Whisper, Electron.
+ 3. FAZ 15A/15B/15C/15D TAMAMLANDI, regresyon testleri 7/7 PASSED (11.14 sabah):
+    - test_phase15a_final_validation.py 7/7
+    - test_phase15b_adaptive_performance.py 7/7
+    - test_phase15c_live_memory.py 7/7
+    - test_phase15d_smart_model_hub.py 7/7
+    - 15D icerigi: SmartModelAdvisor sinifi, /api/models/hub, /api/models/recommend,
+      Model Hub filtre UI (Tumu/Sohbet/Kodlama/Muhakeme/Vision/Araclar/Sadece
+      Ucretsiz), deprecated engel katmani, Ollama opsiyonel (yoksa hatasiz)
+ 4. ACIK IS (KESILDI) — "15D QUICK MODEL CATALOG FIX":
+    - Model lifecycle ile pricing AYRI tutulacak:
+      lifecycle: ACTIVE / PREVIEW / DEPRECATED
+      pricing:   FREE / PAID / UNKNOWN
+    - qwen/qwen3.8-27b  = ACTIVE PREVIEW / PAID
+    - openai/gpt-oss-120b = ACTIVE / PAID
+    - Bu ID'ler DEPRECATED_MODELS'den cikarilmali (yoksa "deprecated" diye
+      reddedilir; ucretli model 15A.1 onay kilit sistemine takilmali)
+    - Model Hub etiketleri + odakli testler guncellenecek
+    - DURUM: KISMEN UYGULANMIS, KULLANICI TARAFINDAN KESILDI -> dogrulanmadi
+ 5. Model saglayici kararlari (11.14 gece araştirmasindan):
+    - Groq: ANA MOTOR, ucretsiz (llama-3.3-70b-versatile, llama-3.1-8b-instant)
+    - SambaNova key: d89f996f-1a49-46a5-8594-b3dd9e032678
+      -> ANAHTAR GECERLI AMA PAYMENT_METHOD_REQUIRED (kart girilmeden kullanilamaz;
+         cloud.sambanova.ai/plans/billing). Modeller: GLM-5.3 (reasoning),
+         gpt-oss-120b, Meta-Llama-3.3-70B-Instruct, MiniMax-M3.1-Flash, gemma-4-31B-it
+    - OpenRouter key elinde (sk-or-v1-...af26) -> UCETLI; sessiz ucretli
+      fallback KESINLIKLE YASAK (15A.1 kilit bunu garanti ediyor)
+    - Kartsiz 2. beyin adayi: Google AI Studio (Gemini) — kart istemez
+    - Dikkat: Groq'ta gecerli olmayan kurgusal ID'ler: "qwen/qwen3.8-27b",
+      "openai/gpt-oss-120b" (Groq dokumanina gore gercek: qwen-2.5-32b,
+      qwen-2.5-coder-32b; 15A.0 denetim bulgusu)
+ 6. KREDI SORUNU COZUMU (11.14):
+    - accio-com-buyer-assistant eklentisi + tum alt ajanlari/skillleri KALDIRILDI
+    - Kredi erimesinin sebebi: devasa dosyalarin tur basina taranmasi + agent
+      baglam boyutu + arka plan tool tetiklemeleri
+    - KURAL: hedefli okuma (offset/limit), tur basina max 1-3 tool, testleri
+      AJAN CALISTIRMAZ (kod yazar, tek satir PS komutu verir, kullanici calistirir)
+
+ B. DERS / YKS 2027 (Sayisal MF, mezun, hedef: ilk 50k, yukselme 10k)
+ 1. Takip dosyasi: C:\Users\negr1\Desktop\yks-test-takip.html (offline, kredisiz)
+    - Moduller: Hata Defteri, Net Hesaplayici, YOK Atlas, Videolar, Brain.fm App,
+      Pomodoro
+    - 11.13 gece: ust yatay sekmeler KALDIRILDI; modern karanlik sol menu
+      (GitHub/Linear estetik, cam efekt, rozetler, sayfa gecis animasyonu), 0 JS hatasi
+    - Brain.fm: yuzen odak butonu silindi; GERCEK player iframe gomuldu
+      (https://my.brain.fm/player/QYN78dJrrzs5mD_TJgBcq) + offline sentetik mod +
+      Yenile + Linki Degistir + A pencerede ac
+    - AÇIK HATA: zorluk bazli video eslesme hatalari (orn. Geometri vs Fizik)
+      henuz tam duzelmedi
+ 2. Program: "Babanin Bahsi" 15 gunluk; Gun 1/15 = 11.11.2026 (Cars); 360 dk taban;
+    21:00-23:00 Apex slotu DOKUNULMAZ; 23:00 ALT+F4; 23:30 uyku
+ 3. AYT Matematik: Eyüp B VDD = ana kanal; Mert Hoca = sadece takilinan 1-2 videoyu
+    1.5x yedek (karar 11.11)
+    - Video 118 (Değer Bulma, s.115-117) BITTI
+    - 345 AYT Mat Test 1 (deger bulma) atandi/calisildi
+    - SIRADA: Fonksiyon Turleri (s.118-122: birebir, oriten, sabit, birim)
+    - Konu anlatimi yapildi: birebir/ortene/icine/birebir-ortene
+      (maymun-muz analojisi ile)
+    - 13.11 (Gün 3, Cuma): Derin Blok 1 (120 dk) = AYT Mat olarak kilitlendi
+ 4. TYT Matematik: ilk 12 konuda MUTLAK DEGER bitti; geriye PROBLEMLER ve
+    veri analizinden sonraki kisim kaldı; Mert Hoca'da sadece eski konulardan
+    testler; eşitsizlik "sahte tekrar" diye programa KONMADI (denemede reflex)
+ 5. Kaynak: studytracker.com.tr/dashboard/videos
+
+ C. SAĞLIK (11.11)
+ 1. Tahlil (11.11.2026, sabah acik): Hb 15.2, Hct %45.4, MCV 83.9 (86.7'den dustu),
+    ferritin 41 (once 56), serum demir 41 (5 ay once 34), transferrin sat. %13.3,
+    urik asit 9.2 (ust sinir), idrarda 5 eritrosit, idrar pH 5.5, trigliserit 62
+    (once 115), HDL 52, LDL 83, TotalK 147, AKS 91, HbA1c %5.3 (5 aydir stabil),
+    hs-CRP 1.3 (once 3.4); immune formül normale dondu
+ 2. Semptom triadi: 8-9 saat uyusam dinlenmemis uyanma + horlama (anne gorseli)
+    + sabah agiz kurugu -> OSAS / UARS supheli
+    Mekanizma zinciri: hava yolu darligi -> hipoksi -> (a) derin uyku parcalanmasi
+    -> testosteron/GH dustusu (b) ATP yikimi -> urik asit 9.2 -> asidik idrar
+    (pH 5.5) -> kristal cökmesi -> idrarda eritrosit
+ 3. PLAN (GPT-ustali ile netlesti):
+    - Saglik ocagina GIDILMEZ (testosterone bakamaz, demir ilaci bazali tabloyu bozar)
+    - MHRS: DAHILIYE 08:00-09:30 acik (Total Testosteron + 25-OH D + demir paneli
+      + TIT) ve KBB (deviasyon/konka; gerekirse polisomnografi)
+    - Doktora okunacak metin 11.11 sohbetinde hazirlanmisti
+    - Idrar kurali: agir antrenmandan 48 saat once, orta akim
+    - 11.11 sabahı kan verildi (sağlık ocağı); sonraki adim sonuclar/belirtileri
+      bilinmiyor -> dogrulanmadi
+ 4. Beslenme hedefi: sekersiz, 1650-1800 kcal, 115-135g protein, 2.5-3L su,
+    0 rafine seker; gunluk_beslenme_checklist.md olusturuldu (HTML istendi)
+ 5. Cene hatti: vucut yagi %12-15 (sonucun %85'i), dil posturu (mewing; video:
+    youtube Om3o9NXrITE), sabah odem rutini (500ml su + soguk yuz + dik postur);
+    çiğneme topu / yuz yogasi / gua sha = MIT (yapilmaz)
+ 6. KAN VERME GUNU KURALI: tahlilden once kahve/cek/sekeryasak, sadece su
+
+ D. DONANIM / YENI PC (AM5)
+ 1. HEDEF: Ryzen 5 7500F (veya daha iyi AM5) + ASUS Prime B650M-R (veya denk);
+    TOPLAM TAKAS TAVANI: CPU + ANAKART <= 16,000 TL
+    (parca baska tavanlar 11.11'de KALDIRILDI; 16k kabuk kabul)
+ 2. Piyasa (11.11): 7500F dip 6.489 / normal 6.729-6.899; B650M-R 5.299;
+    toplam ~11.788 TL. (11.13): 7500F 6.799, B650M-R 5.299 -> GERCEK FIRSAT YOK
+ 3. 11.13 gece: ABIN sabahtan kartla TAKSITLE alacak sozunu verdi; 11.14 sabahi
+    gorusme tamamlandi ("derslerine calis" kapanisi); ALIM GERCEKLESTI MI
+    dogrulanmadi -> KULLANICIYA SOR
+ 4. Fiyat radar botu (radar_daemon.py + Telegram):
+    - 11.09: strict price/model validation (model token eslesmesi, 30 gunluk
+      taban, 12-24s cooldown) — sahte %42 indirimler (8500G vs 7800X3D kiyas hatasi,
+      "Ilk Gozlem" tuzagi) kesildi; daemon PID 10804
+    - 11.13: siren/uneslem spam kaldirildi (temiz baslik: 🔥 FİYAT HATASI /
+      🎯 İNDİRİM); is_fake + rutin + hafif indirimler TAMAMEN engellendi;
+      min %15 indirim VE min 350 TL tasarruf; FORBIDDEN_KEYWORDS (Dragos, Turbox,
+      Izoly, Zeiron); marka kilidi, alt-model kilidi (Gaming Plus/Tomahawk/TUF/
+      Aorus/Eagle/Mortar), form faktoru + Wi-Fi kilidi; daemon PID 1896
+ 5. Sniper dosyalari (11.11 calisma alani): amazon_sniper.user.js (Tampermonkey,
+    5.000 TL esigi), amazon_bg_sniper.py (winsound alarm + otomatik sepet linki),
+    radar_db.py (SQLite: products / price_history / forum_deals),
+    da_forum_scraper.py (Donanim Arsivi sicak firsatlar; hedef: 7500F, B650, AM5);
+    FAZ 2 (Incehesap / Gaming.Gen.TR / Itopya modulleri) KESILDI — TAMAMLANMADI
+ 6. Termal macun: ARCTIC MX-6 (434 TL, 4g) SECILI; TG Aeronaut (499/529 TL)
+    reddedildi (4.3 vs 1.1 W/mK; 1.5-3.5C fark; pump-out; 3-5 yil omur)
+ 7. RAM: DDR5-6000 CL30 = AM5 tatli nokta (UCLK:MCLK 1:1); 6400+ = 1:2,
+    gecikme +10-15ns (oyunlarda daha kotu); 8000G APU'lari 7200+ rahat kaldirir
+ 8. RDR2 140 fps CPU+anakart kombinasyonu sorusu 11.11'de soruldu
+    (cevap detayi o sohbette; yeni PC'de RX 6600 bottleneck olabilir — not)
+ 9. Mevcut PC (i5-8250U / 8GB / UHD 620): ROB RUN KALDIRMAZ (GTX1050Ti/12GB
+    istiyor); Ghost Watchers KALDIRMAZ (720p low 12-22 FPS);
+    DISK KURALI: steamapps\downloading\12210 (GTA IV 22.27GB) ASLA SILINMEZ
+ 10. Yeni kasa parcalari (hedef sistem): Sharkoon 750W Gold, Lexar Thor
+     2x16GB DDR5-6000 CL36, RX 6600, Lancool II Mesh
+
+ E. OYUN
+ 1. DST (Don't Starve Together):
+    - WX-78 ile 60 gun dayanildi (1. el); 2. el tavsiyesi: Ruins/Boss hedefli
+      WX-78 veya Wolfgang/Wigfrid/Wendy
+    - Devre sistemi (6 slot): Acceleration 6 SLOT (tam panel, +%25 hiz, Rook
+      taramasi), Super-Hardening 2 (+150 HP), Hardening 1 (+50 HP), Chorusbox 2
+      (sanity aurasi), Thermal 1, Optoelectronic 1; Circuit Extractor ile mod
+      degisimi (Seyahat / Boss / Erken Aşama modlari)
+    - Gunluk uretim: Bio Scanalyzer (Gun 1), Circuit Extractor (Gun 2),
+      Lightning Rod (Gun 11), Thermal Stone (Gun 18), Walking Cane + Tam o'
+      Shanter (Gun 22-25), Ham Bat + Football Helmet (Gun 28-30), Eyebrella (Gun 32)
+    - 18 karakter tier listesi: 1. Wolfgang 9.0, 2. Maxwell 9.0, 3. Wickerbottom
+      8.8, ... 18. Wes 2.0; late-game 1. Wanda 10/10 (teleport agi + 142+ hasar)
+    - 3 kisi synergy listesi o sohbette istendi/cikti (detay o sohbette)
+    - Hallowed Nights (etkinlik) esyalari SATILAMAZ/takas edilemez;
+      Distinguished = 150 spool (copuruldu); karakter fiyatlari: Wanda/Wortox
+      ~2.700 spool, Elegant skin ~1.350
+    - Dedicated server (dontstarve_dedicated_server_nullrenderer_x64) Windows
+      Firewall istisnasi gerektirir
+ 2. LoL / Rose (skin changer; eski ad LeagueUnlocked; ~Kasim 2025'te acik kaynak):
+    - ARIZA COZUMU: INJECTION FAILED CHROMA_55033 -> LTK Manager Rose bridge'siz
+      acik kalmisti; cift LTK surumu (Program Files v1.33.0 + AppData v1.23.0,
+      ACL hatasi); duzeltme: ltk-manager.exe / ltk_patcher_host.exe / Rose.exe
+      kapat, AppData'daki eski LTK klasorunu sil
+    - KURALLAR: LTK MANAGER ASLA ELLE ACILMAZ (Rose otomatik baslatir); Rose
+      YONETICI olarak; LoL kapandiginda Rose'dan da CIKIS
+    - YAMA GUNLERI (Rose ACILMAZ, guncelleme beklenir): 18.11.2026 (26.23) ve
+      09.12.2026 (26.24)
+    - Ban riski: %0 IMKANSIZ (kernel seviyesi + Riot politikasi ihlali);
+      Riot "bulamiyor" degil "oncelik vermiyor" (kozmetik); crash report
+      RIOT'A ASLA GONDERILMEZ; diger 3. parti modlarla birlikte kullanilma;
+      sadece resmi GitHub'dan guncelle; en guvenli = SMURF/yan hesap
+    - Kullanici talebi (kalici hafizada): "Rose guvenli mi?" denince loglar +
+      surecler + Vanguard/ban belirtisi taranir
+ 3. Oyun oncesi RAM rutini: Chrome / Spotify / Discord / DST server / boşa python
+    kapat (~2.7-4.9 GB serbest); Razer App Engine (DPI), WO Mic (mikrofon),
+    memreduct ACIK KALIR; VANGUARD UYARISI: saldirgan/otomatik surec islemlerinden
+    kacin ("sakin bir sey yapma" - 11.09)
+ 4. Akali vs Kayle 1v1 (18 lvl, full build): Kayle %75-80 favori (R hasar gormezligi
+    + 625 menzil + Banshee/Zhonya); Akali'nin tek yolu: Kayle R'sini bekleyip
+    Zhonya + R2 execute (Kayle can %50 altindaysa ve Zhonya'si yoksa)
+ 5. Apex Legends: 21:00-23:00 sabit slot (arkadaslarla squad);
+    Aim: aiming.pro — horizontal smoothness 1.20-1.60 arasinda kalibre ediliyor
+
+ F. KIMLIK / ORTAM / USTALAP
+ 1. Kullanici: negr1, 18 yas, Ankara (Dikmen/Malazgirt bolumu), 170cm,
+    78.5kg (hedef 73kg); YKS 2027 adayi (gap year, sayisal MF)
+ 2. GPT-USTALI (kalici tercih): rahatlatma + merak/dedektif sorular + net aksiyon
+    plani + abartili terminoloji yok; "maymun-muz" seviyesinde sade aciklama
+ 3. DUSUK KREDI PROTOKOLU (kalici): parca parca; her adimda "gec/uygula" onayi;
+    hedefli diff; dev dosyalari bastan sona tarama; testleri ajan CALISTIRMAZ
+ 4. DEVIR DOSYASI KATALOGU:
+    - ANA: C:\Users\negr1\Projeler\ACCIO-JARVIS\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-14.txt
+    - C:\Users\negr1\Desktop\Yeni klasör\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-09.txt
+    - C:\Users\negr1\Downloads\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-09.txt
+    - C:\Users\negr1\Desktop\Yeni klasör\: DEVIR-DOSYASI.md, DEVİR-DOSYASI.md,
+      DEVIR-DOSYASI-30-08-2026.md, 00_KRONOLOJIK_TAM_DEVIR_REHBERI_2026-11-05.txt,
+      chatgpt_sohbet_gecmisi.txt, chatgpt_share_6af0a4cb.txt
+    - Buyuk arşiv: C:\Users\negr1\Desktop\AccioWork_Yedek_20261106_0206\
+      (eski proje kopyasi + devir paketleri 16.10, 11-05, 11-06)
+    - Calisma alani: DEVIR_YEDEK_2026-11-10.md, DEVIR_NOTLARI.md,
+      gunluk_beslenme_checklist.md, sniper/radar scriptleri
+ 5. KREDI META-NOTU: 11.14'te sourcing eklentisi ve alt ajanlar kaldirildi;
+    yine de her mesajda taban token kesintisi model secerinden kaynaklanir
+    (daha hafif model = daha az kredi)
+
+ ------------------------------------------------------------------------------
+ 6. SIRADAKI ADIMLAR (ONCELIK SIRASI)
+ ------------------------------------------------------------------------------
+ 1. JARVIS — 15D Quick Catalog Fix kalantini BITIR:
+    a) jarvis_server.py icinde DEPRECATED_MODELS / lifecycle / pricing yapisini
+       OKU ve dogrula (qwen/qwen3.8-27b ve gpt-oss-120b hali)
+    b) lifecycle (ACTIVE/PREVIEW/DEPRECATED) ile pricing (FREE/PAID/UNKNOWN)
+       ayrisin; ucretli model "deprecated" diye degil, onay kilidi ile engellensin
+    c) Model Hub etiketleri + test_phase15d guncellensin; kullanici calistirir
+ 2. JARVIS — 15A.2 (TaskState.TERMINAL_DENIED, jarvis_agent_engine.py)
+    yapilip yapilmedigi DOGRULANSIN (15A final test 7/7 gecmistir ama bu
+    madde o sohbette dogrudan gorunmedi)
+ 3. DONANIM — Abinin 11.14 sabahi parca alimini yapip yapmadigini SOR;
+    radar daemon'unun (PID 1896) ayaktayligini kontrol et
+ 4. DERS — 13.11 planindan devam: Fonksiyon Turleri (s.118-122) + 345 Test 1;
+    dashboard'daki video eslesme hatalari (Geometri/Fizik) duzelt
+ 5. SAĞLIK — 11.11 kan tahlili sonrasi: Dahiliye/KBB randevusu alindi mi?
+    Sonuclar geldi mi? (bilinmiyor -> sor)
+ 6. OYUN — 18.11.2026 yama gunu: Rose ACMA, guncelleme beklenir
+
+ Yeni sohbette devam:
+   "C:\Users\negr1\Projeler\ACCIO-JARVIS\YENI_CHATGPT_TAM_DEVIR_REHBERI_2026-11-14.txt
+   dosyasini oku, Bolum 6'dan devam et, dusuk kredi kurallarina uy."

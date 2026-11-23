@@ -1,0 +1,92 @@
+[
+  {
+    "id": "geo_1",
+    "subject": "Geometri: Üçgende Açıortay VDD (Eyüp B - Konu & Birebir ÖSYM)",
+    "duration": 60,
+    "done": false,
+    "category": "geometri",
+    "priority": "high",
+    "note": "2x süre kuralı, önce kendin dene, durdur-çöz yap."
+  },
+  {
+    "id": "geo_2",
+    "subject": "Geometri: Üçgende Açıortay - Eyüp B SB (Yalnızca Öğreniyorum)",
+    "duration": 40,
+    "done": false,
+    "category": "geometri",
+    "priority": "high",
+    "note": "Gelişiyorum testlerine dokunma, Ocak ayına bırak."
+  },
+  {
+    "id": "geo_3",
+    "subject": "Geometri: Üçgende Açıortay - Orijinal SB (Sarı & Mavi Testler)",
+    "duration": 50,
+    "done": false,
+    "category": "geometri",
+    "priority": "medium",
+    "note": "Sarı kavrama + Mavi ÖSYM soruları eritilecek."
+  },
+  {
+    "id": "geo_4",
+    "subject": "Geometri: Üçgende Kenarortay & Merkezler VDD (Eyüp B)",
+    "duration": 60,
+    "done": false,
+    "category": "geometri",
+    "priority": "medium",
+    "note": "Açıortay bitince doğrudan geçilecek."
+  },
+  {
+    "id": "geo_5",
+    "subject": "Geometri: Üçgende Benzerlik VDD (Eyüp B - Kritik Eşik)",
+    "duration": 90,
+    "done": false,
+    "category": "geometri",
+    "priority": "urgent",
+    "note": "Geometrinin omurgası; çok yavaş ve sindirerek."
+  },
+  {
+    "id": "ayt_1",
+    "subject": "AYT Mat: Polinomlar 3D VDD (Konu Anlatımı & Birebir ÖSYM)",
+    "duration": 90,
+    "done": false,
+    "category": "ayt_mat",
+    "priority": "high",
+    "note": "Eyüp B VDD videosu eksiksiz taranacak."
+  },
+  {
+    "id": "ayt_2",
+    "subject": "AYT Mat: Polinomlar - Eyüp B SB (Öğreniyorum Testleri)",
+    "duration": 45,
+    "done": false,
+    "category": "ayt_mat",
+    "priority": "high",
+    "note": "Kavrama ve temel ÖSYM kalıpları pekiştirilecek."
+  },
+  {
+    "id": "ayt_3",
+    "subject": "AYT Mat: Polinomlar - Eyüp B SB (Gelişiyorum Testleri)",
+    "duration": 60,
+    "done": false,
+    "category": "ayt_mat",
+    "priority": "medium",
+    "note": "ÖSYM tarzı yeni nesil ve beceri temelli sorular."
+  },
+  {
+    "id": "ayt_4",
+    "subject": "AYT Mat: Polinomlar - 2. Kaynak (3D / Orijinal vb.)",
+    "duration": 60,
+    "done": false,
+    "category": "ayt_mat",
+    "priority": "medium",
+    "note": "Konuyu farklı soru tipleriyle sağlamlaştırma."
+  },
+  {
+    "id": "ayt_5",
+    "subject": "AYT Mat: Polinomlar - Efişinado Testi & 1 Soru Yorum",
+    "duration": 45,
+    "done": false,
+    "category": "ayt_mat",
+    "priority": "low",
+    "note": "Ünite zirvesi; önce kendin en az 10-15 dk uğraş."
+  }
+]

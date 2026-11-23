@@ -1,0 +1,22 @@
+# Luna AI / ACCIO-JARVIS Git Ignore
+
+# Heavy local AI / speech models (1.3+ GB)
+models/
+
+# Distribution & virtual environment builds
+dist/
+build/
+__pycache__/
+*.pyc
+
+# Archives and logs
+*.zip
+*.log
+jarvis_runtime.log
+
+# Temporary and extra training files
+temp_att/
+deneme_sorulari/
+deneme_sorulari_ek/
+.env
+api_key.txt

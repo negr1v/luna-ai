@@ -1,0 +1,47 @@
+[
+  {
+    "id": "tg_1794145770_2c0d",
+    "source": "Telegram Outbound",
+    "sender": "@JarvisAsistanBot",
+    "timestamp": "16:49",
+    "text": "Msg 2",
+    "category": "deal",
+    "highlight": false
+  },
+  {
+    "id": "tg_1794145770_5831",
+    "source": "Telegram Outbound",
+    "sender": "@JarvisAsistanBot",
+    "timestamp": "16:49",
+    "text": "Msg 1",
+    "category": "deal",
+    "highlight": false
+  },
+  {
+    "id": "tg_1794145711_6232",
+    "source": "Yerel Bildirim",
+    "sender": "@JarvisAsistanBot",
+    "timestamp": "16:48",
+    "text": "Msg 1",
+    "category": "deal",
+    "highlight": false
+  },
+  {
+    "id": "tg_1794145620_e87a",
+    "source": "Telegram Bot/Kanal",
+    "sender": "@TelegramUser",
+    "timestamp": "16:47",
+    "text": "Direct message test",
+    "category": "chat",
+    "highlight": true
+  },
+  {
+    "id": "tg_1794145614_4445",
+    "source": "Telegram Bot/Kanal",
+    "sender": "@TelegramUser",
+    "timestamp": "16:46",
+    "text": "test",
+    "category": "chat",
+    "highlight": true
+  }
+]

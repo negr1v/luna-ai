@@ -1,0 +1,306 @@
+{"timestamp": 1794639253.819083, "event_type": "TASK_CREATED", "task_id": "agent_task_588e48ba", "payload": {"request": "ZERO, sistem durumunu kontrol et.", "steps_count": 2}}
+{"timestamp": 1794639253.819083, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_588e48ba", "payload": {}}
+{"timestamp": 1794639253.819083, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_588e48ba", "payload": {"step_id": 1, "tool": "get_system_telemetry"}}
+{"timestamp": 1794639253.9361117, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_588e48ba", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794639253.947055, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_588e48ba", "payload": {"step_id": 2, "tool": "get_app_status"}}
+{"timestamp": 1794639253.94807, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_588e48ba", "payload": {"step_id": 2, "result_status": "ok"}}
+{"timestamp": 1794639253.94807, "event_type": "TASK_COMPLETED", "task_id": "agent_task_588e48ba", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %4.2, RAM: %75.2"}}
+{"timestamp": 1794639253.94807, "event_type": "TASK_CREATED", "task_id": "agent_task_5ed648be", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794639253.94807, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_5ed648be", "payload": {}}
+{"timestamp": 1794639253.9491167, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_5ed648be", "payload": {"step_id": 1, "tool": "get_app_status"}}
+{"timestamp": 1794639253.9491167, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_5ed648be", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794639253.9491167, "event_type": "TASK_COMPLETED", "task_id": "agent_task_5ed648be", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794639253.9491167, "event_type": "TASK_CREATED", "task_id": "agent_task_4768815e", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 2}}
+{"timestamp": 1794639253.9491167, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_4768815e", "payload": {}}
+{"timestamp": 1794639253.9491167, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_4768815e", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794639253.950113, "event_type": "STEP_APPROVED", "task_id": "agent_task_4768815e", "payload": {"step_id": 1}}
+{"timestamp": 1794639253.950113, "event_type": "TASK_CREATED", "task_id": "agent_task_2d2303a4", "payload": {"request": "ZERO, günlük görevlerimi listele.", "steps_count": 1}}
+{"timestamp": 1794639253.950113, "event_type": "TASK_CANCELLED", "task_id": "agent_task_2d2303a4", "payload": {}}
+{"timestamp": 1794639692.7220986, "event_type": "TASK_CREATED", "task_id": "agent_task_26fc4264", "payload": {"request": "ZERO, sistem durumunu kontrol et.", "steps_count": 2}}
+{"timestamp": 1794639692.723775, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_26fc4264", "payload": {}}
+{"timestamp": 1794639692.7248268, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_26fc4264", "payload": {"step_id": 1, "tool": "get_system_telemetry"}}
+{"timestamp": 1794639692.8273032, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_26fc4264", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794639692.828309, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_26fc4264", "payload": {"step_id": 2, "tool": "get_app_status"}}
+{"timestamp": 1794639692.828309, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_26fc4264", "payload": {"step_id": 2, "result_status": "ok"}}
+{"timestamp": 1794639692.82926, "event_type": "TASK_COMPLETED", "task_id": "agent_task_26fc4264", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %2.1, RAM: %76.0"}}
+{"timestamp": 1794639694.7586033, "event_type": "TASK_CREATED", "task_id": "agent_task_22c7aaa5", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 1}}
+{"timestamp": 1794639694.7596421, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_22c7aaa5", "payload": {}}
+{"timestamp": 1794639694.760601, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_22c7aaa5", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794641205.4674907, "event_type": "TASK_CREATED", "task_id": "agent_task_99d89efe", "payload": {"request": "ZERO, hangi uygulama açık?", "steps_count": 1}}
+{"timestamp": 1794641205.4674907, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_99d89efe", "payload": {}}
+{"timestamp": 1794641205.4684923, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_99d89efe", "payload": {"step_id": 1, "tool": "get_active_window_info"}}
+{"timestamp": 1794641205.4695373, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_99d89efe", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794641205.4695373, "event_type": "TASK_COMPLETED", "task_id": "agent_task_99d89efe", "payload": {"summary": "Görev 'Ön plandaki aktif pencere ve uygulamanın tespiti' başarıyla tamamlandı."}}
+{"timestamp": 1794644689.1362011, "event_type": "TASK_CREATED", "task_id": "agent_task_f3e6169f", "payload": {"request": "ZERO, sistem durumunu kontrol et.", "steps_count": 2}}
+{"timestamp": 1794644689.1362011, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_f3e6169f", "payload": {}}
+{"timestamp": 1794644689.1362011, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_f3e6169f", "payload": {"step_id": 1, "tool": "get_system_telemetry"}}
+{"timestamp": 1794644689.2518299, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_f3e6169f", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794644689.2528477, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_f3e6169f", "payload": {"step_id": 2, "tool": "get_app_status"}}
+{"timestamp": 1794644689.2528477, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_f3e6169f", "payload": {"step_id": 2, "result_status": "ok"}}
+{"timestamp": 1794644689.2528477, "event_type": "TASK_COMPLETED", "task_id": "agent_task_f3e6169f", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %3.8, RAM: %80.5"}}
+{"timestamp": 1794644689.2528477, "event_type": "TASK_CREATED", "task_id": "agent_task_896584b7", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794644689.2538264, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_896584b7", "payload": {}}
+{"timestamp": 1794644689.2538264, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_896584b7", "payload": {"step_id": 1, "tool": "get_app_status"}}
+{"timestamp": 1794644689.2538264, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_896584b7", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794644689.2538264, "event_type": "TASK_COMPLETED", "task_id": "agent_task_896584b7", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794644689.2538264, "event_type": "TASK_CREATED", "task_id": "agent_task_66c8185b", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 1}}
+{"timestamp": 1794644689.254825, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_66c8185b", "payload": {}}
+{"timestamp": 1794644689.254825, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_66c8185b", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794644689.254825, "event_type": "STEP_APPROVED", "task_id": "agent_task_66c8185b", "payload": {"step_id": 1}}
+{"timestamp": 1794644689.254825, "event_type": "TASK_CREATED", "task_id": "agent_task_2fd0b28e", "payload": {"request": "ZERO, günlük görevlerimi listele.", "steps_count": 1}}
+{"timestamp": 1794644689.254825, "event_type": "TASK_CANCELLED", "task_id": "agent_task_2fd0b28e", "payload": {}}
+{"timestamp": 1794645373.7750974, "event_type": "TASK_CREATED", "task_id": "agent_task_0fb70ce1", "payload": {"request": "ZERO, sistem durumunu kontrol et.", "steps_count": 2}}
+{"timestamp": 1794645373.7760987, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_0fb70ce1", "payload": {}}
+{"timestamp": 1794645373.7760987, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_0fb70ce1", "payload": {"step_id": 1, "tool": "get_system_telemetry"}}
+{"timestamp": 1794645373.8925905, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_0fb70ce1", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794645373.8925905, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_0fb70ce1", "payload": {"step_id": 2, "tool": "get_app_status"}}
+{"timestamp": 1794645373.8925905, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_0fb70ce1", "payload": {"step_id": 2, "result_status": "ok"}}
+{"timestamp": 1794645373.8925905, "event_type": "TASK_COMPLETED", "task_id": "agent_task_0fb70ce1", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %0.0, RAM: %80.6"}}
+{"timestamp": 1794645373.8935895, "event_type": "TASK_CREATED", "task_id": "agent_task_e4ea8898", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794645373.8935895, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_e4ea8898", "payload": {}}
+{"timestamp": 1794645373.8935895, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_e4ea8898", "payload": {"step_id": 1, "tool": "get_app_status"}}
+{"timestamp": 1794645373.8935895, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_e4ea8898", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794645373.8935895, "event_type": "TASK_COMPLETED", "task_id": "agent_task_e4ea8898", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794645373.8945887, "event_type": "TASK_CREATED", "task_id": "agent_task_7037b5dc", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 1}}
+{"timestamp": 1794645373.8945887, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_7037b5dc", "payload": {}}
+{"timestamp": 1794645373.8945887, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_7037b5dc", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794645373.8945887, "event_type": "STEP_APPROVED", "task_id": "agent_task_7037b5dc", "payload": {"step_id": 1}}
+{"timestamp": 1794645373.8945887, "event_type": "TASK_CREATED", "task_id": "agent_task_16b75a96", "payload": {"request": "ZERO, günlük görevlerimi listele.", "steps_count": 1}}
+{"timestamp": 1794645373.8945887, "event_type": "TASK_CANCELLED", "task_id": "agent_task_16b75a96", "payload": {}}
+{"timestamp": 1794645738.616839, "event_type": "TASK_CREATED", "task_id": "agent_task_1373e8bf", "payload": {"request": "ZERO, sistem durumunu kontrol et.", "steps_count": 2}}
+{"timestamp": 1794645738.616839, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_1373e8bf", "payload": {}}
+{"timestamp": 1794645738.617842, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_1373e8bf", "payload": {"step_id": 1, "tool": "get_system_telemetry"}}
+{"timestamp": 1794645738.731715, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_1373e8bf", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794645738.7327344, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_1373e8bf", "payload": {"step_id": 2, "tool": "get_app_status"}}
+{"timestamp": 1794645738.7327344, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_1373e8bf", "payload": {"step_id": 2, "result_status": "ok"}}
+{"timestamp": 1794645738.7327344, "event_type": "TASK_COMPLETED", "task_id": "agent_task_1373e8bf", "payload": {"summary": "Görev 'Sistem donanım telemetrisi ve servis sağlık analizi' başarıyla tamamlandı. | CPU: %12.2, RAM: %80.5"}}
+{"timestamp": 1794645738.7336707, "event_type": "TASK_CREATED", "task_id": "agent_task_a189e21b", "payload": {"request": "ZERO, proje dosyalarında jarvis_config dosyasını bul.", "steps_count": 1}}
+{"timestamp": 1794645738.7336707, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_a189e21b", "payload": {}}
+{"timestamp": 1794645738.7336707, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_a189e21b", "payload": {"step_id": 1, "tool": "get_app_status"}}
+{"timestamp": 1794645738.7336707, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_a189e21b", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794645738.7336707, "event_type": "TASK_COMPLETED", "task_id": "agent_task_a189e21b", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: ZERO, proje dosyalarında jarvis_config d' başarıyla tamamlandı."}}
+{"timestamp": 1794645738.734671, "event_type": "TASK_CREATED", "task_id": "agent_task_8d538043", "payload": {"request": "ZERO, bu ekran görüntüsünü analiz et.", "steps_count": 1}}
+{"timestamp": 1794645738.734671, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_8d538043", "payload": {}}
+{"timestamp": 1794645738.734671, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_8d538043", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794645738.734671, "event_type": "STEP_APPROVED", "task_id": "agent_task_8d538043", "payload": {"step_id": 1}}
+{"timestamp": 1794645738.734671, "event_type": "TASK_CREATED", "task_id": "agent_task_c797701d", "payload": {"request": "ZERO, günlük görevlerimi listele.", "steps_count": 1}}
+{"timestamp": 1794645738.7357128, "event_type": "TASK_CANCELLED", "task_id": "agent_task_c797701d", "payload": {}}
+{"timestamp": 1794645787.4431698, "event_type": "TASK_CREATED", "task_id": "agent_task_dd37361d", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794645787.4441597, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_dd37361d", "payload": {}}
+{"timestamp": 1794645787.4441597, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_dd37361d", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794645787.4451704, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_dd37361d", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1794645787.4451704, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_dd37361d", "payload": {}}
+{"timestamp": 1794645789.744451, "event_type": "TASK_CREATED", "task_id": "agent_task_bf90300b", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794645789.7454512, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_bf90300b", "payload": {}}
+{"timestamp": 1794645789.7454512, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_bf90300b", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794645789.746451, "event_type": "STEP_APPROVED", "task_id": "agent_task_bf90300b", "payload": {"step_id": 1}}
+{"timestamp": 1794645809.6211836, "event_type": "TASK_CREATED", "task_id": "agent_task_72b5e9e9", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794645809.6211836, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_72b5e9e9", "payload": {}}
+{"timestamp": 1794645809.6211836, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_72b5e9e9", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794645809.622224, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_72b5e9e9", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1794645809.622224, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_72b5e9e9", "payload": {}}
+{"timestamp": 1794645811.859071, "event_type": "TASK_CREATED", "task_id": "agent_task_c4b0bb51", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794645811.859071, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_c4b0bb51", "payload": {}}
+{"timestamp": 1794645811.8600745, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_c4b0bb51", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794645811.8600745, "event_type": "STEP_APPROVED", "task_id": "agent_task_c4b0bb51", "payload": {"step_id": 1}}
+{"timestamp": 1794646234.8204331, "event_type": "TASK_CREATED", "task_id": "agent_task_dd76f3fd", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794646234.821433, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_dd76f3fd", "payload": {}}
+{"timestamp": 1794646234.821433, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_dd76f3fd", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794646234.822433, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_dd76f3fd", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1794646234.822433, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_dd76f3fd", "payload": {}}
+{"timestamp": 1794646237.277212, "event_type": "TASK_CREATED", "task_id": "agent_task_b00aa281", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794646237.278216, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_b00aa281", "payload": {}}
+{"timestamp": 1794646237.278216, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_b00aa281", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794646237.2792137, "event_type": "STEP_APPROVED", "task_id": "agent_task_b00aa281", "payload": {"step_id": 1}}
+{"timestamp": 1794646775.4829931, "event_type": "TASK_CREATED", "task_id": "agent_task_c7f44648", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794646775.4829931, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_c7f44648", "payload": {}}
+{"timestamp": 1794646775.4840074, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_c7f44648", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794646775.4840074, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_c7f44648", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1794646775.485007, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_c7f44648", "payload": {}}
+{"timestamp": 1794646777.7725768, "event_type": "TASK_CREATED", "task_id": "agent_task_bd9d9253", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794646777.7736082, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_bd9d9253", "payload": {}}
+{"timestamp": 1794646777.7736082, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_bd9d9253", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794646777.7736082, "event_type": "STEP_APPROVED", "task_id": "agent_task_bd9d9253", "payload": {"step_id": 1}}
+{"timestamp": 1794647031.2960038, "event_type": "TASK_CREATED", "task_id": "agent_task_d2696e40", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794647031.2970445, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_d2696e40", "payload": {}}
+{"timestamp": 1794647031.2970445, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_d2696e40", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794647031.2970445, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_d2696e40", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1794647031.2980046, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_d2696e40", "payload": {}}
+{"timestamp": 1794647033.6550763, "event_type": "TASK_CREATED", "task_id": "agent_task_49f7f285", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794647033.6561236, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_49f7f285", "payload": {}}
+{"timestamp": 1794647033.6561236, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_49f7f285", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794647033.6561236, "event_type": "STEP_APPROVED", "task_id": "agent_task_49f7f285", "payload": {"step_id": 1}}
+{"timestamp": 1794647422.093791, "event_type": "TASK_CREATED", "task_id": "agent_task_13be9ef6", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794647422.093791, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_13be9ef6", "payload": {}}
+{"timestamp": 1794647422.093791, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_13be9ef6", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794647422.0947554, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_13be9ef6", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1794647422.0947554, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_13be9ef6", "payload": {}}
+{"timestamp": 1794647423.7640665, "event_type": "TASK_CREATED", "task_id": "agent_task_27041c5c", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1794647423.7650657, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_27041c5c", "payload": {}}
+{"timestamp": 1794647423.7650657, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_27041c5c", "payload": {"step_id": 1, "tool": "capture_screen_preview"}}
+{"timestamp": 1794647423.7660656, "event_type": "STEP_APPROVED", "task_id": "agent_task_27041c5c", "payload": {"step_id": 1}}
+{"timestamp": 1794681976.8421361, "event_type": "TASK_CREATED", "task_id": "agent_task_b3d17733", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794681976.8541386, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_b3d17733", "payload": {}}
+{"timestamp": 1794681976.8551362, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_b3d17733", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794681976.8951406, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_b3d17733", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794681976.8961387, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_b3d17733", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794681976.8991444, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_b3d17733", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794681976.9001718, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_b3d17733", "payload": {}}
+{"timestamp": 1794681983.50873, "event_type": "TASK_CREATED", "task_id": "agent_task_847eb5a1", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794681983.5107305, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_847eb5a1", "payload": {}}
+{"timestamp": 1794681983.5117273, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_847eb5a1", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794681983.5447807, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_847eb5a1", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794681983.5467896, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_847eb5a1", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794681983.5497909, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_847eb5a1", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794681983.5507808, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_847eb5a1", "payload": {}}
+{"timestamp": 1794682390.8373952, "event_type": "TASK_CREATED", "task_id": "agent_task_f0b2b52a", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794682390.8443975, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_f0b2b52a", "payload": {}}
+{"timestamp": 1794682390.8463964, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_f0b2b52a", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794682390.8753924, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_f0b2b52a", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794682390.8753924, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_f0b2b52a", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794682390.8763957, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_f0b2b52a", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794682390.878399, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_f0b2b52a", "payload": {}}
+{"timestamp": 1794756202.950727, "event_type": "TASK_CREATED", "task_id": "agent_task_ff3e5631", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794756202.9723938, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_ff3e5631", "payload": {}}
+{"timestamp": 1794756202.9723938, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_ff3e5631", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794756203.0248013, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_ff3e5631", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794756203.0248013, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_ff3e5631", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794756203.025801, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_ff3e5631", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794756203.025801, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_ff3e5631", "payload": {}}
+{"timestamp": 1794756614.6386957, "event_type": "TASK_CREATED", "task_id": "agent_task_31a48636", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794756614.6406958, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_31a48636", "payload": {}}
+{"timestamp": 1794756614.6406958, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_31a48636", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794756614.6546955, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_31a48636", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794756614.6546955, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_31a48636", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794756614.6546955, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_31a48636", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794756614.6546955, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_31a48636", "payload": {}}
+{"timestamp": 1794759993.0144098, "event_type": "TASK_CREATED", "task_id": "agent_task_eba8ca18", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794759993.0184088, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_eba8ca18", "payload": {}}
+{"timestamp": 1794759993.0194068, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_eba8ca18", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794759993.0554512, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_eba8ca18", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794759993.0554512, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_eba8ca18", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794759993.0564098, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_eba8ca18", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794759993.0564098, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_eba8ca18", "payload": {}}
+{"timestamp": 1794761342.0153453, "event_type": "TASK_CREATED", "task_id": "agent_task_696570f9", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794761342.0203424, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_696570f9", "payload": {}}
+{"timestamp": 1794761342.0203424, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_696570f9", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794761342.0503502, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_696570f9", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794761342.0513506, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_696570f9", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794761342.0513506, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_696570f9", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794761342.0523477, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_696570f9", "payload": {}}
+{"timestamp": 1794761575.4965768, "event_type": "TASK_CREATED", "task_id": "agent_task_116256b0", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794761575.4975772, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_116256b0", "payload": {}}
+{"timestamp": 1794761575.4985774, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_116256b0", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794761575.5165775, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_116256b0", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794761575.5165775, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_116256b0", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794761575.5165775, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_116256b0", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794761575.5165775, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_116256b0", "payload": {}}
+{"timestamp": 1794761856.459995, "event_type": "TASK_CREATED", "task_id": "agent_task_02bca367", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794761856.4619927, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_02bca367", "payload": {}}
+{"timestamp": 1794761856.462991, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_02bca367", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794761856.4889894, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_02bca367", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794761856.4889894, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_02bca367", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794761856.4889894, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_02bca367", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794761856.489989, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_02bca367", "payload": {}}
+{"timestamp": 1794761967.4915962, "event_type": "TASK_CREATED", "task_id": "agent_task_615a0534", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794761967.4925938, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_615a0534", "payload": {}}
+{"timestamp": 1794761967.4936378, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_615a0534", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794761967.509789, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_615a0534", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794761967.5103488, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_615a0534", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794761967.5103488, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_615a0534", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794761967.5109117, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_615a0534", "payload": {}}
+{"timestamp": 1794762118.7406669, "event_type": "TASK_CREATED", "task_id": "agent_task_56d045f6", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794762118.7427318, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_56d045f6", "payload": {}}
+{"timestamp": 1794762118.7436695, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_56d045f6", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794762118.7696655, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_56d045f6", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794762118.7706676, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_56d045f6", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794762118.7706676, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_56d045f6", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794762118.7716663, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_56d045f6", "payload": {}}
+{"timestamp": 1794763105.9975755, "event_type": "TASK_CREATED", "task_id": "agent_task_c4eb87c4", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1794763105.9985754, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_c4eb87c4", "payload": {}}
+{"timestamp": 1794763105.9985754, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_c4eb87c4", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1794763106.0145752, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_c4eb87c4", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1794763106.0145752, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_c4eb87c4", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1794763106.0145752, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_c4eb87c4", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1794763106.0145752, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_c4eb87c4", "payload": {}}
+{"timestamp": 1794855844.885379, "event_type": "TASK_CREATED", "task_id": "agent_task_12820042", "payload": {"request": "konuşur musun", "steps_count": 1}}
+{"timestamp": 1794855844.8963783, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_12820042", "payload": {}}
+{"timestamp": 1794855844.8973458, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_12820042", "payload": {"step_id": 1, "tool": "get_app_status"}}
+{"timestamp": 1794855844.898346, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_12820042", "payload": {"step_id": 1, "result_status": "ok"}}
+{"timestamp": 1794855844.898346, "event_type": "TASK_COMPLETED", "task_id": "agent_task_12820042", "payload": {"summary": "Görev 'Genel Sistem Sorgusu: konuşur musun' başarıyla tamamlandı."}}
+{"timestamp": 1795021176.057674, "event_type": "TASK_CREATED", "task_id": "agent_task_e9649231", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795021176.070677, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_e9649231", "payload": {}}
+{"timestamp": 1795021176.0716746, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_e9649231", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795021176.0737147, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_e9649231", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795021176.0737147, "event_type": "ACTION_CONTRACT_REJECTED", "task_id": "agent_task_e9649231", "payload": {"step_id": 2, "tool": "invoke_ui_element"}}
+{"timestamp": 1795021243.4148679, "event_type": "TASK_CREATED", "task_id": "agent_task_356019f4", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795021243.4168677, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_356019f4", "payload": {}}
+{"timestamp": 1795021243.4168677, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_356019f4", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795021243.4178724, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_356019f4", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795021243.418905, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_356019f4", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "initial", "approval_fingerprint": "f1c1628207581be7667a79eb098403d2cab025bba396df77460b19ad6b6c3bce"}}
+{"timestamp": 1795021243.418905, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_356019f4", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1795021243.4198666, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_356019f4", "payload": {}}
+{"timestamp": 1795021312.2099307, "event_type": "TASK_CREATED", "task_id": "agent_task_0c2421ce", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795021312.211932, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_0c2421ce", "payload": {}}
+{"timestamp": 1795021312.212929, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_0c2421ce", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795021312.2139313, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_0c2421ce", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795021312.2149322, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_0c2421ce", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "initial", "approval_fingerprint": "f1c1628207581be7667a79eb098403d2cab025bba396df77460b19ad6b6c3bce"}}
+{"timestamp": 1795021312.2159305, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_0c2421ce", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1795021312.2169302, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_0c2421ce", "payload": {}}
+{"timestamp": 1795022540.6581335, "event_type": "TASK_CREATED", "task_id": "agent_task_ad5144eb", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795022540.6601338, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_ad5144eb", "payload": {}}
+{"timestamp": 1795022540.6611362, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_ad5144eb", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795022540.6611362, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_ad5144eb", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795022540.6621318, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_ad5144eb", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "initial", "approval_fingerprint": "f1c1628207581be7667a79eb098403d2cab025bba396df77460b19ad6b6c3bce"}}
+{"timestamp": 1795022540.663132, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_ad5144eb", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1795022540.6641338, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_ad5144eb", "payload": {}}
+{"timestamp": 1795022579.7404892, "event_type": "TASK_CREATED", "task_id": "agent_task_9ac1872e", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795022579.7414849, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_9ac1872e", "payload": {}}
+{"timestamp": 1795022579.7424858, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_9ac1872e", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795022579.7434862, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_9ac1872e", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795022579.7444828, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_9ac1872e", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "initial", "approval_fingerprint": "f1c1628207581be7667a79eb098403d2cab025bba396df77460b19ad6b6c3bce"}}
+{"timestamp": 1795022579.7444828, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_9ac1872e", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1795022579.745485, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_9ac1872e", "payload": {}}
+{"timestamp": 1795022680.21425, "event_type": "TASK_CREATED", "task_id": "agent_task_ad727437", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795022680.2162485, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_ad727437", "payload": {}}
+{"timestamp": 1795022680.2162485, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_ad727437", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795022680.2172484, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_ad727437", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795022680.2182481, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_ad727437", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "initial", "approval_fingerprint": "f1c1628207581be7667a79eb098403d2cab025bba396df77460b19ad6b6c3bce"}}
+{"timestamp": 1795022680.2182481, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_ad727437", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1795022680.2192516, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_ad727437", "payload": {}}
+{"timestamp": 1795024290.808786, "event_type": "TASK_CREATED", "task_id": "agent_task_b1047493", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795024290.8137856, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_b1047493", "payload": {}}
+{"timestamp": 1795024290.815787, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_b1047493", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795024290.8177874, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_b1047493", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795024290.8197858, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_b1047493", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "initial", "approval_fingerprint": "f1c1628207581be7667a79eb098403d2cab025bba396df77460b19ad6b6c3bce"}}
+{"timestamp": 1795024290.8207862, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_b1047493", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1795024290.8227878, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_b1047493", "payload": {}}
+{"timestamp": 1795024473.9241161, "event_type": "TASK_CREATED", "task_id": "agent_task_0fdef792", "payload": {"request": "hesap makinesinde butona tıkla", "steps_count": 2}}
+{"timestamp": 1795024473.926122, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_0fdef792", "payload": {}}
+{"timestamp": 1795024473.926122, "event_type": "STEP_EXECUTION_START", "task_id": "agent_task_0fdef792", "payload": {"step_id": 1, "tool": "preview_ui_action"}}
+{"timestamp": 1795024473.9271147, "event_type": "STEP_EXECUTION_SUCCESS", "task_id": "agent_task_0fdef792", "payload": {"step_id": 1, "result_status": "preview"}}
+{"timestamp": 1795024473.928119, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_0fdef792", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "initial", "approval_fingerprint": "f1c1628207581be7667a79eb098403d2cab025bba396df77460b19ad6b6c3bce"}}
+{"timestamp": 1795024473.9291196, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_0fdef792", "payload": {"step_id": 2, "tool": "invoke_ui_element", "reason": "Güvenlik nedeniyle onaylanmadı"}}
+{"timestamp": 1795024473.9291196, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_0fdef792", "payload": {}}
+{"timestamp": 1795024948.2105563, "event_type": "TASK_EXECUTION_STARTED", "task_id": "desktop_task_f161948d84cf", "payload": {}}
+{"timestamp": 1795024948.2305386, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "desktop_task_f161948d84cf", "payload": {"step_id": 1, "tool": "desktop.focus_window", "reason": "initial", "approval_fingerprint": "e5d99221e12d2b0fc318db1048ed6c6f7435c2f97d566fe308f8403f615f1afc"}}
+{"timestamp": 1795024954.567144, "event_type": "STEP_APPROVED", "task_id": "desktop_task_f161948d84cf", "payload": {"step_id": 1, "approval_fingerprint": "e5d99221e12d2b0fc318db1048ed6c6f7435c2f97d566fe308f8403f615f1afc"}}
+{"timestamp": 1795024954.5701416, "event_type": "TASK_EXECUTION_STARTED", "task_id": "desktop_task_f161948d84cf", "payload": {}}
+{"timestamp": 1795024954.5781415, "event_type": "STEP_EXECUTION_START", "task_id": "desktop_task_f161948d84cf", "payload": {"step_id": 1, "tool": "desktop.focus_window"}}
+{"timestamp": 1795093673.4728198, "event_type": "TASK_CREATED", "task_id": "agent_task_6ebc29b3", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1795093673.473853, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_6ebc29b3", "payload": {}}
+{"timestamp": 1795093673.4748385, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_6ebc29b3", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "initial", "approval_fingerprint": "886e578ee9787a9ba476ab0b2242d32ce6828a745cbcf586d28b73a336396d1e"}}
+{"timestamp": 1795093673.4748385, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_6ebc29b3", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1795093673.4758132, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_6ebc29b3", "payload": {}}
+{"timestamp": 1795093677.6722345, "event_type": "TASK_CREATED", "task_id": "agent_task_c8326671", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1795093677.6862354, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_c8326671", "payload": {}}
+{"timestamp": 1795093677.6912382, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_c8326671", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "initial", "approval_fingerprint": "886e578ee9787a9ba476ab0b2242d32ce6828a745cbcf586d28b73a336396d1e"}}
+{"timestamp": 1795093709.3322084, "event_type": "TASK_CREATED", "task_id": "agent_task_3510e501", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1795093709.3322084, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_3510e501", "payload": {}}
+{"timestamp": 1795093709.3332071, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_3510e501", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "initial", "approval_fingerprint": "886e578ee9787a9ba476ab0b2242d32ce6828a745cbcf586d28b73a336396d1e"}}
+{"timestamp": 1795093709.3342068, "event_type": "TASK_TERMINAL_DENIED", "task_id": "agent_task_3510e501", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "Güvenlik reddi"}}
+{"timestamp": 1795093709.3342068, "event_type": "TERMINAL_DENIAL_BLOCKED_EXECUTION", "task_id": "agent_task_3510e501", "payload": {}}
+{"timestamp": 1795093711.8677151, "event_type": "TASK_CREATED", "task_id": "agent_task_b4816491", "payload": {"request": "ekran görüntüsü al", "steps_count": 1}}
+{"timestamp": 1795093711.8686702, "event_type": "TASK_EXECUTION_STARTED", "task_id": "agent_task_b4816491", "payload": {}}
+{"timestamp": 1795093711.8696773, "event_type": "STEP_AWAITING_APPROVAL", "task_id": "agent_task_b4816491", "payload": {"step_id": 1, "tool": "capture_screen_preview", "reason": "initial", "approval_fingerprint": "886e578ee9787a9ba476ab0b2242d32ce6828a745cbcf586d28b73a336396d1e"}}
+{"timestamp": 1795093711.8696773, "event_type": "STEP_APPROVED", "task_id": "agent_task_b4816491", "payload": {"step_id": 1, "approval_fingerprint": "886e578ee9787a9ba476ab0b2242d32ce6828a745cbcf586d28b73a336396d1e"}}

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accio Jarvis — Ana Kokpit & Komuta Merkezi</title>
+<style>
+  :root {
+    --bg: #090d12;
+    --card: #121820;
+    --card-hover: #17202b;
+    --card-inner: #1a232f;
+    --border: #222d3b;
+    --border-bright: #314256;
+    --txt: #e6edf3;
+    --dim: #8b9bb0;
+    --amber: #f59e0b;
+    --amber-dim: rgba(245, 158, 11, 0.15);
+    --green: #10b981;
+    --green-dim: rgba(16, 185, 129, 0.15);
+    --cyan: #06b6d4;
+    --cyan-dim: rgba(6, 182, 212, 0.15);
+    --red: #ef4444;
+    --red-dim: rgba(239, 68, 68, 0.15);
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--txt);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding-bottom: 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  header {
+    background: rgba(18, 24, 32, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 12px 20px;
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #fff;
+    font-size: 16px;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+  }
+  .brand-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge-jarvis {
+    background: var(--cyan-dim);
+    color: var(--cyan);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .countdowns {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .cd-box {
+    background: var(--card-inner);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .cd-box .label { color: var(--dim); }
+  .cd-box .val {
+    font-family: monospace;
+    font-weight: 700;
+    color: var(--amber);
+  }
+
+  /* Nav Tabs */
+  nav {
+    max-width: 1200px;
+    margin: 16px auto 0;
+    padding: 0 20px;
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--dim);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tab-btn:hover {
+    color: var(--txt);
+    background: var(--card-inner);
+  }
+  .tab-btn.active {
+    background: var(--card-inner);
+    color: var(--cyan);
+    border-color: var(--border-bright);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+  }
+
+  /* Main Container */
+  main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Grid & Cards */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--txt);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-subtitle {
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  /* Metric Tile */
+  .metric-tile {
+    background: var(--card-inner);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .metric-label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric-val { font-size: 20px; font-weight: 800; font-family: monospace; color: var(--txt); }
+  .metric-sub { font-size: 11px; color: var(--dim); }
+
+  /* Tables */
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .custom-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--dim);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+  .custom-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(34, 45, 59, 0.6);
+    vertical-align: middle;
+  }
+  .custom-table tr:hover td { background: var(--card-inner); }
+  .badge-status {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .status-alarm { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .status-close { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+  .status-wait { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+  .status-ok { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+  /* Interactive Simulator */
+  .sim-box {
+    background: var(--card-inner);
+    border: 1px solid var(--border-bright);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 12px;
+  }
+  .sim-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .sim-input {
+    background: #0d1217;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: #fff;
+    padding: 6px 10px;
+    font-size: 13px;
+    width: 130px;
+    font-family: monospace;
+  }
+  .sim-input:focus { border-color: var(--cyan); outline: none; }
+  .sim-result {
+    padding: 10px;
+    background: #0d1217;
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    border-left: 3px solid var(--cyan);
+  }
+
+  /* YKS Checklist & Pomodoro */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .check-item {
+    background: var(--card-inner);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .check-item:hover { border-color: var(--border-bright); }
+  .check-item.done {
+    opacity: 0.55;
+    background: #11171e;
+  }
+  .check-item.done .check-title { text-decoration: line-through; color: var(--dim); }
+  .check-input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--green);
+    cursor: pointer;
+  }
+  .check-body { flex: 1; }
+  .check-title { font-size: 13.5px; font-weight: 600; color: var(--txt); }
+  .check-sub { font-size: 11.5px; color: var(--dim); }
+  .check-badge {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #232f3e;
+    color: var(--cyan);
+    font-family: monospace;
+  }
+
+  /* Pomodoro Widget */
+  .pomo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: var(--card-inner);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .pomo-clock {
+    font-size: 44px;
+    font-weight: 800;
+    font-family: monospace;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    margin: 8px 0;
+  }
+  .pomo-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .btn {
+    background: var(--border);
+    color: var(--txt);
+    border: 1px solid var(--border-bright);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { background: var(--border-bright); color: #fff; }
+  .btn-primary { background: var(--cyan); color: #000; border-color: var(--cyan); }
+  .btn-primary:hover { background: #0891b2; color: #fff; }
+  .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
+
+  /* Copy Buttons & Command Box */
+  .copy-box {
+    background: #0a0f14;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 12px;
+  }
+  .copy-text {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .btn-sm {
+    padding: 3px 9px;
+    font-size: 11px;
+    border-radius: 4px;
+  }
+
+  /* Progress Bar */
+  .pbar-wrap {
+    height: 8px;
+    background: #1c2631;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .pbar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--green));
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header-inner { flex-direction: column; align-items: flex-start; }
+    .countdowns { width: 100%; justify-content: space-between; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">A</div>
+      <div class="brand-title">
+        Accio Jarvis
+        <span class="badge-jarvis">TAM GÜÇ DEVREDE</span>
+      </div>
+    </div>
+    <div class="countdowns">
+      <div class="cd-box">
+        <span class="label">📅 BF 27.11:</span>
+        <span class="val" id="bf-timer">Hesaplanıyor...</span>
+      </div>
+      <div class="cd-box">
+        <span class="label">🎯 Babaya Söyleme (07.11):</span>
+        <span class="val" id="yks-timer">Hesaplanıyor...</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="switchTab('tab-hardware')">🖥️ Donanım & Black Friday</button>
+  <button class="tab-btn" onclick="switchTab('tab-yks')">📚 YKS 2027 Koçluk & Takip</button>
+  <button class="tab-btn" onclick="switchTab('tab-system')">💾 Sistem & Projeler Hub</button>
+  <button class="tab-btn" onclick="switchTab('tab-agent')">⚡ Jarvis Komut Merkezi</button>
+</nav>
+
+<main>
+
+  <!-- TAB 1: DONANIM -->
+  <section id="tab-hardware" class="tab-content active">
+    <div class="grid-3">
+      <div class="metric-tile">
+        <span class="metric-label">HEDEF İKİLİ (7500F + B650M-R)</span>
+        <span class="metric-val" style="color:var(--cyan);">11.732,98 TL</span>
+        <span class="metric-sub">CPU: 6.632,99 · Anakart: 5.099,99</span>
+      </div>
+      <div class="metric-tile">
+        <span class="metric-label">BÜTÇE TAVANI PAYI (≤40.000 TL)</span>
+        <span class="metric-val" style="color:var(--green);">7.502,00 TL</span>
+        <span class="metric-sub">RAM alındı (25.998 TL) · Kalan tavan marjı</span>
+      </div>
+      <div class="metric-tile">
+        <span class="metric-label">GENEL STRATEJİ POZİSYONU</span>
+        <span class="metric-val" style="color:var(--amber);">BEKLE</span>
+        <span class="metric-sub">Son Kayıt: TUR 139 · BF'ye 23 Gün</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">🖥️ Canlı Takip Listesi & Eşik Durumu (TUR 139)</div>
+          <div class="card-subtitle">Referans: Akakçe en ucuz · Alarm: Bant içi VE kümülatif %5+ düşüş</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Parça / Ürün</th>
+              <th>Son Fiyat</th>
+              <th>Hedef Eşik</th>
+              <th>Fark / Durum</th>
+              <th>Sınıf / Karar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Biostar B850MT2-E DJ</b></td>
+              <td style="font-family:monospace;">4.499,99 TL</td>
+              <td style="font-family:monospace;">≤ 4.499,00 TL</td>
+              <td><span style="color:var(--red);">+0,99 TL</span> (Alarm)</td>
+              <td><span class="badge-status status-alarm">TUR 138 BİLDİRİMLİ</span></td>
+            </tr>
+            <tr>
+              <td><b>Maxsun Challenger B650M-K V1</b></td>
+              <td style="font-family:monospace;">4.507,02 TL</td>
+              <td style="font-family:monospace;">≤ 4.499,00 TL</td>
+              <td><span style="color:var(--amber);">+8,02 TL</span></td>
+              <td><span class="badge-status status-close">EN YAKIN TETİK</span></td>
+            </tr>
+            <tr>
+              <td><b>ASUS Prime B650M-R</b></td>
+              <td style="font-family:monospace;">5.099,99 TL</td>
+              <td style="font-family:monospace;">≤ 4.899,00 TL</td>
+              <td><span style="color:var(--blue);">+200,99 TL</span></td>
+              <td><span class="badge-status status-wait">BEKLE (Bant Dışı)</span></td>
+            </tr>
+            <tr>
+              <td><b>Ryzen 5 7500F</b></td>
+              <td style="font-family:monospace;">6.632,99 TL</td>
+              <td style="font-family:monospace;">≤ 6.500,00 TL</td>
+              <td><span style="color:var(--blue);">+132,99 TL</span></td>
+              <td><span class="badge-status status-wait">BEKLE (Bant Dışı)</span></td>
+            </tr>
+            <tr>
+              <td><b>Ryzen 7 7700 / 7700X</b></td>
+              <td style="font-family:monospace;">9.950,00 / 11.219,52</td>
+              <td style="font-family:monospace;">≤ 9.000,00 TL</td>
+              <td><span>+950,00 / +2.219,52</span></td>
+              <td><span class="badge-status status-wait">ALARM YOK</span></td>
+            </tr>
+            <tr>
+              <td><b>Klasse Zen Poron Speed Geisha</b></td>
+              <td style="font-family:monospace;">1.199,90 TL</td>
+              <td style="font-family:monospace;">≤ 1.500,00 TL (Tavan)</td>
+              <td><span style="color:var(--green);">Amazon'da 1.199 TL</span></td>
+              <td><span class="badge-status status-ok">03.11 SEÇİMİ</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Simulator -->
+      <div class="sim-box">
+        <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:var(--cyan);">
+          ⚡ Fırsat & Bütçe Simülatörü
+        </div>
+        <div class="sim-row">
+          <div>
+            <label style="font-size:11px; color:var(--dim); display:block;">İşlemci Fiyatı (TL):</label>
+            <input type="number" id="sim-cpu" class="sim-input" value="6632.99" oninput="runSim()">
+          </div>
+          <div>
+            <label style="font-size:11px; color:var(--dim); display:block;">Anakart Fiyatı (TL):</label>
+            <input type="number" id="sim-mobo" class="sim-input" value="5099.99" oninput="runSim()">
+          </div>
+        </div>
+        <div class="sim-result" id="sim-out">Hesaplanıyor...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: YKS -->
+  <section id="tab-yks" class="tab-content">
+    <div class="grid-3">
+      <div class="metric-tile">
+        <span class="metric-label">GÜNLÜK YÜK MODELİ</span>
+        <span class="metric-val" style="color:var(--cyan);">320 Dk / Gün</span>
+        <span class="metric-sub">6 Blok · Sabit Yük (Artmaz/Azalmaz)</span>
+      </div>
+      <div class="metric-tile">
+        <span class="metric-label">3 HAFTALIK TEST HEDEFİ</span>
+        <span class="metric-val" style="color:var(--green);">≥ %90 + ≥ 70 Net</span>
+        <span class="metric-sub">07.11 Babaya Söyleme · 27.11 BF Alım</span>
+      </div>
+      <div class="metric-tile">
+        <span class="metric-label">BUGÜNKÜ İLERLEME</span>
+        <span class="metric-val" id="yks-progress-val">0 / 6 Blok</span>
+        <div class="pbar-wrap"><div class="pbar-fill" id="yks-progress-bar"></div></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- 6 Blok Checklist -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📚 Günlük 6 Çekirdek Blok (320 Dk)</div>
+          <button class="btn btn-sm" onclick="resetYksBlocks()">Sıfırla</button>
+        </div>
+        <div class="checklist" id="yks-block-list">
+          <div class="check-item" onclick="toggleTask('b1')">
+            <input type="checkbox" class="check-input" id="cb-b1" onclick="event.stopPropagation(); toggleTask('b1')">
+            <div class="check-body">
+              <div class="check-title">Blok 1: AYT Matematik (90 dk)</div>
+              <div class="check-sub">345 AYT Mat + Mert Hoca · Polinom (Bölme/Kalan)</div>
+            </div>
+            <span class="check-badge">90'</span>
+          </div>
+
+          <div class="check-item" onclick="toggleTask('b2')">
+            <input type="checkbox" class="check-input" id="cb-b2" onclick="event.stopPropagation(); toggleTask('b2')">
+            <div class="check-body">
+              <div class="check-title">Blok 2: TYT Paragraf (40 dk)</div>
+              <div class="check-sub">3D Paragraf · 25 Soru süreli (bölünmez)</div>
+            </div>
+            <span class="check-badge">40'</span>
+          </div>
+
+          <div class="check-item" onclick="toggleTask('b3')">
+            <input type="checkbox" class="check-input" id="cb-b3" onclick="event.stopPropagation(); toggleTask('b3')">
+            <div class="check-body">
+              <div class="check-title">Blok 3: TYT Matematik (40 dk)</div>
+              <div class="check-sub">Miray TYT Mat + Orijinal Problem Fasikülü</div>
+            </div>
+            <span class="check-badge">40'</span>
+          </div>
+
+          <div class="check-item" onclick="toggleTask('b4')">
+            <input type="checkbox" class="check-input" id="cb-b4" onclick="event.stopPropagation(); toggleTask('b4')">
+            <div class="check-body">
+              <div class="check-title">Blok 4: Fen Bloğu (80 dk)</div>
+              <div class="check-sub">Apotemi TYT Fen / Aydın Kimya / Biotik Biyo</div>
+            </div>
+            <span class="check-badge">80'</span>
+          </div>
+
+          <div class="check-item" onclick="toggleTask('b5')">
+            <input type="checkbox" class="check-input" id="cb-b5" onclick="event.stopPropagation(); toggleTask('b5')">
+            <div class="check-body">
+              <div class="check-title">Blok 5: Geometri / Dil Bilgisi (40 dk)</div>
+              <div class="check-sub">EİS DAF Geometri (4 föy/hf) / Apotemi Dil Sprint</div>
+            </div>
+            <span class="check-badge">40'</span>
+          </div>
+
+          <div class="check-item" onclick="toggleTask('b6')">
+            <input type="checkbox" class="check-input" id="cb-b6" onclick="event.stopPropagation(); toggleTask('b6')">
+            <div class="check-body">
+              <div class="check-title">Blok 6: AYT Fizik (30 dk Tavan)</div>
+              <div class="check-sub">Paraf AYT Fizik · Ünite 1 Vektörler (s.9-18 + s.87)</div>
+            </div>
+            <span class="check-badge">30'</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pomodoro & Dokunulmaz Rutin -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⏱️ 40/10 Pomodoro & Rutinler</div>
+        </div>
+        <div class="pomo-wrap">
+          <div style="font-size:12px; color:var(--dim); text-transform:uppercase;">Çalışma Zamanlayıcısı</div>
+          <div class="pomo-clock" id="pomo-display">40:00</div>
+          <div class="pomo-btns">
+            <button class="btn btn-primary" id="pomo-toggle" onclick="togglePomo()">Başlat</button>
+            <button class="btn" onclick="setPomo(40)">40 Dk (Blok)</button>
+            <button class="btn" onclick="setPomo(10)">10 Dk (Mola)</button>
+            <button class="btn btn-danger" onclick="resetPomo()">Sıfırla</button>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="font-size:12px; font-weight:700; color:var(--dim); margin-bottom:8px;">GÜNLÜK 7 RUTİN (Yüzdeye Sayılmaz):</div>
+          <div style="font-size:12px; color:var(--dim); line-height:1.8;">
+            • 09:15–09:45 Kahvaltı &bull; 15:20–16:00 Yürüyüş<br>
+            • <b style="color:var(--amber);">16:00–17:30 Oyun Saati (Dokunulmaz)</b><br>
+            • 19:00–19:40 Akşam Yemeği &bull; 15 dk Almanca &bull; 10 dk İngilizce<br>
+            • 20 dk Python (Cuma/Pazar)
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: SİSTEM & PROJELER -->
+  <section id="tab-system" class="tab-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💾 Disk & GTA IV Kurtarma Protokolü</div>
+          <span class="badge-status status-alarm">SİLİNMEMELİ</span>
+        </div>
+        <p style="font-size:13px; color:var(--dim); margin-bottom:12px;">
+          <b style="color:#fff;">GTA IV (22,27 GB) Yarım İndirme:</b> <code>steamapps\downloading\12210</code> klasöründe duruyor.
+          Steam üzerinden <i>"İndirmeyi Sürdür"</i> ile tam kuruluma çevrilmelidir. Kurulum sonrası zorunlu parametreler:
+        </p>
+        <div class="copy-box">
+          <span class="copy-text">-nomemrestrict -norestrictions -availablevidmem 4096 -noprecache -novblank -percentvidmem 100</span>
+          <button class="btn btn-sm" onclick="copyText('-nomemrestrict -norestrictions -availablevidmem 4096 -noprecache -novblank -percentvidmem 100')">Kopyala</button>
+        </div>
+        <p style="font-size:11.5px; color:var(--dim); margin-top:8px;">
+          Not: <code>commandline.txt</code> olarak GTA IV ana dizinine kaydedilir.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🎮 Don't Starve Together — WX-78 Build</div>
+        </div>
+        <p style="font-size:13px; color:var(--dim); margin-bottom:10px;">
+          300 Günlük ko-op hedefi (3 kişi: WX-78 + Wendy/Wilson). Kış penceresi ~Gün 20.
+        </p>
+        <div style="background:var(--card-inner); padding:10px; border-radius:8px; font-size:12.5px; line-height:1.7;">
+          • <b>Alpha Build (6/6):</b> Hardy × 2 + Gastrogain + Super-Processing<br>
+          • <b>Beta:</b> Optoelectronic + Super-Acceleration<br>
+          • <b>Gamma:</b> Blocking + Chessmaster<br>
+          • <i>Refrigerant ve Rangebooster bilinçli olarak elendi.</i>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📹 Faceless YouTube — "Weak Hardware, Measured"</div>
+      </div>
+      <p style="font-size:13px; color:var(--dim); margin-bottom:8px;">
+        <b>Kural:</b> YKS çekirdek blokları bitmeden ve 21:00'den önce başlanmaz. Pencere: <b>21:00–22:30 sert bitiş</b>, günde max 60 dk.
+      </p>
+      <div style="font-size:12.5px; color:var(--dim); line-height:1.6;">
+        • <b>Video 1:</b> Laptop LoL 20 → 80 FPS (veri alındı, ~11 saat emek, 30 dk/gün ile ~22 gün).<br>
+        • <b>Video 2:</b> RX 6600 undervolt ve stabilite analizi.<br>
+        • <b>İçerik Dağılımı:</b> %65 zayıf donanım performansı · %25 AI · %10 stunt.
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: JARVIS KOMUT MERKEZİ -->
+  <section id="tab-agent" class="tab-content">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-title">⚡ Tek Tıkla Hazır Jarvis İstekleri</div>
+        <div class="card-subtitle">Sohbete yapıştırmak için tek tıkla kopyala</div>
+      </div>
+      
+      <div class="copy-box">
+        <span class="copy-text">Donanım fırsat taramasını (TUR 140) çalıştır, FIYAT-GECMISI.md'ye ekle ve özet ver.</span>
+        <button class="btn btn-sm" onclick="copyText('Donanım fırsat taramasını (TUR 140) çalıştır, FIYAT-GECMISI.md\'ye ekle ve özet ver.')">Kopyala</button>
+      </div>
+
+      <div class="copy-box">
+        <span class="copy-text">YKS 2027 günlük 320 dk blok takibimi güncelle: tamamlanan blokları kaydet.</span>
+        <button class="btn btn-sm" onclick="copyText('YKS 2027 günlük 320 dk blok takibimi güncelle: tamamlanan blokları kaydet.')">Kopyala</button>
+      </div>
+
+      <div class="copy-box">
+        <span class="copy-text">07.11 Babaya söyleme günü için 3 haftalık test baseline raporunu ve 17.000 TL donanım savunmasını hazırla.</span>
+        <button class="btn btn-sm" onclick="copyText('07.11 Babaya söyleme günü için 3 haftalık test baseline raporunu ve 17.000 TL donanım savunmasını hazırla.')">Kopyala</button>
+      </div>
+
+      <div class="copy-box">
+        <span class="copy-text">Aktif çalışma alanlarındaki FIYAT-GECMISI.md ve FIRSAT-TETIKLERI.md durumunu kontrol et.</span>
+        <button class="btn btn-sm" onclick="copyText('Aktif çalışma alanlarındaki FIYAT-GECMISI.md ve FIRSAT-TETIKLERI.md durumunu kontrol et.')">Kopyala</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📁 Önemli Çalışma Alanı Kısayolları</div>
+      </div>
+      <div style="font-size:12.5px; line-height:2;">
+        <div><b>Canlı Donanım Alanı:</b> <code>C:\Users\negr1\AccioWork\2026-10-31-13-00-32-810-40f9cfb6</code></div>
+        <div><b>YKS Plan ve Takip Alanı:</b> <code>C:\Users\negr1\AccioWork\2026-11-01-11-40-57-549-259ac274</code></div>
+        <div><b>Devir Paketi:</b> <code>C:\Users\negr1\AccioWork\2026-11-03-15-57-18-083-2fad59ab\devir-paketi</code></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Tab Switching
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  // Countdowns
+  function updateCountdowns() {
+    const now = new Date();
+    
+    // Black Friday: 2026-11-27 00:00:00
+    const bfDate = new Date('2026-11-27T00:00:00');
+    const diffBf = bfDate - now;
+    if (diffBf > 0) {
+      const days = Math.floor(diffBf / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diffBf / (1000 * 60 * 60)) % 24);
+      document.getElementById('bf-timer').innerText = `${days}g ${hours}s kaldı`;
+    } else {
+      document.getElementById('bf-timer').innerText = "GÜNÜ GELDİ!";
+    }
+
+    // YKS Babaya Söyleme: 2026-11-07 00:00:00
+    const yksDate = new Date('2026-11-07T00:00:00');
+    const diffYks = yksDate - now;
+    if (diffYks > 0) {
+      const days = Math.floor(diffYks / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diffYks / (1000 * 60 * 60)) % 24);
+      document.getElementById('yks-timer').innerText = `${days}g ${hours}s kaldı`;
+    } else {
+      document.getElementById('yks-timer').innerText = "BUGÜN!";
+    }
+  }
+  setInterval(updateCountdowns, 1000);
+  updateCountdowns();
+
+  // Price Simulator
+  function runSim() {
+    const cpu = parseFloat(document.getElementById('sim-cpu').value) || 0;
+    const mobo = parseFloat(document.getElementById('sim-mobo').value) || 0;
+    const ram = 25998.00;
+    const maxBudget = 40000.00;
+    
+    const combo = cpu + mobo;
+    const totalSpent = ram + combo;
+    const budgetRemaining = maxBudget - totalSpent;
+
+    let moboStatus = "BEKLE";
+    if (mobo <= 4499.00) moboStatus = "<b style='color:var(--green);'>KESİN AL (≤4.499)</b>";
+    else if (mobo <= 4899.00) moboStatus = "<b style='color:var(--amber);'>AL BANDI (4.500–4.899)</b>";
+    else if (mobo <= 7000.00) moboStatus = "<span style='color:var(--blue);'>TAVAN ALTI (BEKLE)</span>";
+    else moboStatus = "<span style='color:var(--red);'>TAVAN AŞIMI</span>";
+
+    let cpuStatus = "BEKLE";
+    if (cpu <= 6500.00) cpuStatus = "<b style='color:var(--green);'>KESİN AL (≤6.500)</b>";
+    else if (cpu <= 7200.00) cpuStatus = "<b style='color:var(--amber);'>AL BANDI (6.501–7.200)</b>";
+    else cpuStatus = "<span style='color:var(--blue);'>BEKLE (>7.200)</span>";
+
+    document.getElementById('sim-out').innerHTML = `
+      <b>İkili Toplam:</b> ${combo.toLocaleString('tr-TR', {minimumFractionDigits:2})} TL<br>
+      <b>Anakart Değerlendirmesi:</b> ${moboStatus} &bull; <b>İşlemci:</b> ${cpuStatus}<br>
+      <b>40.000 TL Bütçe Kalan Marj:</b> <span style="color:${budgetRemaining >= 0 ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${budgetRemaining.toLocaleString('tr-TR', {minimumFractionDigits:2})} TL</span>
+    `;
+  }
+  runSim();
+
+  // YKS Checklist LocalStorage
+  const blocks = ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'];
+  function loadYksState() {
+    let completed = 0;
+    blocks.forEach(b => {
+      const isDone = localStorage.getItem('yks_' + b) === '1';
+      const cb = document.getElementById('cb-' + b);
+      if (cb) {
+        cb.checked = isDone;
+        const item = cb.closest('.check-item');
+        if (isDone) {
+          item.classList.add('done');
+          completed++;
+        } else {
+          item.classList.remove('done');
+        }
+      }
+    });
+    const pct = Math.round((completed / blocks.length) * 100);
+    document.getElementById('yks-progress-val').innerText = `${completed} / 6 Blok (%${pct})`;
+    document.getElementById('yks-progress-bar').style.width = `${pct}%`;
+  }
+  function toggleTask(id) {
+    const cb = document.getElementById('cb-' + id);
+    cb.checked = !cb.checked;
+    localStorage.setItem('yks_' + id, cb.checked ? '1' : '0');
+    loadYksState();
+  }
+  function resetYksBlocks() {
+    if (confirm("Günün bloklarını sıfırlamak istiyor musunuz?")) {
+      blocks.forEach(b => localStorage.removeItem('yks_' + b));
+      loadYksState();
+    }
+  }
+  loadYksState();
+
+  // Pomodoro
+  let pomoSecs = 40 * 60;
+  let pomoTimer = null;
+  function updatePomoDisplay() {
+    const m = Math.floor(pomoSecs / 60).toString().padStart(2, '0');
+    const s = (pomoSecs % 60).toString().padStart(2, '0');
+    document.getElementById('pomo-display').innerText = `${m}:${s}`;
+  }
+  function togglePomo() {
+    const btn = document.getElementById('pomo-toggle');
+    if (pomoTimer) {
+      clearInterval(pomoTimer);
+      pomoTimer = null;
+      btn.innerText = "Devam Et";
+    } else {
+      btn.innerText = "Durdur";
+      pomoTimer = setInterval(() => {
+        if (pomoSecs > 0) {
+          pomoSecs--;
+          updatePomoDisplay();
+        } else {
+          clearInterval(pomoTimer);
+          pomoTimer = null;
+          btn.innerText = "Bitti!";
+          alert("Pomodoro Tamamlandı!");
+        }
+      }, 1000);
+    }
+  }
+  function setPomo(mins) {
+    if (pomoTimer) clearInterval(pomoTimer);
+    pomoTimer = null;
+    document.getElementById('pomo-toggle').innerText = "Başlat";
+    pomoSecs = mins * 60;
+    updatePomoDisplay();
+  }
+  function resetPomo() {
+    setPomo(40);
+  }
+
+  // Copy helper
+  function copyText(txt) {
+    navigator.clipboard.writeText(txt).then(() => {
+      alert("Panoya kopyalandı:\n" + txt);
+    });
+  }
+</script>
+
+</body>
+</html>

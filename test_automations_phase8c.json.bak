@@ -1,0 +1,23 @@
+{
+  "schema_version": "4.0",
+  "revision": 1,
+  "automations": [
+    {
+      "id": "auto_timeout_test",
+      "name": "Timeout Test",
+      "schedule": {
+        "kind": "daily",
+        "time": "14:00"
+      },
+      "action": {
+        "action_id": "run_isolated_worker",
+        "params": {
+          "task_name": "akakce_price_validator",
+          "timeout": 0.1
+        }
+      },
+      "enabled": true,
+      "execution_count": 0
+    }
+  ]
+}
