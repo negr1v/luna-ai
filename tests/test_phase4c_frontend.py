@@ -20,7 +20,7 @@ import unittest
 import shutil
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-INDEX_HTML = os.path.join(BASE_DIR, "index.html")
+INDEX_HTML = os.path.join(os.path.dirname(BASE_DIR), "index.html")
 
 def get_node_bin():
     n = shutil.which("node")

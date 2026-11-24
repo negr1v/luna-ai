@@ -33,7 +33,8 @@ import subprocess
 import shutil
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-INDEX_FILE = os.path.join(BASE_DIR, "index.html")
+PROJECT_DIR = os.path.dirname(BASE_DIR)
+INDEX_FILE = os.path.join(PROJECT_DIR, "index.html")
 
 def get_node_bin():
     n = shutil.which("node")
@@ -54,7 +55,7 @@ class TestPhase5CAudio(unittest.TestCase):
             cls.html = f.read()
 
         script_matches = re.findall(r"<script\b[^>]*>([\s\S]*?)</script>", cls.html, re.IGNORECASE)
-        cls.script_code = script_matches[0] if script_matches else ""
+        cls.script_code = next((code for code in script_matches if "function playAudioBase64" in code), "")
 
     def test_01_javascript_syntax_clean(self):
         """Verify index.html JavaScript syntax is completely clean."""
@@ -64,7 +65,7 @@ class TestPhase5CAudio(unittest.TestCase):
             "const m = /<script\\b[^>]*>([\\s\\S]*?)<\\/script>/i.exec(html);"
             "new Function(m[1]);"
         )
-        res = subprocess.run([NODE_BIN, "-e", node_code], cwd=BASE_DIR, capture_output=True, text=True)
+        res = subprocess.run([NODE_BIN, "-e", node_code], cwd=PROJECT_DIR, capture_output=True, text=True)
         self.assertEqual(res.returncode, 0, f"Syntax error in index.html: {res.stderr}")
         print("  [Phase 5C Test 1 PASSED] JavaScript syntax validation clean via node.")
 

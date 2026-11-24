@@ -22,6 +22,7 @@ from jarvis_server import (
     PAID_MODEL_AUTHORIZATIONS,
     PAID_AUTH_TTL_SECONDS,
     handle_chat,
+    handle_chat_stream,
     handle_request_paid_auth,
     AI_MODEL_CATALOG
 )
@@ -33,6 +34,7 @@ class TestPhase15A1PaidProtection(AioHTTPTestCase):
     async def get_application(self):
         app = web.Application()
         app.router.add_post("/api/chat", handle_chat)
+        app.router.add_post("/api/chat/stream", handle_chat_stream)
         app.router.add_post("/api/models/paid_auth/request", handle_request_paid_auth)
         return app
 
@@ -95,6 +97,8 @@ class TestPhase15A1PaidProtection(AioHTTPTestCase):
         """Ücretli model onaysız çağrıldığında HTTP 402 ve confirmation_required dönmeli."""
         payload = {
             "message": "Merhaba",
+            "voice_mode": False,
+            "voice_reply": False,
             "config": {
                 "model": "z-ai/glm-5.3"
             }
@@ -129,6 +133,8 @@ class TestPhase15A1PaidProtection(AioHTTPTestCase):
         payload = {
             "message": "Hesaplama yap",
             "paid_auth_token": token,
+            "voice_mode": False,
+            "voice_reply": False,
             "config": {
                 "model": "z-ai/glm-5.3"
             }
@@ -139,9 +145,27 @@ class TestPhase15A1PaidProtection(AioHTTPTestCase):
             resp = await self.client.post("/api/chat", json=payload)
             # 402 dönmemeli, onay aşamasını geçmiş olmalı
             self.assertNotEqual(resp.status, 402)
+            replay = await self.client.post("/api/chat", json=payload)
+            self.assertEqual(replay.status, 402)
+            replay_data = await replay.json()
+            self.assertEqual(replay_data.get("error_code"), "PAID_MODEL_AUTHORIZATION_INVALID")
 
     @unittest_run_loop
-    async def test_08_paid_auth_request_endpoint(self):
+    async def test_08_stream_paid_model_without_approval_blocked_before_sse(self):
+        payload = {
+            "message": "Merhaba",
+            "config": {"model": "z-ai/glm-5.3"},
+        }
+        with patch("jarvis_server.completion_request") as provider_request:
+            resp = await self.client.post("/api/chat/stream", json=payload)
+        self.assertEqual(resp.status, 402)
+        data = await resp.json()
+        self.assertEqual(data.get("error_code"), "PAID_MODEL_CONFIRMATION_REQUIRED")
+        self.assertTrue(data.get("auth_token", "").startswith("pauth_"))
+        provider_request.assert_not_called()
+
+    @unittest_run_loop
+    async def test_09_paid_auth_request_endpoint(self):
         """POST /api/models/paid_auth/request endpointi test edilir."""
         # Ücretli model için onay talebi
         resp = await self.client.post("/api/models/paid_auth/request", json={"model_id": "z-ai/glm-5.3"})

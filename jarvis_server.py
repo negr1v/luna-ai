@@ -3662,7 +3662,6 @@ async def generate_tts(
     cfg=None,
     max_len: int = MAX_TTS_TEXT_LENGTH,
     paid_auth_token: Optional[str] = None,
-    paid_tts_authorized: bool = False,
     return_status: bool = False,
 ):
     """
@@ -3693,8 +3692,9 @@ async def generate_tts(
     engine = str(cfg.get("tts_engine", "edge_tts")).strip().lower()
     paid_provider = get_paid_tts_provider(cfg)
     authorization_status = None
+    paid_authorized = False
 
-    if paid_provider and paid_tts_authorized:
+    if paid_provider:
         availability_error = get_paid_tts_provider_availability_error(cfg, paid_provider)
         if availability_error:
             authorization_status = {
@@ -3703,6 +3703,13 @@ async def generate_tts(
                 **availability_error,
             }
             return _result(None, authorization_status)
+        paid_authorized, authorization_reason = validate_and_consume_paid_tts_authorization(
+            paid_auth_token, paid_provider
+        )
+        if not paid_authorized:
+            authorization_status = get_paid_tts_authorization_payload(
+                paid_provider, authorization_reason
+            )
 
     try:
         await asyncio.wait_for(TTS_SEMAPHORE.acquire(), timeout=5.0)
@@ -3714,7 +3721,9 @@ async def generate_tts(
 
     try:
         audio_b64 = None
-        if engine == "fish_audio":
+        if paid_provider and not paid_authorized:
+            pass
+        elif engine == "fish_audio":
             audio_b64 = await _generate_fish_audio_tts(cleaned, cfg)
         elif engine == "speechify" and cfg.get("speechify_api_key"):
             audio_b64 = await _generate_speechify_tts(cleaned, cfg)
@@ -3732,7 +3741,7 @@ async def generate_tts(
             except Exception:
                 pass
 
-        if not audio_b64:
+        if not audio_b64 and not (paid_provider and not paid_authorized):
             authorization_status = {"status": "error", "provider": engine,
                                     "message": "Seçilen ses sağlayıcısı ses üretemedi."}
         return _result(audio_b64, authorization_status)
@@ -4806,6 +4815,27 @@ def get_paid_tts_authorization_payload(provider: str, reason: str = "") -> Dict[
         "message": "Ücretli TTS hizmeti için onay gerekli. Onay olmadan ses sağlayıcısına istek gönderilmedi.",
     }
 
+
+def get_paid_model_confirmation_payload(
+    model_id: str, provider: str, reason: str = ""
+) -> Dict[str, Any]:
+    meta = next((model for model in AI_MODEL_CATALOG if model["id"] == model_id), None)
+    rate_info = meta.get("rate", "Bilinmiyor") if meta else "Bilinmiyor"
+    return {
+        "status": "confirmation_required",
+        "error_code": "PAID_MODEL_CONFIRMATION_REQUIRED",
+        "reason": reason or "Ücretli veya fiyatı bilinmeyen model için açık onay gerekli.",
+        "model_id": model_id,
+        "provider": provider,
+        "auth_token": create_paid_model_authorization(model_id, provider),
+        "expires_in_seconds": PAID_AUTH_TTL_SECONDS,
+        "warning_message": (
+            f"DİKKAT: '{meta.get('name', model_id) if meta else model_id}' modeli "
+            f"ücretli API çağrısı yapabilir. Tahmini tarife: {rate_info}. Onaylıyor musunuz?"
+        ),
+    }
+
+
 async def handle_request_paid_auth(request):
     """
     POST /api/models/paid_auth/request
@@ -4828,7 +4858,7 @@ async def handle_request_paid_auth(request):
             "message": f"'{model_id}' ücretsiz modeldir, özel ücretli onayı gerektirmez."
         })
         
-    provider = meta["provider"] if meta else ("openrouter" if "/" in model_id else "unknown")
+    provider = meta["provider"] if meta else ("openrouter" if "/" in model_id else "groq")
     provider_name = meta.get("providerDisplayName", provider) if meta else provider
     rate_info = meta.get("rate", "Bilinmiyor") if meta else "Bilinmiyor"
     
@@ -4863,7 +4893,9 @@ async def handle_request_paid_service_auth(request):
     service = str(data.get("service", "")).strip().lower()
     action = str(data.get("action", "synthesize")).strip().lower()
     provider = str(data.get("provider", "")).strip().lower()
-    if service != "tts" or action != "synthesize" or provider not in {"elevenlabs", "openai"}:
+    if service != "tts" or action != "synthesize" or provider not in {
+        "elevenlabs", "openai", "speechify", "fish_audio"
+    }:
         return web.json_response({
             "status": "error",
             "message": "Bu ücretli hizmet için onay isteği desteklenmiyor."
@@ -5189,9 +5221,19 @@ async def handle_tts_direct(request):
         cleaned,
         cfg,
         max_len=MAX_DIRECT_TTS_TEXT_LENGTH,
+        paid_auth_token=data.get("paid_tts_auth_token"),
+        return_status=True,
     )
-    audio_b64 = tts_res[0] if isinstance(tts_res, tuple) else tts_res
-    return web.json_response({"audio_base64": audio_b64, "text": cleaned})
+    audio_b64, tts_status = tts_res if isinstance(tts_res, tuple) else (tts_res, None)
+    if tts_status and tts_status.get("error_code") == "PAID_TTS_CONFIRMATION_REQUIRED":
+        return web.json_response(tts_status, status=402)
+    if tts_status and tts_status.get("status") == "error":
+        return web.json_response(tts_status, status=503)
+    return web.json_response({
+        "audio_base64": audio_b64,
+        "text": cleaned,
+        "tts_authorization_required": tts_status,
+    })
 
 
 async def handle_screen_capture(request):
@@ -5386,6 +5428,7 @@ async def handle_chat(request):
     message = data.get("message", "").strip()
     history = data.get("history", [])
     custom_cfg = data.get("config", {})
+    paid_model_auth_token = data.get("paid_auth_token") or data.get("paid_model_auth_token")
     paid_tts_auth_token = data.get("paid_tts_auth_token")
     
     cfg = load_config()
@@ -5414,6 +5457,22 @@ async def handle_chat(request):
         active_model = model_candidate
     cost_category, meta_check = get_model_cost_category(active_model)
     target_provider = meta_check["provider"] if meta_check else ("openrouter" if "/" in active_model else "groq")
+    if cost_category in {"paid", "unknown"}:
+        if not paid_model_auth_token:
+            return web.json_response(
+                get_paid_model_confirmation_payload(active_model, target_provider), status=402
+            )
+        authorized, auth_reason = validate_and_consume_paid_authorization(
+            paid_model_auth_token, active_model, target_provider
+        )
+        if not authorized:
+            return web.json_response({
+                "status": "error",
+                "error_code": "PAID_MODEL_AUTHORIZATION_INVALID",
+                "reason": auth_reason,
+                "model_id": active_model,
+                "provider": target_provider,
+            }, status=402)
 
     groq_key = cfg.get("groq_api_key", "").strip()
     reply_text = ""
@@ -5597,6 +5656,7 @@ async def handle_chat_stream(request):
     history = data.get("history", [])
     custom_cfg = data.get("config", {})
     requested_agent = data.get("agent")
+    paid_model_auth_token = data.get("paid_auth_token") or data.get("paid_model_auth_token")
     paid_tts_auth_token = data.get("paid_tts_auth_token")
     voice_mode = bool(data.get("voice_mode", False) or data.get("is_voice", False) or data.get("voice_reply", True))
     
@@ -5625,6 +5685,25 @@ async def handle_chat_stream(request):
             active_model = free_id
     else:
         active_model = model_candidate
+
+    cost_category, meta_check = get_model_cost_category(active_model)
+    target_provider = meta_check["provider"] if meta_check else ("openrouter" if "/" in active_model else "groq")
+    if not no_free_err and cost_category in {"paid", "unknown"}:
+        if not paid_model_auth_token:
+            return web.json_response(
+                get_paid_model_confirmation_payload(active_model, target_provider), status=402
+            )
+        authorized, auth_reason = validate_and_consume_paid_authorization(
+            paid_model_auth_token, active_model, target_provider
+        )
+        if not authorized:
+            return web.json_response({
+                "status": "error",
+                "error_code": "PAID_MODEL_AUTHORIZATION_INVALID",
+                "reason": auth_reason,
+                "model_id": active_model,
+                "provider": target_provider,
+            }, status=402)
 
     agent_name = requested_agent if requested_agent in AGENT_PROFILES else route_agent(message)
     agent_cfg = AGENT_PROFILES.get(agent_name, AGENT_PROFILES["Main JARVIS"])
@@ -5658,11 +5737,6 @@ async def handle_chat_stream(request):
         await sse_send("agent", {"agent": agent_name, "role": agent_cfg["role"], "intent": user_intent, "model": active_model})
         
         # Hedef modelin sağlayıcısını belirle
-        target_meta = next((m for m in AI_MODEL_CATALOG if m["id"] == active_model), None)
-        target_provider = target_meta["provider"] if target_meta else ("openrouter" if "/" in active_model else "groq")
-
-        cost_category, meta_check = get_model_cost_category(active_model)
-
         if target_provider == "openrouter" and not openrouter_key:
             reply_text = f"Erişim Kilitli: {active_model} modeli için OpenRouter API anahtarı sisteme girilmemiş."
             await sse_send("token", {"token": reply_text})

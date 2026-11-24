@@ -32,7 +32,9 @@ import subprocess
 import shutil
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-INDEX_FILE = os.path.join(BASE_DIR, "index.html")
+PROJECT_DIR = os.path.dirname(BASE_DIR)
+INDEX_FILE = os.path.join(PROJECT_DIR, "index.html")
+LOCAL_STT_FILE = os.path.join(PROJECT_DIR, "static", "js", "local_stt.js")
 
 def get_node_bin():
     n = shutil.which("node")
@@ -51,19 +53,22 @@ class TestPhase5MicPrivacy(unittest.TestCase):
     def setUpClass(cls):
         with open(INDEX_FILE, "r", encoding="utf-8") as f:
             cls.html = f.read()
+        with open(LOCAL_STT_FILE, "r", encoding="utf-8") as f:
+            cls.local_stt_code = f.read()
 
         script_matches = [m for m in re.findall(r"<script\b[^>]*>([\s\S]*?)</script>", cls.html, re.IGNORECASE) if m.strip()]
-        cls.script_code = script_matches[0] if script_matches else ""
+        cls.script_code = "\n".join(script_matches)
 
     def test_00_node_check_syntax(self):
         """Validate JavaScript syntax via node execution check reading file directly."""
         node_code = (
             "const fs = require('fs');"
             "const html = fs.readFileSync('index.html', 'utf8');"
-            "const m = /<script\\b[^>]*>([\\s\\S]*?)<\\/script>/i.exec(html);"
-            "new Function(m[1]);"
+            "const scripts = [...html.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi)]"
+            ".map(m => m[1]).filter(s => s.trim());"
+            "for (const script of scripts) new Function(script);"
         )
-        res = subprocess.run([NODE_BIN, "-e", node_code], cwd=BASE_DIR, capture_output=True, text=True)
+        res = subprocess.run([NODE_BIN, "-e", node_code], cwd=PROJECT_DIR, capture_output=True, text=True)
         self.assertEqual(res.returncode, 0, f"Syntax error in index.html script: {res.stderr}")
         print("  [Privacy Test 0 PASSED] JavaScript syntax validation clean via node.")
 
@@ -75,10 +80,10 @@ class TestPhase5MicPrivacy(unittest.TestCase):
         print("  [Privacy Test 1 PASSED] Page initialization never starts recognition automatically.")
 
     def test_02_explicit_mic_button_activation_starts_recognition(self):
-        """Verify explicit click on #micBtn invokes setListening/startListening."""
+        """Verify explicit click reaches LocalVoiceRecorder.start with the authorized audio track."""
         self.assertIn("micBtn.onclick", self.script_code)
         self.assertIn("startListening()", self.script_code)
-        self.assertIn("recognition.start()", self.script_code)
+        self.assertIn("recognition.start(audioTrack, isContinuous, initAudioCtx())", self.script_code)
         print("  [Privacy Test 2 PASSED] Explicit microphone button activation triggers recognition.")
 
     def test_03_space_activates_only_outside_editable_controls(self):
@@ -119,39 +124,37 @@ class TestPhase5MicPrivacy(unittest.TestCase):
         print("  [Privacy Test 6 PASSED] rec.onend never restarts recognition automatically.")
 
     def test_07_not_allowed_correctly_stops_and_updates_ui(self):
-        """Verify not-allowed error transitions to ERROR state and informs user."""
+        """Verify local STT failure stops capture and updates the user-facing state."""
         onerror_match = re.search(r"rec\.onerror\s*=\s*(?:\([^)]*\)|function\s*\([^)]*\))\s*=>?\s*\{([\s\S]*?)\};", self.script_code)
         self.assertIsNotNone(onerror_match, "rec.onerror handler not found")
         onerror_body = onerror_match.group(1)
-        self.assertIn("not-allowed", onerror_body)
+        self.assertIn("local-stt", onerror_body)
         self.assertIn("isListening = false", onerror_body)
-        self.assertIn("ERROR", onerror_body)
-        print("  [Privacy Test 7 PASSED] not-allowed error correctly stops recognition and informs user.")
+        self.assertIn("Yerel ses tanıma tamamlanamadı", onerror_body)
+        print("  [Privacy Test 7 PASSED] Local STT failure stops capture and informs user.")
 
     def test_08_audio_capture_and_network_recover_safely(self):
-        """Verify audio-capture and network errors are handled safely."""
-        onerror_match = re.search(r"rec\.onerror\s*=\s*(?:\([^)]*\)|function\s*\([^)]*\))\s*=>?\s*\{([\s\S]*?)\};", self.script_code)
-        self.assertIsNotNone(onerror_match)
-        onerror_body = onerror_match.group(1)
-        self.assertIn("audio-capture", onerror_body)
-        self.assertIn("network", onerror_body)
-        self.assertIn("no-speech", onerror_body)
-        print("  [Privacy Test 8 PASSED] audio-capture and network errors handled with graceful recovery.")
+        """Verify local capture failures abort upload and release the media track."""
+        self.assertIn("recorder.onerror = () => release('audio-capture')", self.local_stt_code)
+        self.assertIn("controller.abort()", self.local_stt_code)
+        self.assertIn("track.removeEventListener('ended', trackEnded)", self.local_stt_code)
+        self.assertIn("response = await fetch('/api/stt'", self.local_stt_code)
+        print("  [Privacy Test 8 PASSED] Capture/upload failures abort and release local audio resources.")
 
     def test_09_empty_transcription_does_not_submit_chat(self):
         """Verify empty transcription is checked before calling handleUserMessage."""
         onresult_match = re.search(r"rec\.onresult\s*=\s*(?:\([^)]*\)|function\s*\([^)]*\))\s*=>?\s*\{([\s\S]*?)\};", self.script_code)
         self.assertIsNotNone(onresult_match, "rec.onresult handler not found")
         onresult_body = onresult_match.group(1)
-        self.assertTrue("text.length > 0" in onresult_body or "if (!text)" in onresult_body)
+        self.assertTrue("if (!text && !hadDraft) return" in onresult_body)
         print("  [Privacy Test 9 PASSED] Empty transcription guarded against submission.")
 
     def test_10_unsupported_browsers_disable_mic_cleanly(self):
-        """Verify unsupported browsers disable #micBtn without breaking app."""
-        self.assertIn("if (!SpeechRecognition)", self.script_code)
-        self.assertIn("micBtn.disabled = true", self.script_code)
-        self.assertIn("return null", self.script_code)
-        print("  [Privacy Test 10 PASSED] Unsupported browsers cleanly disable microphone.")
+        """Verify capture requires browser MediaRecorder and getUserMedia support."""
+        self.assertIn("navigator.mediaDevices?.getUserMedia", self.script_code)
+        self.assertIn("typeof MediaRecorder === 'function'", self.script_code)
+        self.assertIn("if (!audioTrack) throw new Error('Microphone capture unavailable')", self.script_code)
+        print("  [Privacy Test 10 PASSED] Unsupported capture APIs fail closed without starting recognition.")
 
     def test_11_visibility_change_stops_active_recognition(self):
         """Verify document visibilitychange event stops active listening."""
@@ -179,19 +182,23 @@ class TestPhase5MicPrivacy(unittest.TestCase):
         print("  [Privacy Test 13 PASSED] All privacy disclosure modal DOM elements present.")
 
     def test_14_privacy_disclosure_text_content(self):
-        """Verify the Turkish disclosure explains Web Speech API, cloud processing, no raw storage, and text-only dispatch."""
+        """Verify the disclosure matches local MediaRecorder/Vosk processing and possible remote chat dispatch."""
         modal_match = re.search(r'id="micConsentModal"[\s\S]*?</div>\s*</div>\s*</div>', self.html)
         self.assertIsNotNone(modal_match, "micConsentModal HTML block not found")
         modal_text = modal_match.group(0)
 
-        # 1. Web Speech API
-        self.assertIn("Web Speech API", modal_text, "Disclosure must mention Web Speech API")
-        # 2. Browser provider processing outside local JARVIS
-        self.assertTrue("yerel JARVIS uygulaması dışındaki" in modal_text or "tarayıcı ses tanıma servisleri" in modal_text)
-        # 3. No raw microphone recordings stored on server
-        self.assertTrue("kesinlikle depolanmaz" in modal_text and "ham mikrofon" in modal_text)
-        # 4. Only recognized text submitted to chat endpoint
-        self.assertTrue("metne dönüştürülen transkript" in modal_text and "sohbet" in modal_text)
+        # 1. Actual browser recorder and local STT endpoint
+        self.assertIn("MediaRecorder", modal_text)
+        self.assertIn("/api/stt", modal_text)
+        # 2. Local Vosk processing rather than a browser speech-recognition provider
+        self.assertIn("yerel Vosk", modal_text)
+        self.assertIn("üçüncü taraf tarayıcı konuşma tanıma servisine gönderilmez", modal_text)
+        # 3. Temporary raw-audio handling
+        self.assertIn("Ham mikrofon sesi kalıcı olarak saklanmaz", modal_text)
+        self.assertIn("geçici dosya işlem sonunda silinir", modal_text)
+        # 4. Transcript can be sent to a local or remote configured model provider
+        self.assertIn("seçili sağlayıcıya iletilebilir", modal_text)
+        self.assertIn("yerel veya uzak olabilir", modal_text)
         # Explicit actions
         self.assertIn("Kabul Et ve Mikrofonu Aç", modal_text)
         self.assertIn("Vazgeç", modal_text)
@@ -204,12 +211,12 @@ class TestPhase5MicPrivacy(unittest.TestCase):
         self.assertIn("showMicConsentModal()", self.script_code)
         self.assertIn("micConsentAcceptBtn.onclick", self.script_code)
 
-        # In accept handler, sets micConsentGranted = true and starts listening
+        # Acceptance grants the session and resumes the action that requested microphone access.
         accept_match = re.search(r"micConsentAcceptBtn\.onclick\s*=\s*(?:\([^)]*\)|function\s*\([^)]*\))\s*=>?\s*\{([\s\S]*?)\};", self.script_code)
         self.assertIsNotNone(accept_match, "micConsentAcceptBtn.onclick handler not found")
         accept_body = accept_match.group(1)
         self.assertIn("micConsentGranted = true", accept_body)
-        self.assertIn("startListening()", accept_body)
+        self.assertIn("action()", accept_body)
         print("  [Privacy Test 15 PASSED] Consent flow blocks recognition until user explicitly accepts.")
 
     def test_16_decline_flow_keeps_microphone_off(self):
@@ -223,11 +230,11 @@ class TestPhase5MicPrivacy(unittest.TestCase):
         print("  [Privacy Test 16 PASSED] Decline flow hides modal and keeps microphone strictly OFF.")
 
     def test_17_session_reset_page_memory_only(self):
-        """Verify micConsentGranted is stored only in page memory with NO localStorage/cookies/tracking."""
-        # Ensure micConsent is never written to localStorage or sessionStorage or document.cookie
-        self.assertNotIn("localStorage.setItem('micConsent", self.script_code)
-        self.assertNotIn("localStorage.setItem(\"micConsent", self.script_code)
-        self.assertNotIn("sessionStorage.setItem('micConsent", self.script_code)
+        """Verify consent defaults to opt-out and remains only in page memory."""
+        self.assertIn("let micConsentGranted = false;", self.script_code)
+        self.assertNotIn("localStorage.getItem('jarvis_mic_consent'", self.script_code)
+        self.assertNotIn("localStorage.setItem('jarvis_mic_consent'", self.script_code)
+        self.assertNotIn("sessionStorage.setItem('jarvis_mic_consent'", self.script_code)
         self.assertNotIn("document.cookie", self.script_code)
         print("  [Privacy Test 17 PASSED] Consent state kept strictly in page memory (session reset on reload).")
 

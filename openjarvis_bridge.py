@@ -3,7 +3,7 @@ openjarvis_bridge.py
 ACCIO-JARVIS ve OpenJarvis Modülleri Arasındaki API ve Entegrasyon Köprüsü.
 
 Bu modül:
-- `openjarvis_executor` (Python CodeAct)
+- Python CodeAct route (disabled until an OS-level sandbox is available)
 - `openjarvis_researcher` (Deep Research)
 - `openjarvis_digest` (Morning Digest)
 
@@ -13,13 +13,10 @@ uyumlu handler'lar sunar.
 
 from __future__ import annotations
 
-import json
 from aiohttp import web
-from openjarvis_executor import OpenJarvisExecutor
 from openjarvis_researcher import OpenJarvisResearcher
 from openjarvis_digest import OpenJarvisDigest
 
-executor = OpenJarvisExecutor(timeout_sec=15)
 researcher = OpenJarvisResearcher()
 digest = OpenJarvisDigest()
 
@@ -28,24 +25,11 @@ async def handle_openjarvis_execute(request: web.Request) -> web.Response:
     POST /api/openjarvis/execute
     JSON gövdesi: {"code": "print('hello')"} veya {"text": "```python\nprint(1+1)\n```"}
     """
-    try:
-        data = await request.json()
-    except Exception:
-        return web.json_response({"success": False, "error": "Geçersiz JSON"}, status=400)
-
-    code = data.get("code")
-    text = data.get("text")
-
-    if code:
-        res = executor.execute_code(code)
-    elif text:
-        res = executor.run_agent_turn(text)
-        if res is None:
-            return web.json_response({"success": False, "error": "Metin içinde python kodu bulunamadı."}, status=400)
-    else:
-        return web.json_response({"success": False, "error": "'code' veya 'text' alanı gereklidir."}, status=400)
-
-    return web.json_response(res)
+    return web.json_response({
+        "success": False,
+        "error_code": "PYTHON_EXECUTION_DISABLED",
+        "error": "Genel Python yürütme, işletim sistemi düzeyinde sandbox sağlanana kadar devre dışıdır.",
+    }, status=501)
 
 
 async def handle_openjarvis_research(request: web.Request) -> web.Response:

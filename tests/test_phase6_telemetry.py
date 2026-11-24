@@ -194,7 +194,7 @@ class Phase6TelemetryBackendTest(AioHTTPTestCase):
 class Phase6FrontendCommandCenterTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        html_path = os.path.join(os.path.dirname(__file__), "index.html")
+        html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html")
         with open(html_path, "r", encoding="utf-8") as f:
             cls.html_content = f.read()
 

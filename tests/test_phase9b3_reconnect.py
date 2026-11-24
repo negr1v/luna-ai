@@ -20,7 +20,7 @@ from unittest.mock import patch, MagicMock
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)
 

@@ -5979,24 +5979,24 @@
     </div>
     <div style="font-size:12px; line-height:1.6; color:#cbd5e1; display:flex; flex-direction:column; gap:10px; margin-top:8px;">
       <p style="margin:0;">
-        JARVIS sesli komut sistemi, tarayıcınızın yerleşik <b>Web Speech API</b> arayüzünü kullanır.
+        Mikrofonu açınca tarayıcı <b>MediaRecorder</b> ile kısa ses parçaları kaydeder ve yerel JARVIS uygulamasındaki <b>/api/stt</b> rotasına gönderir.
       </p>
       <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:10px; border-radius:6px; font-size:11px; display:flex; flex-direction:column; gap:6px;">
         <div style="display:flex; align-items:flex-start; gap:6px;">
           <span style="color:var(--cyan);">•</span>
-          <span>Tarayıcı sağlayıcısına bağlı olarak (örn. Google Chrome), ses veriniz yerel JARVIS uygulaması dışındaki tarayıcı ses tanıma servisleri tarafından işlenebilir.</span>
+          <span>Ses, yerel Vosk tanıma motorunda işlenir; üçüncü taraf tarayıcı konuşma tanıma servisine gönderilmez.</span>
         </div>
         <div style="display:flex; align-items:flex-start; gap:6px;">
           <span style="color:var(--cyan);">•</span>
-          <span>JARVIS sunucusunda ham mikrofon ses kayıtları <b>kesinlikle depolanmaz</b>.</span>
+          <span>Ham mikrofon sesi kalıcı olarak saklanmaz; STT isteği için kullanılan geçici dosya işlem sonunda silinir.</span>
         </div>
         <div style="display:flex; align-items:flex-start; gap:6px;">
           <span style="color:var(--cyan);">•</span>
-          <span>Yalnızca metne dönüştürülen transkript, mevcut JARVIS sohbet kanalına iletilir.</span>
+          <span>Tanıma metni sohbete gönderildiğinde, seçili sağlayıcıya iletilebilir; bu sağlayıcı yerel veya uzak olabilir.</span>
         </div>
       </div>
       <p style="margin:0; font-size:11px; color:var(--dim);">
-        Bu onay yalnızca mevcut sayfa oturumunda bellekte tutulur; kalıcı çerez veya izleyici kullanılmaz.
+        Onay yalnızca bu sayfa oturumu boyunca bellekte tutulur. Sayfa yeniden yüklendiğinde tekrar sorulur.
       </p>
     </div>
     <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:16px;">
@@ -7596,9 +7596,8 @@
     }
   }
 
-  // Page-session and persistent consent memory
+  // Page-session consent memory
   let micConsentGranted = false;
-  if (localStorage.getItem('jarvis_mic_consent') !== 'false') micConsentGranted = true;
 
   function showMicConsentModal() {
     if (micConsentModal) micConsentModal.classList.add('open');
@@ -7614,7 +7613,6 @@
 
   if (micConsentDeclineBtn) {
     micConsentDeclineBtn.onclick = () => {
-      localStorage.setItem('jarvis_mic_consent', 'false');
       micConsentGranted = false;
       hideMicConsentModal();
     };
@@ -7622,7 +7620,6 @@
 
   if (micConsentAcceptBtn) {
     micConsentAcceptBtn.onclick = () => {
-      localStorage.setItem('jarvis_mic_consent', 'true');
       micConsentGranted = true;
       hideMicConsentModal();
       const action = micConsentAction || window.handleVoiceInputToggle;
@@ -8601,6 +8598,43 @@
     refreshSpeechVoices();
   }
 
+  async function requestDirectTts(payload) {
+    const send = body => fetch('/api/tts_direct', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    let requestBody = {...payload};
+    let response = await send(requestBody);
+    let data = await response.json().catch(() => ({}));
+    if (response.status === 402 && data.error_code === 'PAID_TTS_CONFIRMATION_REQUIRED' && data.auth_token) {
+      if (!window.confirm(data.message || 'Ücretli ses sağlayıcısını kullanmayı onaylıyor musunuz?')) {
+        return {response, data, declined: true};
+      }
+      requestBody.paid_tts_auth_token = data.auth_token;
+      response = await send(requestBody);
+      data = await response.json().catch(() => ({}));
+    }
+    return {response, data, declined: false};
+  }
+
+  async function requestChatWithPaidApproval(endpoint, payload, signal) {
+    const send = body => fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+      signal
+    });
+    let response = await send(payload);
+    if (response.status !== 402) return response;
+    const challenge = await response.clone().json().catch(() => ({}));
+    if (challenge.error_code !== 'PAID_MODEL_CONFIRMATION_REQUIRED' || !challenge.auth_token) return response;
+    if (!window.confirm(challenge.warning_message || 'Ücretli veya fiyatı bilinmeyen model çağrısını onaylıyor musunuz?')) {
+      return {cancelled: true};
+    }
+    return send({...payload, paid_auth_token: challenge.auth_token});
+  }
+
   // Seslendirme (Yalnızca Speechify/Yetkili Motor - Microsoft Edge/SpeechSynthesis Kesin Olarak İptal Edildi)
   window.speakTextWithFallback = async function(text, updateStatus = message => {
     if (message) showZeroToast('Yanıtı dinle', message, 'info');
@@ -8619,12 +8653,11 @@
     }
 
     try {
-      const res = await fetch('/api/tts_direct', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ text: ttsText })
-      });
-      const data = await res.json();
+      const {response: res, data, declined} = await requestDirectTts({text: ttsText});
+      if (declined) {
+        updateStatus('Ücretli seslendirme iptal edildi.');
+        return false;
+      }
       if (generation !== currentAudioGeneration) {
         updateStatus('Seslendirme durduruldu.');
         return;
@@ -8852,20 +8885,22 @@ const sidebarNewChatBtn = document.getElementById('sidebarNewChatBtn');
     let receivedTerminalEvent = false;
     let fullReply = '';
     let paidTtsAuthToken = null;
+    const chatRequestPayload = {
+      message: msg,
+      voice_mode: false,
+      voice_reply: false,
+      paid_tts_auth_token: paidTtsAuthToken
+    };
 
     try {
       paidTtsAuthToken = null;
-      const res = await fetch('/api/chat/stream', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ 
-          message: msg,
-          voice_mode: false,
-          voice_reply: false,
-          paid_tts_auth_token: paidTtsAuthToken
-        }),
-        signal: controller.signal
-      });
+      const res = await requestChatWithPaidApproval('/api/chat/stream', chatRequestPayload, controller.signal);
+      if (res.cancelled) {
+        isThinking = false;
+        textSpan.textContent = 'Ücretli model çağrısı onaylanmadı.';
+        setCoreState('IDLE');
+        return;
+      }
 
       if (!res.ok || !res.body) {
         throw new Error(`HTTP ${res.status}`);
@@ -9004,12 +9039,13 @@ const sidebarNewChatBtn = document.getElementById('sidebarNewChatBtn');
 
       console.warn('SSE başarısız, /api/chat fallback deneniyor:', e);
       try {
-        const fbRes = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ message: msg, voice_mode: false, voice_reply: false, paid_tts_auth_token: paidTtsAuthToken }),
-          signal: controller.signal
-        });
+        const fbRes = await requestChatWithPaidApproval('/api/chat', chatRequestPayload, controller.signal);
+        if (fbRes.cancelled) {
+          isThinking = false;
+          textSpan.textContent = 'Ücretli model çağrısı onaylanmadı.';
+          setCoreState('IDLE');
+          return;
+        }
         if (thisRequestId !== currentChatRequestId) return;
         if (!fbRes.ok) throw new Error('HTTP ' + fbRes.status);
         const fbData = await fbRes.json();
@@ -10322,12 +10358,11 @@ const sidebarNewChatBtn = document.getElementById('sidebarNewChatBtn');
 
   async function triggerAutonomousSpeech(text) {
     const paidTtsAuthToken = null;
-    const res = await fetch('/api/tts_direct', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ text: text, paid_tts_auth_token: paidTtsAuthToken })
+    const {data: d, declined} = await requestDirectTts({
+      text: text,
+      paid_tts_auth_token: paidTtsAuthToken
     });
-    const d = await res.json();
+    if (declined) return;
     if (d.audio_base64) {
       playAudioBase64(d.audio_base64);
     } else if (d.message) {
@@ -11337,7 +11372,14 @@ const sidebarNewChatBtn = document.getElementById('sidebarNewChatBtn');
         const span = document.createElement('span');
         span.style.cssText = 'background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:3px 8px; display:inline-flex; align-items:center; gap:5px; color:#f1f5f9; font-size:11px;';
         const gb = (m.size / 1e9).toFixed(1);
-        span.innerHTML = `<span style="width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981;"></span> <b>${m.name}</b> <span style="color:var(--dim);">(${gb} GB)</span>`;
+        const indicator = document.createElement('span');
+        indicator.style.cssText = 'width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981;';
+        const modelName = document.createElement('b');
+        modelName.textContent = String(m.name ?? '');
+        const sizeLabel = document.createElement('span');
+        sizeLabel.style.color = 'var(--dim)';
+        sizeLabel.textContent = `(${gb} GB)`;
+        span.append(indicator, modelName, sizeLabel);
         container.appendChild(span);
       });
     } catch (e) {
@@ -11562,18 +11604,15 @@ const sidebarNewChatBtn = document.getElementById('sidebarNewChatBtn');
         }
         token = null;
       }
-      const response = await fetch('/api/tts_direct', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          preview: true,
-          text: 'Merhaba Negr1v, ben senin sesli asistanınım.',
-          tts_engine: engine,
-          elevenlabs_voice_id: elevenlabsVoiceSelect.value,
-          speechify_voice: speechifyVoiceSelect ? speechifyVoiceSelect.value : 'elif',
-          paid_tts_auth_token: token
-        })
+      const {response, data: result, declined} = await requestDirectTts({
+        preview: true,
+        text: 'Merhaba Negr1v, ben senin sesli asistanınım.',
+        tts_engine: engine,
+        elevenlabs_voice_id: elevenlabsVoiceSelect.value,
+        speechify_voice: speechifyVoiceSelect ? speechifyVoiceSelect.value : 'elif',
+        paid_tts_auth_token: token
       });
-      const result = await response.json();
+      if (declined) return;
       if (!response.ok || !result.audio_base64) throw new Error(result.message || 'Ses önizlemesi hazırlanamadı.');
       if (gothicVoiceToggle) window.gothicVoiceEnabled = Boolean(gothicVoiceToggle.checked);
       playAudioBase64(result.audio_base64);

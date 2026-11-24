@@ -1,6 +1,7 @@
 """Focused tests for Phase 17 paid TTS authorization and DPAPI secret storage."""
 
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -84,6 +85,7 @@ class TestPaidTtsAuthorization(unittest.IsolatedAsyncioTestCase):
         paid_tts.assert_not_awaited()
 
 
+@unittest.skipUnless(os.name == "nt", "Windows DPAPI is available only on Windows")
 class TestDpapiSecretStorage(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -168,6 +170,24 @@ class TestPaidTtsHttpEndpoint(AioHTTPTestCase):
         self.assertEqual(payload["error_code"], "PAID_TTS_CONFIRMATION_REQUIRED")
         self.assertIn("onay", payload["message"].lower())
         paid_tts.assert_not_awaited()
+
+    @unittest_run_loop
+    async def test_paid_tts_direct_endpoint_consumes_token_once(self):
+        config = {"tts_engine": "elevenlabs", "elevenlabs_api_key": "temporary-test-key"}
+        token = server.create_paid_tts_authorization("elevenlabs")
+        request_body = {"text": "Merhaba", "paid_tts_auth_token": token}
+        with patch.object(server, "load_config", return_value=config), \
+             patch.object(server, "_generate_elevenlabs_tts", new=AsyncMock(return_value="paid-audio")) as paid_tts:
+            authorized = await self.client.post("/api/tts_direct", json=request_body)
+            authorized_payload = await authorized.json()
+            replay = await self.client.post("/api/tts_direct", json=request_body)
+            replay_payload = await replay.json()
+
+        self.assertEqual(authorized.status, 200)
+        self.assertEqual(authorized_payload["audio_base64"], "paid-audio")
+        paid_tts.assert_awaited_once()
+        self.assertEqual(replay.status, 402)
+        self.assertEqual(replay_payload["error_code"], "PAID_TTS_CONFIRMATION_REQUIRED")
 
 
 if __name__ == "__main__":

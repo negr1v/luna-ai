@@ -13,7 +13,7 @@ import glob
 import subprocess
 import tempfile
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX_PATH = os.path.join(PROJECT_DIR, "index.html")
 
 
@@ -49,7 +49,7 @@ class TestPhase9B4CLongRunDOM(unittest.TestCase):
             html = f.read()
 
         start_marker = "function appendBubble(text, role, agentName) {"
-        end_marker = "// PAKET 4 & FAZ 2 — SSE STREAMING SOHBET İŞLEME"
+        end_marker = "  // OpenJarvis System Pulse Dynamic State Controller"
         
         start_idx = html.find(start_marker)
         end_idx = html.find(end_marker)
@@ -113,6 +113,8 @@ global.document = {{
   createElement: (tag) => new MockElement(tag),
   getElementById: (id) => id === 'transcript' ? transcript : null
 }};
+global.window = global;
+global.activeConversationId = 'test-conversation';
 
 // --- VERBATIM JS INJECTION ---
 {self.extracted_append_bubble}

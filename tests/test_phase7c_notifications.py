@@ -181,7 +181,7 @@ class Phase7CNotificationsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_11_voice_and_mic_privacy_contract_intact(self):
         """Test 11: Phase 5 microphone privacy and TTS generation mechanisms remain intact."""
-        html_path = os.path.join(os.path.dirname(__file__), "index.html")
+        html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html")
         with open(html_path, "r", encoding="utf-8") as f:
             html = f.read()
 
