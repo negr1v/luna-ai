@@ -1,0 +1,39 @@
+{
+  "project": "Luna AI",
+  "version": "1.0.0",
+  "updated_at": "2026-11-24T12:00:00Z",
+  "active_phase": "Phase 1 - Security & Test Triage",
+  "agents": {
+    "manus": {
+      "role": "Security & Backend Regression Triage",
+      "branch": "manus-fixes",
+      "latest_commit": "2d5fd2e",
+      "status": "in_progress",
+      "assigned_task": "Triage 30 failing and 38 error tests, fix path/import discrepancies, ensure regression runner is clean",
+      "last_message": "Security gates implemented. Test suite triage in progress."
+    },
+    "claude": {
+      "role": "Lead Architect & UI/UX Specialist",
+      "branch": "claude-ui",
+      "latest_commit": "",
+      "status": "ready_for_b2",
+      "assigned_task": "Faz B2: Cam dock & floating callbar design, sidebar 38px lock & transcript display",
+      "last_message": "B1 and B1b styles applied. Ready for B2."
+    },
+    "accio": {
+      "role": "Local Orchestrator & Test Runner",
+      "branch": "main",
+      "status": "syncing",
+      "assigned_task": "Automated sync, local Windows test runner, conflict resolution, audit logging",
+      "last_message": "Secured repository files, applied B1 and B1b, configured automated multi-agent dispatcher."
+    }
+  },
+  "pipeline_queue": [
+    { "phase": "0", "name": "Repository Security (Credentials in .gitignore)", "status": "completed" },
+    { "phase": "1", "name": "Manus Test Triage (68 Fail/Error)", "status": "in_progress" },
+    { "phase": "2", "name": "Merge manus-fixes to main", "status": "blocked_by_phase_1" },
+    { "phase": "3", "name": "Claude UI Phase B2 (Glass Dock)", "status": "ready" },
+    { "phase": "4", "name": "Sidebar & Transcript Refactor (C1, C2)", "status": "pending" },
+    { "phase": "5", "name": "Side Chat & VAD Token Integration (D, E)", "status": "pending" }
+  ]
+}

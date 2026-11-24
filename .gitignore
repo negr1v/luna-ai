@@ -24,3 +24,24 @@ api_key.txt
 # Backups and execution hooks
 *.bak
 .buyer-execution-hooks/
+
+# Sensitive user credentials, memory, runtime, and audit data
+luna_config.json
+jarvis_config.json
+luna_memory.json
+jarvis_memory.json
+luna_telegram.json
+jarvis_telegram.json
+luna_agent_audit.jsonl
+jarvis_agent_audit.jsonl
+.luna_runtime.json
+.jarvis_runtime.json
+luna_notifications.json
+jarvis_notifications.json
+luna_tasks.json
+jarvis_tasks.json
+ocr_full.json
+ocr_catalog.json
+CLAUDE_PROJE_PAKETI/
+*.zip
+

@@ -4515,6 +4515,33 @@
     opacity: 0.9;
   }
 </style>
+<style id="luna-scene-b1">
+/* B1: avatar daire kırpmasını ve çerçeveyi kaldır */
+#viewCockpit .avatar-art-container{
+  width:min(380px,40vh) !important;
+  height:auto !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  overflow:visible !important;
+}
+#viewCockpit .avatar-art-container img,
+#viewCockpit #animeAvatarImg{
+  display:block; width:100%; height:auto;
+  object-fit:contain; border-radius:0;
+}
+/* Konuşma halkası/glow daire şeklinde kalmasın (L2740 içeriği doğrulanana kadar) */
+#viewCockpit #animeAvatarBox.avatar-speaking .avatar-art-container{
+  box-shadow:none !important;
+  border-color:transparent !important;
+}
+</style>
+<style id="luna-scene-b1b">
+#viewCockpit #animeAvatarBox{ width:auto !important; height:auto !important; }
+#viewCockpit .avatar-stage-wrap{ width:auto !important; height:auto !important; }
+#viewCockpit #avatarHaloRing{ display:none !important; }
+</style>
 </head>
 <body>
 <div id="zeroWallpaperLayer" class="zero-wallpaper-layer"></div>

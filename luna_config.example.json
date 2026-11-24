@@ -1,0 +1,20 @@
+{
+  "groq_api_key": "",
+  "openrouter_api_key": "",
+  "elevenlabs_api_key": "",
+  "elevenlabs_voice_id": "",
+  "openai_api_key": "",
+  "openai_voice": "alloy",
+  "speechify_api_key": "",
+  "speechify_voice": "",
+  "gothic_voice_enabled": false,
+  "tts_engine": "edge",
+  "edge_voice": "tr-TR-EmelNeural",
+  "edge_rate": "+0%",
+  "edge_pitch": "+0Hz",
+  "memory_learning_enabled": true,
+  "active_model": "local-demo",
+  "fish_audio_api_key": "",
+  "fish_audio_model_id": "",
+  "performance_profile": "balanced"
+}
