@@ -8,6 +8,7 @@ import asyncio
 import os
 import sys
 import json
+import base64
 import tempfile
 import shutil
 from unittest.mock import patch
@@ -16,6 +17,30 @@ from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
 import jarvis_server
+
+
+_TEST_SECRET_PREFIX = "test-only:v1:"
+_REAL_IS_PROTECTED_SECRET = jarvis_server.is_protected_secret
+_REAL_UNPROTECT_SECRET = jarvis_server.unprotect_secret
+
+
+def _test_is_protected_secret(value):
+    return (
+        isinstance(value, str) and value.startswith(_TEST_SECRET_PREFIX)
+    ) or _REAL_IS_PROTECTED_SECRET(value)
+
+
+def _test_protect_secret(value):
+    if not value or _test_is_protected_secret(value):
+        return value
+    return _TEST_SECRET_PREFIX + base64.b64encode(value.encode("utf-8")).decode("ascii")
+
+
+def _test_unprotect_secret(value):
+    if isinstance(value, str) and value.startswith(_TEST_SECRET_PREFIX):
+        encoded = value[len(_TEST_SECRET_PREFIX):]
+        return base64.b64decode(encoded, validate=True).decode("utf-8")
+    return _REAL_UNPROTECT_SECRET(value)
 
 
 class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
@@ -54,11 +79,21 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
         self.orig_base_dir = jarvis_server.BASE_DIR
         jarvis_server.CONFIG_FILE = self.test_config_file
 
+        self.secret_storage_patches = [
+            patch("jarvis_server.protect_secret", _test_protect_secret),
+            patch("jarvis_server.unprotect_secret", _test_unprotect_secret),
+            patch("jarvis_server.is_protected_secret", _test_is_protected_secret),
+        ]
+        for secret_storage_patch in self.secret_storage_patches:
+            secret_storage_patch.start()
+
         super().setUp()
 
     def tearDown(self):
         super().tearDown()
         jarvis_server.CONFIG_FILE = self.orig_config_file
+        for secret_storage_patch in self.secret_storage_patches:
+            secret_storage_patch.stop()
         if hasattr(self, "test_dir") and os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
 
@@ -194,9 +229,9 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
         self.assertTrue(saved.get("memory_learning_enabled"))
 
         # Secret fields strictly preserved
-        self.assertEqual(saved.get("groq_api_key"), "gsk_mock_groq_secret_key_12345")
-        self.assertEqual(saved.get("elevenlabs_api_key"), "xi_mock_eleven_secret_key_67890")
-        self.assertEqual(saved.get("openai_api_key"), "sk-mock_openai_secret_key_abcdef")
+        self.assertEqual(_test_unprotect_secret(saved.get("groq_api_key")), "gsk_mock_groq_secret_key_12345")
+        self.assertEqual(_test_unprotect_secret(saved.get("elevenlabs_api_key")), "xi_mock_eleven_secret_key_67890")
+        self.assertEqual(_test_unprotect_secret(saved.get("openai_api_key")), "sk-mock_openai_secret_key_abcdef")
         print("  [Phase 8B.1 Test 7 PASSED] Omitted API keys preserve existing values.")
 
     async def test_08_masked_placeholders_cannot_overwrite_real_keys(self):
@@ -214,7 +249,7 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
 
             with open(self.test_config_file, "r", encoding="utf-8") as f:
                 saved = json.load(f)
-            self.assertEqual(saved.get("groq_api_key"), "gsk_mock_groq_secret_key_12345")
+            self.assertEqual(_test_unprotect_secret(saved.get("groq_api_key")), "gsk_mock_groq_secret_key_12345")
         print("  [Phase 8B.1 Test 8 PASSED] Masked placeholders cannot overwrite real keys.")
 
     async def test_09_explicit_key_replacement_works(self):
@@ -226,15 +261,22 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
         with open(self.test_config_file, "r", encoding="utf-8") as f:
             saved = json.load(f)
 
-        self.assertEqual(saved.get("groq_api_key"), new_key)
-        self.assertEqual(saved.get("elevenlabs_api_key"), "xi_mock_eleven_secret_key_67890")
-        self.assertEqual(saved.get("openai_api_key"), "sk-mock_openai_secret_key_abcdef")
+        self.assertEqual(_test_unprotect_secret(saved.get("groq_api_key")), new_key)
+        self.assertEqual(_test_unprotect_secret(saved.get("elevenlabs_api_key")), "xi_mock_eleven_secret_key_67890")
+        self.assertEqual(_test_unprotect_secret(saved.get("openai_api_key")), "sk-mock_openai_secret_key_abcdef")
         print("  [Phase 8B.1 Test 9 PASSED] Explicit key replacement works safely.")
 
     async def test_10_atomic_writes_preserve_valid_configuration(self):
         """Test 10: Atomic write protects against zero-byte files and fail-closed on corrupt config."""
         # 1. Simulate write failure during atomic replace
-        with patch("os.replace", side_effect=IOError("Simulated disk write failure")):
+        real_replace = os.replace
+
+        def fail_primary_replace(src, dst):
+            if os.path.abspath(dst) == os.path.abspath(self.test_config_file):
+                raise IOError("Simulated disk write failure")
+            return real_replace(src, dst)
+
+        with patch("jarvis_server.os.replace", side_effect=fail_primary_replace):
             with self.assertRaises(IOError):
                 jarvis_server.save_config({"tts_engine": "edge_tts"})
 
@@ -243,6 +285,9 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
         self.assertGreater(os.path.getsize(self.test_config_file), 0)
 
         # 2. Corrupt configuration triggers fail-closed error without silent overwrite
+        backup_file = f"{self.test_config_file}.bak"
+        if os.path.exists(backup_file):
+            os.remove(backup_file)
         with open(self.test_config_file, "w", encoding="utf-8") as f:
             f.write("{corrupt: json content[}")
 
@@ -279,7 +324,7 @@ class Phase8B1ConfigSecurityTest(AioHTTPTestCase):
         self.assertEqual(saved.get("tts_engine"), "openai")
         self.assertEqual(saved.get("edge_rate"), "+10%")
         self.assertTrue(saved.get("memory_learning_enabled"))
-        self.assertEqual(saved.get("groq_api_key"), "gsk_mock_groq_secret_key_12345")
+        self.assertEqual(_test_unprotect_secret(saved.get("groq_api_key")), "gsk_mock_groq_secret_key_12345")
         print("  [Phase 8B.1 Test 11 PASSED] Concurrent updates preserved under CONFIG_ASYNC_LOCK.")
 
     def test_12_existing_frontend_settings_behavior_remains_functional(self):

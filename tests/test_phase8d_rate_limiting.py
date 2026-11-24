@@ -9,7 +9,7 @@ import os
 import sys
 import json
 import time
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch, AsyncMock, MagicMock
 
 from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
@@ -73,16 +73,32 @@ class Phase8DRateLimitingTest(AioHTTPTestCase):
         # Lower quota temporarily for quick test
         orig_max = jarvis_server.CHAT_RATE_LIMITER.max_requests
         jarvis_server.CHAT_RATE_LIMITER.max_requests = 2
+        mock_response = MagicMock(status=200, headers={})
+        mock_response.json = AsyncMock(return_value={
+            "choices": [{"message": {"content": "Test yanıtı"}}]
+        })
+        mock_post_ctx = MagicMock()
+        mock_post_ctx.__aenter__ = AsyncMock(return_value=mock_response)
+        mock_post_ctx.__aexit__ = AsyncMock(return_value=False)
         try:
-            with patch("jarvis_server.load_config", return_value={"groq_api_key": ""}):
-                resp1 = await self.client.post("/api/chat", json={"message": "Selam"})
+            with patch("jarvis_server.load_config", side_effect=lambda: {"groq_api_key": "mock_groq_key"}), \
+                 patch("aiohttp.ClientSession.post", return_value=mock_post_ctx), \
+                 patch("jarvis_server.generate_tts", AsyncMock(return_value=None)):
+                free_model_config = {"model": "llama-3.1-8b-instant"}
+                resp1 = await self.client.post("/api/chat", json={
+                    "message": "Selam", "config": free_model_config
+                })
                 self.assertEqual(resp1.status, 200)
 
-                resp2 = await self.client.post("/api/chat", json={"message": "Selam 2"})
+                resp2 = await self.client.post("/api/chat", json={
+                    "message": "Selam 2", "config": free_model_config
+                })
                 self.assertEqual(resp2.status, 200)
 
                 # Third request exceeds quota
-                resp3 = await self.client.post("/api/chat", json={"message": "Selam 3"})
+                resp3 = await self.client.post("/api/chat", json={
+                    "message": "Selam 3", "config": free_model_config
+                })
                 self.assertEqual(resp3.status, 429)
                 data = await resp3.json()
                 self.assertEqual(data.get("status"), "error")

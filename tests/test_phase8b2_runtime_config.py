@@ -199,17 +199,19 @@ class Phase8B2RuntimeConfigTest(AioHTTPTestCase):
             self.assertIn("zaman aşımına uğradı", data.get("message", ""))
         print("  [Phase 8B.2 Test 7 PASSED] Provider timeout gracefully caught and returns HTTP 504.")
 
-    async def test_08_tts_graceful_fallback_when_api_key_missing(self):
-        """Test 8: generate_tts safely falls back to Edge-TTS when ElevenLabs key is empty."""
+    async def test_08_tts_fails_closed_when_paid_provider_key_missing(self):
+        """Test 8: A selected paid TTS provider with no key must not fall back silently."""
         test_cfg = {
             "tts_engine": "elevenlabs",
             "elevenlabs_api_key": "",
             "edge_voice": "tr-TR-EmelNeural"
         }
-        with patch("jarvis_server._generate_edge_tts", new=AsyncMock(return_value="edge_mock_audio_b64")):
-            audio = await jarvis_server.generate_tts("Selam Negr1", test_cfg)
-            self.assertEqual(audio, "edge_mock_audio_b64")
-        print("  [Phase 8B.2 Test 8 PASSED] Missing ElevenLabs key automatically triggers Edge-TTS fallback.")
+        with patch("jarvis_server._generate_edge_tts", new=AsyncMock(return_value="edge_mock_audio_b64")) as mock_edge:
+            audio, status = await jarvis_server.generate_tts("Selam Negr1", test_cfg, return_status=True)
+            self.assertIsNone(audio)
+            self.assertEqual(status.get("error_code"), "TTS_PROVIDER_NOT_CONFIGURED")
+            mock_edge.assert_not_awaited()
+        print("  [Phase 8B.2 Test 8 PASSED] Missing paid-provider key fails closed without Edge-TTS fallback.")
 
     async def test_09_tts_graceful_fallback_when_provider_fails(self):
         """Test 9: generate_tts safely falls back to Edge-TTS when ElevenLabs HTTP fails."""

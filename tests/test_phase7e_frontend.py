@@ -51,11 +51,9 @@ class Phase7EFrontendTest(unittest.TestCase):
                     os.remove(temp_js)
         print("  [Phase 7E Test 1 PASSED] JavaScript syntax validation clean via node --check.")
 
-    def test_02_all_automation_and_gaming_dom_ids_present(self):
-        """Test 2: All required Command Center Automation & Gaming Mode DOM IDs exist in index.html."""
+    def test_02_automation_and_gaming_dom_ids_and_current_route(self):
+        """Test 2: Automation and gaming DOM IDs exist and automation is reachable by command palette."""
         required_ids = [
-            "navTabAutomations",
-            "autoNavBadge",
             "viewAutomations",
             "gamingStatusBadge",
             "gamingReasonVal",
@@ -88,7 +86,9 @@ class Phase7EFrontendTest(unittest.TestCase):
         ]
         for dom_id in required_ids:
             self.assertIn(f'id="{dom_id}"', self.html, f"Missing required DOM element: id='{dom_id}'")
-        print(f"  [Phase 7E Test 2 PASSED] All {len(required_ids)} required DOM IDs present.")
+        self.assertIn("Otomasyon & Zamanlayıcı Yönetimini Aç", self.html)
+        self.assertIn("switchView('automations')", self.html)
+        print(f"  [Phase 7E Test 2 PASSED] {len(required_ids)} DOM IDs and current automation route verified.")
 
     def test_03_action_registry_allowlist_options_strictly_match_backend(self):
         """Test 3: Action select dropdown offers ONLY the 4 backend allowlisted action IDs."""
@@ -400,7 +400,8 @@ class Phase7EFrontendTest(unittest.TestCase):
         self.assertIn("micConsentGranted", self.html)
         self.assertIn("interruptSpeech()", self.html)
         self.assertIn("currentAudioGeneration", self.html)
-        self.assertIn("initSpeechRecognition", self.html)
+        self.assertIn("MediaRecorder", self.html)
+        self.assertIn("/api/stt", self.html)
         self.assertIn("isListening", self.html)
         self.assertIn("micConsentModal", self.html)
 

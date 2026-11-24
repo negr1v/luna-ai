@@ -25,12 +25,26 @@ import base64
 import asyncio
 import tempfile
 import unittest
+import sys
+import types
 from unittest.mock import patch, MagicMock, AsyncMock
 
 from aiohttp.test_utils import AioHTTPTestCase
 from aiohttp import web
 
 import jarvis_server
+
+
+class _FakeEdgeCommunicate:
+    def __init__(self, text, *args, **kwargs):
+        self.text = text
+
+    async def stream(self):
+        yield {"type": "audio", "data": b"FAKE_EDGE_AUDIO"}
+
+
+_FAKE_EDGE_TTS = types.ModuleType("edge_tts")
+_FAKE_EDGE_TTS.Communicate = _FakeEdgeCommunicate
 
 
 class Phase5ATTSTest(AioHTTPTestCase):
@@ -75,7 +89,8 @@ class Phase5ATTSTest(AioHTTPTestCase):
         async def mock_stream(self_comm):
             yield {"type": "audio", "data": raw_audio}
 
-        with patch("edge_tts.Communicate.stream", mock_stream):
+        with patch.dict(sys.modules, {"edge_tts": _FAKE_EDGE_TTS}), \
+             patch.object(_FakeEdgeCommunicate, "stream", mock_stream):
             cfg = {"tts_engine": "edge_tts", "edge_voice": "tr-TR-EmelNeural"}
             b64 = await jarvis_server.generate_tts("Merhaba dünya", cfg)
             self.assertIsNotNone(b64)
@@ -89,7 +104,8 @@ class Phase5ATTSTest(AioHTTPTestCase):
             await asyncio.sleep(2.0)
             yield {"type": "audio", "data": b"late"}
 
-        with patch("edge_tts.Communicate.stream", hanging_stream), \
+        with patch.dict(sys.modules, {"edge_tts": _FAKE_EDGE_TTS}), \
+             patch.object(_FakeEdgeCommunicate, "stream", hanging_stream), \
              patch("jarvis_server.EDGE_TTS_TIMEOUT_SECONDS", 0.05):
             cfg = {"tts_engine": "edge_tts"}
             b64 = await jarvis_server.generate_tts("Zaman aşımı testi", cfg)
@@ -102,14 +118,15 @@ class Phase5ATTSTest(AioHTTPTestCase):
             raise ConnectionResetError("Remote socket forcibly closed by host")
             yield {}
 
-        with patch("edge_tts.Communicate.stream", failing_stream):
+        with patch.dict(sys.modules, {"edge_tts": _FAKE_EDGE_TTS}), \
+             patch.object(_FakeEdgeCommunicate, "stream", failing_stream):
             cfg = {"tts_engine": "edge_tts"}
             b64 = await jarvis_server.generate_tts("Hata testi", cfg)
             self.assertIsNone(b64)
         print("  [Phase 5A Test 3 PASSED] Edge-TTS provider exceptions caught and silenced safely.")
 
-    async def test_04_elevenlabs_provider_success_and_fallback(self):
-        """ElevenLabs returns audio when valid, or falls back to Edge-TTS on error/missing key."""
+    async def test_04_elevenlabs_requires_one_time_authorization_and_configured_key(self):
+        """Paid ElevenLabs calls require one-use authorization; missing keys fail closed."""
         mock_audio = b"ELEVEN_MOCK_AUDIO"
 
         # 1. Success case
@@ -121,20 +138,31 @@ class Phase5ATTSTest(AioHTTPTestCase):
         mock_post_ctx.__aenter__ = AsyncMock(return_value=mock_resp)
         mock_post_ctx.__aexit__ = AsyncMock()
 
-        with patch("aiohttp.ClientSession.post", return_value=mock_post_ctx):
+        with patch("aiohttp.ClientSession.post", return_value=mock_post_ctx) as mock_post, \
+             patch("jarvis_server._generate_edge_tts", AsyncMock(return_value=None)) as mock_edge:
             cfg = {"tts_engine": "elevenlabs", "elevenlabs_api_key": "el_key_123"}
-            b64 = await jarvis_server.generate_tts("Eleven test", cfg)
+            unauthorized = await jarvis_server.generate_tts("Eleven test", cfg)
+            self.assertIsNone(unauthorized)
+            mock_post.assert_not_called()
+
+            token = jarvis_server.create_paid_tts_authorization("elevenlabs")
+            b64 = await jarvis_server.generate_tts("Eleven test", cfg, paid_auth_token=token)
             self.assertEqual(base64.b64decode(b64), mock_audio)
+            mock_post.assert_called_once()
 
-        # 2. Missing key falls back to Edge-TTS
-        async def mock_edge_stream(self_comm):
-            yield {"type": "audio", "data": b"EDGE_FALLBACK"}
+            replay = await jarvis_server.generate_tts("Eleven replay", cfg, paid_auth_token=token)
+            self.assertIsNone(replay)
+            mock_post.assert_called_once()
+            mock_edge.assert_awaited()
 
-        with patch("edge_tts.Communicate.stream", mock_edge_stream):
+        # 2. An unavailable paid provider is reported; it is not silently replaced.
+        with patch("jarvis_server._generate_edge_tts", AsyncMock()) as mock_edge:
             cfg_no_key = {"tts_engine": "elevenlabs", "elevenlabs_api_key": ""}
-            b64_fb = await jarvis_server.generate_tts("Fallback test", cfg_no_key)
-            self.assertEqual(base64.b64decode(b64_fb), b"EDGE_FALLBACK")
-        print("  [Phase 5A Test 4 PASSED] ElevenLabs provider success and automatic Edge-TTS fallback.")
+            audio, status = await jarvis_server.generate_tts("Fallback test", cfg_no_key, return_status=True)
+            self.assertIsNone(audio)
+            self.assertEqual(status.get("error_code"), "TTS_PROVIDER_NOT_CONFIGURED")
+            mock_edge.assert_not_awaited()
+        print("  [Phase 5A Test 4 PASSED] ElevenLabs one-time authorization and fail-closed configuration verified.")
 
     async def test_05_openai_tts_provider_success_and_fallback(self):
         """OpenAI TTS returns audio when valid, or falls back to Edge-TTS on failure."""
@@ -150,7 +178,8 @@ class Phase5ATTSTest(AioHTTPTestCase):
 
         with patch("aiohttp.ClientSession.post", return_value=mock_post_ctx):
             cfg = {"tts_engine": "openai", "openai_api_key": "sk-mock-key"}
-            b64 = await jarvis_server.generate_tts("OpenAI test", cfg)
+            token = jarvis_server.create_paid_tts_authorization("openai")
+            b64 = await jarvis_server.generate_tts("OpenAI test", cfg, paid_auth_token=token)
             self.assertEqual(base64.b64decode(b64), mock_audio)
         print("  [Phase 5A Test 5 PASSED] OpenAI TTS provider success and contract verified.")
 
@@ -165,9 +194,8 @@ class Phase5ATTSTest(AioHTTPTestCase):
 
     async def test_07_oversized_input_clamping(self):
         """Oversized inputs are cleanly clamped to MAX_TTS_TEXT_LENGTH before provider dispatch."""
-        import edge_tts
         recorded_text = []
-        original_init = edge_tts.Communicate.__init__
+        original_init = _FakeEdgeCommunicate.__init__
 
         def mock_init(self_comm, text, *args, **kwargs):
             recorded_text.append(text)
@@ -176,8 +204,9 @@ class Phase5ATTSTest(AioHTTPTestCase):
         async def capture_stream(self_comm):
             yield {"type": "audio", "data": b"mock"}
 
-        with patch.object(edge_tts.Communicate, "__init__", mock_init), \
-             patch("edge_tts.Communicate.stream", capture_stream):
+        with patch.dict(sys.modules, {"edge_tts": _FAKE_EDGE_TTS}), \
+             patch.object(_FakeEdgeCommunicate, "__init__", mock_init), \
+             patch.object(_FakeEdgeCommunicate, "stream", capture_stream):
             huge_text = ("Bu bir uzun metin testidir. " * 150)  # ~3900 chars
             self.assertGreater(len(huge_text), jarvis_server.MAX_TTS_TEXT_LENGTH)
             await jarvis_server.generate_tts(huge_text, {"tts_engine": "edge_tts"})
@@ -242,7 +271,10 @@ class Phase5ATTSTest(AioHTTPTestCase):
 
         with patch("aiohttp.ClientSession.post", return_value=mock_post_ctx), \
              patch("jarvis_server.generate_tts", AsyncMock(return_value=None)):
-            resp = await self.client.post("/api/chat", json={"message": "Selam"})
+            resp = await self.client.post("/api/chat", json={
+                "message": "Selam",
+                "config": {"model": "llama-3.1-8b-instant"}
+            })
             self.assertEqual(resp.status, 200)
             data = await resp.json()
             self.assertEqual(data.get("reply"), "Bu metin kesinlikle korunmalıdır.")
@@ -266,7 +298,10 @@ class Phase5ATTSTest(AioHTTPTestCase):
 
         with patch("aiohttp.ClientSession.post", return_value=mock_post_ctx), \
              patch("jarvis_server.generate_tts", AsyncMock(return_value=None)):
-            resp = await self.client.post("/api/chat/stream", json={"message": "SSE TTS Test"})
+            resp = await self.client.post("/api/chat/stream", json={
+                "message": "SSE TTS Test",
+                "config": {"model": "llama-3.1-8b-instant"}
+            })
             self.assertEqual(resp.status, 200)
             text = await resp.text()
 
@@ -343,9 +378,15 @@ class Phase5ATTSTest(AioHTTPTestCase):
         """Direct TTS endpoint (/api/tts_direct) does not truncate inputs between 1501 and 3000 chars."""
         captured_text = []
 
-        async def capture_gen(text, cfg, max_len=jarvis_server.MAX_TTS_TEXT_LENGTH):
+        async def capture_gen(
+            text,
+            cfg,
+            max_len=jarvis_server.MAX_TTS_TEXT_LENGTH,
+            paid_auth_token=None,
+            return_status=False,
+        ):
             captured_text.append((text, max_len))
-            return "mock_direct_audio"
+            return ("mock_direct_audio", None) if return_status else "mock_direct_audio"
 
         direct_text = ("Bu doğrudan bir tts metnidir. " * 80).strip()  # ~2400 chars
         self.assertGreater(len(direct_text), jarvis_server.MAX_TTS_TEXT_LENGTH)

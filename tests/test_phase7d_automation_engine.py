@@ -260,7 +260,14 @@ class Phase7DAutomationEngineTest(unittest.IsolatedAsyncioTestCase):
         orig_data = {"schema_version": "4.0", "revision": 1, "automations": [{"id": "a1", "name": "Initial"}]}
         jarvis_server.save_automations_data(orig_data)
 
-        with patch("os.replace", side_effect=OSError("Simulated disk full")):
+        real_replace = os.replace
+
+        def fail_primary_replace(src, dst):
+            if os.path.abspath(dst) == os.path.abspath(jarvis_server.AUTOMATIONS_FILE):
+                raise OSError("Simulated disk full")
+            return real_replace(src, dst)
+
+        with patch("jarvis_server.os.replace", side_effect=fail_primary_replace):
             with self.assertRaises(OSError):
                 jarvis_server.save_automations_data({"schema_version": "4.0", "revision": 2, "automations": []})
 

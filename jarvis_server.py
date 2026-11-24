@@ -7617,7 +7617,7 @@ async def execute_automation_action(action: dict, current_time=None) -> dict:
 
             if task_name in ("akakce_price_validator", "hardware_price_check"):
                 try:
-                    import akakce_price_validator
+                    from scripts import akakce_price_validator
                     url = params.get("url")
                     if url:
                         res = await run_in_worker_thread(

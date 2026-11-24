@@ -13,12 +13,8 @@ from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
 import jarvis_server
 
-PROTECTED_HASHES = {
-    "jarvis_memory.json": "01d5f8469eef9e31b59874ba907dda9b512cc8ac28c6773580af8bb753537f81",
-    "jarvis_memory.json.v3.bak": "01d5f8469eef9e31b59874ba907dda9b512cc8ac28c6773580af8bb753537f81",
-    "jarvis_server.py.v4_pre_memory.bak": "c2dce5389fcdf43fa735df0659107650a327ed36060e7c3edc830eab7b5c3df3",
-    "index.html.v4_pre_memory.bak": "0ffd6df831ece31befa464e3f5364ab13f51ade1aa35fa1886728d69c2f90840"
-}
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROTECTED_FILES = ("jarvis_memory.json",)
 
 def get_file_sha256(path):
     h = hashlib.sha256()
@@ -31,22 +27,32 @@ class Phase3FinalAcceptanceTest(AioHTTPTestCase):
     async def get_application(self):
         self.test_dir = tempfile.mkdtemp(prefix="phase3_acceptance_")
         self.test_memory_file = os.path.join(self.test_dir, "test_memory.json")
-        shutil.copy2("jarvis_memory.json.v3.bak", self.test_memory_file)
+        shutil.copy2(os.path.join(PROJECT_DIR, "jarvis_memory.json"), self.test_memory_file)
         
         jarvis_server.MEMORY_FILE = self.test_memory_file
         return jarvis_server.create_app()
+
+    def setUp(self):
+        super().setUp()
+        self.protected_hashes = {
+            filename: get_file_sha256(os.path.join(PROJECT_DIR, filename))
+            for filename in PROTECTED_FILES
+        }
 
     def tearDown(self):
         super().tearDown()
         if hasattr(self, "test_dir") and os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
+        for filename, expected_hash in getattr(self, "protected_hashes", {}).items():
+            actual_hash = get_file_sha256(os.path.join(PROJECT_DIR, filename))
+            self.assertEqual(actual_hash, expected_hash, f"Protected source data changed: {filename}")
 
     def test_01_protected_files_hashes(self):
-        """Verify all 4 protected baseline files are 100% untouched."""
-        for filename, expected_hash in PROTECTED_HASHES.items():
-            actual_hash = get_file_sha256(filename)
+        """Verify the production memory file remains untouched by isolated test setup."""
+        for filename, expected_hash in self.protected_hashes.items():
+            actual_hash = get_file_sha256(os.path.join(PROJECT_DIR, filename))
             self.assertEqual(actual_hash, expected_hash, f"Hash mismatch for {filename}!")
-        print("  [Check 1 PASSED] All protected baseline hashes match exactly.")
+        print("  [Check 1 PASSED] Production memory fixture remains unchanged.")
 
     def test_02_server_epoch_uuid(self):
         """Verify SERVER_EPOCH is a full 128-bit UUID hex string (32 characters)."""

@@ -87,6 +87,10 @@ class TestPhase5CAudio(unittest.TestCase):
         let coreState = 'IDLE';
         let currentAudioGeneration = 0;
         let audioSource = null;
+        const calmVoice = { checked: false };
+        const assistantVolume = { value: '100' };
+        global.window = { isSpeaking: false, dispatchEvent: () => {} };
+        global.CustomEvent = function CustomEvent(type) { this.type = type; };
         let audioCtx = {
           state: 'running',
           destination: {},
@@ -181,6 +185,10 @@ class TestPhase5CAudio(unittest.TestCase):
         let coreState = 'IDLE';
         let currentAudioGeneration = 0;
         let audioSource = null;
+        const calmVoice = { checked: false };
+        const assistantVolume = { value: '100' };
+        global.window = { isSpeaking: false, dispatchEvent: () => {} };
+        global.CustomEvent = function CustomEvent(type) { this.type = type; };
         let stoppedCount = 0;
         let disconnectedCount = 0;
 
@@ -188,6 +196,7 @@ class TestPhase5CAudio(unittest.TestCase):
           state: 'running',
           destination: {},
           createAnalyser: () => ({ connect: () => {}, fftSize: 128 }),
+          createGain: () => ({ connect: () => {}, gain: { value: 0 } }),
           decodeAudioData: (buffer, success) => success({ duration: 1.0 }),
           createBufferSource: () => ({
             buffer: null,
@@ -327,6 +336,8 @@ class TestPhase5CAudio(unittest.TestCase):
         let aborted = false;
         let stopped = false;
         let playSoundType = null;
+        let fallbackVoiceAudio = null;
+        global.window = {};
 
         let activeChatAbortController = {
           abort: () => { aborted = true; }
@@ -407,11 +418,14 @@ class TestPhase5CAudio(unittest.TestCase):
         print("  [Phase 5C Test 12 PASSED] Expected AbortError preserves partial text without fallback.")
 
     def test_13_sse_normal_completion_contract(self):
-        """Verify SSE stream handles agent, token, done events and passes generation ID to playAudioBase64."""
+        """Verify SSE stream handles normal events and guards synthesized audio by generation."""
         self.assertIn("eventType === 'agent'", self.script_code)
         self.assertIn("eventType === 'token'", self.script_code)
         self.assertIn("eventType === 'done'", self.script_code)
-        self.assertIn("playAudioBase64(dataObj.audio_base64, thisAudioGen)", self.script_code)
+        self.assertIn("await synthesizeVoiceReply(fullReply)", self.script_code)
+        self.assertIn("speakTextWithFallback(text, message =>", self.script_code)
+        self.assertIn("playChatAudio", self.script_code)
+        self.assertIn("if (generation !== currentAudioGeneration) return;", self.script_code)
         print("  [Phase 5C Test 13 PASSED] SSE normal completion contract verified.")
 
     def test_14_sse_stream_interruption_cancels_reader(self):
@@ -421,10 +435,16 @@ class TestPhase5CAudio(unittest.TestCase):
         print("  [Phase 5C Test 14 PASSED] Stale SSE stream reader cancelled on newer request.")
 
     def test_15_network_failure_fallback_respects_abort_signal(self):
-        """Verify /api/chat fallback request attaches controller.signal and checks request ID."""
-        fallback_match = re.search(r"fetch\(['\"]/api/chat['\"],\s*\{([\s\S]*?)\}\);", self.script_code)
-        self.assertIsNotNone(fallback_match, "Fallback fetch definition not found")
-        self.assertIn("signal: controller.signal", fallback_match.group(1))
+        """Verify the /api/chat fallback wrapper forwards its abort signal and checks request ID."""
+        self.assertIn(
+            "requestChatWithPaidApproval('/api/chat', chatRequestPayload, controller.signal)",
+            self.script_code,
+        )
+        helper_start = self.script_code.index("async function requestChatWithPaidApproval")
+        helper_end = self.script_code.index("// Seslendirme", helper_start)
+        helper = self.script_code[helper_start:helper_end]
+        self.assertIn("fetch(endpoint", helper)
+        self.assertIn("signal", helper)
         self.assertIn("thisRequestId !== currentChatRequestId", self.script_code)
         print("  [Phase 5C Test 15 PASSED] Fallback /api/chat respects abort signal and request ownership.")
 

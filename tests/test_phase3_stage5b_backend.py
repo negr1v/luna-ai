@@ -13,6 +13,8 @@ from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
 import jarvis_server
 
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 class Phase3Stage5BBackendTest(AioHTTPTestCase):
     async def get_application(self):
         self.test_dir = tempfile.mkdtemp(prefix="stage5b_backend_test_")
@@ -20,17 +22,27 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         self.test_candidates_file = os.path.join(self.test_dir, "test_candidates.json")
         self.test_journal_file = os.path.join(self.test_dir, "test_journal.json")
 
-        shutil.copy2("jarvis_memory.json.v3.bak", self.test_memory_file)
+        shutil.copy2(os.path.join(PROJECT_DIR, "jarvis_memory.json"), self.test_memory_file)
 
         jarvis_server.MEMORY_FILE = self.test_memory_file
         jarvis_server.CANDIDATES_FILE = self.test_candidates_file
         jarvis_server.JOURNAL_FILE = self.test_journal_file
         jarvis_server.RECOVERY_REQUIRED_STATE = False
+        self.p_config = patch(
+            "jarvis_server.load_config",
+            side_effect=lambda: {
+                **jarvis_server.DEFAULT_CONFIG,
+                "active_model": "nvidia/nemotron-3.5-lightning:free",
+            },
+        )
+        self.p_config.start()
 
         return jarvis_server.create_app()
 
     def tearDown(self):
         super().tearDown()
+        if hasattr(self, "p_config"):
+            self.p_config.stop()
         if hasattr(self, "test_dir") and os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
 
@@ -45,7 +57,9 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         """Explicit remember command creates candidate with ZERO Groq API calls for memory extraction."""
         with patch("jarvis_server.run_groq_structured_extraction") as mock_groq_extract:
             resp = await self.client.post("/api/chat", json={
-                "message": "Bunu unutma: Gelecekte AMD AM5 platformunu tercih edeceğim"
+                "message": "Bunu unutma: Gelecekte AMD AM5 platformunu tercih edeceğim",
+                "voice_mode": False,
+                "voice_reply": False,
             })
             self.assertEqual(resp.status, 200)
             mock_groq_extract.assert_not_called()
@@ -67,7 +81,9 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         count_before = len(cdata_before.get("candidates", []))
 
         resp = await self.client.post("/api/chat", json={
-            "message": "bunu unutma"
+            "message": "bunu unutma",
+            "voice_mode": False,
+            "voice_reply": False,
         })
         self.assertEqual(resp.status, 200)
 
@@ -82,7 +98,9 @@ class Phase3Stage5BBackendTest(AioHTTPTestCase):
         """When memory_learning_enabled is False, normal chat triggers zero extraction requests."""
         self.assertEqual(jarvis_server.MEMORY_EXTRACTION_QUEUE.qsize(), 0)
         resp = await self.client.post("/api/chat", json={
-            "message": "Normal bir sohbet mesajı gönderiyorum."
+            "message": "Normal bir sohbet mesajı gönderiyorum.",
+            "voice_mode": False,
+            "voice_reply": False,
         })
         self.assertEqual(resp.status, 200)
         self.assertEqual(jarvis_server.MEMORY_EXTRACTION_QUEUE.qsize(), 0)

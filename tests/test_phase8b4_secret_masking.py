@@ -7,6 +7,7 @@ import unittest
 import json
 import os
 import sys
+import base64
 import tempfile
 import shutil
 from unittest.mock import patch, AsyncMock
@@ -15,6 +16,30 @@ from aiohttp import web
 from aiohttp.test_utils import AioHTTPTestCase
 
 import jarvis_server
+
+
+_TEST_SECRET_PREFIX = "test-only:v1:"
+_REAL_IS_PROTECTED_SECRET = jarvis_server.is_protected_secret
+_REAL_UNPROTECT_SECRET = jarvis_server.unprotect_secret
+
+
+def _test_is_protected_secret(value):
+    return (
+        isinstance(value, str) and value.startswith(_TEST_SECRET_PREFIX)
+    ) or _REAL_IS_PROTECTED_SECRET(value)
+
+
+def _test_protect_secret(value):
+    if not value or _test_is_protected_secret(value):
+        return value
+    return _TEST_SECRET_PREFIX + base64.b64encode(value.encode("utf-8")).decode("ascii")
+
+
+def _test_unprotect_secret(value):
+    if isinstance(value, str) and value.startswith(_TEST_SECRET_PREFIX):
+        encoded = value[len(_TEST_SECRET_PREFIX):]
+        return base64.b64decode(encoded, validate=True).decode("utf-8")
+    return _REAL_UNPROTECT_SECRET(value)
 
 
 class Phase8B4SecretMaskingTest(AioHTTPTestCase):
@@ -59,11 +84,21 @@ class Phase8B4SecretMaskingTest(AioHTTPTestCase):
         jarvis_server.TASKS_FILE = self.test_tasks_file
         jarvis_server.TELEGRAM_FILE = self.test_tg_file
 
+        self.secret_storage_patches = [
+            patch("jarvis_server.protect_secret", _test_protect_secret),
+            patch("jarvis_server.unprotect_secret", _test_unprotect_secret),
+            patch("jarvis_server.is_protected_secret", _test_is_protected_secret),
+        ]
+        for secret_storage_patch in self.secret_storage_patches:
+            secret_storage_patch.start()
+
     def tearDown(self):
         jarvis_server.CONFIG_FILE = self.orig_cfg_file
         jarvis_server.MEMORY_FILE = self.orig_mem_file
         jarvis_server.TASKS_FILE = self.orig_tasks_file
         jarvis_server.TELEGRAM_FILE = self.orig_tg_file
+        for secret_storage_patch in self.secret_storage_patches:
+            secret_storage_patch.stop()
 
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir, ignore_errors=True)
@@ -185,6 +220,8 @@ class Phase8B4SecretMaskingTest(AioHTTPTestCase):
 
         groq_raw = saved_cfg.get("groq_api_key")
         tg_raw = saved_cfg.get("telegram_bot_token")
+        self.assertTrue(groq_raw.startswith(_TEST_SECRET_PREFIX))
+        self.assertNotIn("gsk_prod_secret_key_1234567890", json.dumps(saved_cfg))
         groq_val = jarvis_server.unprotect_secret(groq_raw) if hasattr(jarvis_server, "unprotect_secret") else groq_raw
         tg_val = jarvis_server.unprotect_secret(tg_raw) if hasattr(jarvis_server, "unprotect_secret") else tg_raw
         self.assertEqual(groq_val, "gsk_prod_secret_key_1234567890")

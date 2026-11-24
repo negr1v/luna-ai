@@ -15,6 +15,7 @@ import tempfile
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX_PATH = os.path.join(PROJECT_DIR, "index.html")
+TELEMETRY_PATH = os.path.join(PROJECT_DIR, "static", "js", "telemetry.js")
 
 
 def get_node_executable() -> str:
@@ -378,18 +379,29 @@ runTest().then(result => {{
 
 class TestPhase9B4CTimerDiscipline(unittest.TestCase):
     """
-    Static and architectural inspection of timers and intervals in index.html.
-    Verifies no new or stray intervals were introduced.
+    Static inspection of telemetry ownership across index.html and the external module,
+    plus Telegram polling visibility behavior.
     """
 
     def setUp(self):
         with open(INDEX_PATH, "r", encoding="utf-8") as f:
             self.html = f.read()
+        with open(TELEMETRY_PATH, "r", encoding="utf-8") as f:
+            self.telemetry_js = f.read()
 
-    def test_04_timer_count_and_intervals_verified(self):
-        """4. Verify only existing expected setInterval instances exist, with no duplicate production timers."""
-        intervals = [line.strip() for line in self.html.splitlines() if "setInterval(" in line]
-        self.assertEqual(len(intervals), 5, f"Expected exactly 5 permanent intervals, found {len(intervals)}")
+    def test_04_telemetry_has_single_polling_owner(self):
+        """4. Verify telemetry has a single startup owner and Telegram pauses when hidden."""
+        inline_auto_start = "\n  startTelemetryPolling();\n" in self.html
+        module_auto_start = (
+            "document.addEventListener('DOMContentLoaded', startTelemetryPolling);" in self.telemetry_js
+            and "startTelemetryPolling();" in self.telemetry_js
+        )
+        polling_owners = int(inline_auto_start) + int(module_auto_start)
+        self.assertEqual(
+            polling_owners,
+            1,
+            f"Telemetry should have exactly one startup owner; found {polling_owners}",
+        )
 
         # Verify telegram feed interval around line 4664 preserves document.hidden check
         tg_interval_block = self.html[self.html.find("loadTelegramFeed();", 4600):self.html.find("</script>", 4600)]
